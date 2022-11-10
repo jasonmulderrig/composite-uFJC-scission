@@ -125,11 +125,13 @@ class TotalSegmentPotentialEnergyFunctionCharacterizer(CompositeuFJCScissionChar
                 continue
             else:
                 plt.plot(lmbda_nu_locmax_hat, u_nu_tot_locmax_hat, marker='s', color=cp.color_list[lmbda_nu_hat_indx], alpha=1, linewidth=2.5)
-        plt.legend(loc='best')
+        plt.legend(loc='best', fontsize=12)
         plt.xlim([lmbda_nu[0], lmbda_nu[-1]])
+        plt.xticks(fontsize=16)
         plt.ylim([-500, 4])
+        plt.yticks(fontsize=16)
         plt.grid(True, alpha=0.25)
-        save_current_figure(self.savedir, r'$\lambda_{\nu}$', 30, r'$\hat{u}_{\nu}^{tot}$', 30, "u_nu_tot_hat-vs-lmbda_nu")
+        save_current_figure(self.savedir, r'$\lambda_{\nu}$', 20, r'$\hat{u}_{\nu}^{tot}$', 20, "u_nu_tot_hat-vs-lmbda_nu")
 
         fig = plt.figure()
         for lmbda_nu_hat_indx in range(cp.lmbda_nu_hat_num):
@@ -145,11 +147,13 @@ class TotalSegmentPotentialEnergyFunctionCharacterizer(CompositeuFJCScissionChar
                 continue
             else:
                 plt.plot(lmbda_nu_locmax_hat, overline_u_nu_tot_locmax_hat, marker='s', color=cp.color_list[lmbda_nu_hat_indx], alpha=1, linewidth=2.5)
-        plt.legend(loc='best')
+        plt.legend(loc='best', fontsize=12)
         plt.xlim([lmbda_nu[0], lmbda_nu[-1]])
+        plt.xticks(fontsize=16)
         plt.ylim([-5, 0.05])
+        plt.yticks(fontsize=16)
         plt.grid(True, alpha=0.25)
-        save_current_figure(self.savedir, r'$\lambda_{\nu}$', 30, r'$\overline{\hat{u}}_{\nu}^{tot}$', 30, "overline_u_nu_tot_hat-vs-lmbda_nu")
+        save_current_figure(self.savedir, r'$\lambda_{\nu}$', 20, r'$\overline{\hat{u}}_{\nu}^{tot}$', 20, "overline_u_nu_tot_hat-vs-lmbda_nu")
 
 if __name__ == '__main__':
 

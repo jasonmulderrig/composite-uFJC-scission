@@ -26,7 +26,7 @@ class ChainHelmholtzFreeEnergyMinimizationMethodComparisonCharacterizer(Composit
         p.characterizer.color_list = ['orange', 'blue', 'green', 'red', 'purple']
     
     def prefix(self):
-        return "chain_Helmholtz_free_energy_minimization_method_comparison"
+        return "chain_helmholtz_free_energy_minimization_method_comparison"
     
     def characterization(self):
 
@@ -206,10 +206,11 @@ class ChainHelmholtzFreeEnergyMinimizationMethodComparisonCharacterizer(Composit
             plt.plot(lmbda_c_eq, lmbda_nu, linestyle='-', color=cp.color_list[single_chain_indx], alpha=1, linewidth=2.5, label=cp.psi_minimization_zeta_nu_char_label_single_chain_list[single_chain_indx])
             plt.plot(lmbda_c_eq, lmbda_nu_psimin, linestyle='-.', color=cp.color_list[single_chain_indx], alpha=1, linewidth=2.5)
 
-        plt.legend(loc='best')
+        plt.legend(loc='best', fontsize=15)
         plt.xlim([-0.05, lmbda_c_eq_max + 0.1])
+        plt.xticks(fontsize=20)
         plt.ylim([0.95, lmbda_nu_max + 0.1])
-        plt.legend(loc='best')
+        plt.yticks(fontsize=20)
         plt.grid(True, alpha=0.25)
         save_current_figure(self.savedir, r'$\lambda_c^{eq}$', 30, r'$\lambda_{\nu}$', 30, "zeta_nu_char-lmbda_nu-vs-lmbda_c_eq-method-comparison")
         
@@ -228,13 +229,16 @@ class ChainHelmholtzFreeEnergyMinimizationMethodComparisonCharacterizer(Composit
             
             ax2.semilogy(lmbda_c_eq__lmbda_c_eq_crit, lmbda_nu_mthderr, linestyle='-', color=cp.color_list[single_chain_indx], alpha=1, linewidth=2.5, label=cp.psi_minimization_zeta_nu_char_label_single_chain_list[single_chain_indx])
         
-        ax1.legend(loc='best')
+        ax1.legend(loc='best', fontsize=15)
         ax1.set_ylim([0.95, lmbda_nu_max + 0.1])
-        ax1.set_ylabel(r'$\lambda_{\nu}$', fontsize=20)
+        ax1.tick_params(axis='y', labelsize=20)
+        ax1.set_ylabel(r'$\lambda_{\nu}$', fontsize=30)
         ax1.grid(True, alpha=0.25)
-        ax2.set_ylabel(r'$\%~\textrm{error}$', fontsize=20)
+        ax2.tick_params(axis='y', labelsize=20)
+        ax2.set_ylabel(r'$\%~\textrm{error}$', fontsize=30)
         ax2.grid(True, alpha=0.25)
         plt.xlim([-0.05, cp.zeta_nu_char_lmbda_c_eq_crit_factor + 0.05])
+        plt.xticks(fontsize=20)
         plt.xlabel(r'$\lambda_c^{eq}/(\lambda_c^{eq})^{crit}$', fontsize=30)
         save_current_figure_no_labels(self.savedir, "zeta_nu_char-lmbda_nu-vs-lmbda_c_eq__lmbda_c_eq_crit-method-comparison")
 
@@ -263,10 +267,11 @@ class ChainHelmholtzFreeEnergyMinimizationMethodComparisonCharacterizer(Composit
             plt.plot(lmbda_c_eq, lmbda_nu, linestyle='-', color=cp.color_list[single_chain_indx], alpha=1, linewidth=2.5, label=cp.psi_minimization_kappa_nu_label_single_chain_list[single_chain_indx])
             plt.plot(lmbda_c_eq, lmbda_nu_psimin, linestyle='-.', color=cp.color_list[single_chain_indx], alpha=1, linewidth=2.5)
 
-        plt.legend(loc='best')
+        plt.legend(loc='best', fontsize=15)
         plt.xlim([-0.05, lmbda_c_eq_max + 0.1])
+        plt.xticks(fontsize=20)
         plt.ylim([0.95, lmbda_nu_max + 0.1])
-        plt.legend(loc='best')
+        plt.yticks(fontsize=20)
         plt.grid(True, alpha=0.25)
         save_current_figure(self.savedir, r'$\lambda_c^{eq}$', 30, r'$\lambda_{\nu}$', 30, "kappa_nu-lmbda_nu-vs-lmbda_c_eq-method-comparison")
         
@@ -285,13 +290,16 @@ class ChainHelmholtzFreeEnergyMinimizationMethodComparisonCharacterizer(Composit
             
             ax2.semilogy(lmbda_c_eq__lmbda_c_eq_crit, lmbda_nu_mthderr, linestyle='-', color=cp.color_list[single_chain_indx], alpha=1, linewidth=2.5, label=cp.psi_minimization_kappa_nu_label_single_chain_list[single_chain_indx])
         
-        ax1.legend(loc='best')
+        ax1.legend(loc='best', fontsize=15)
         ax1.set_ylim([0.95, lmbda_nu_max + 0.1])
-        ax1.set_ylabel(r'$\lambda_{\nu}$', fontsize=20)
+        ax1.tick_params(axis='y', labelsize=20)
+        ax1.set_ylabel(r'$\lambda_{\nu}$', fontsize=30)
         ax1.grid(True, alpha=0.25)
-        ax2.set_ylabel(r'$\%~\textrm{error}$', fontsize=20)
+        ax2.tick_params(axis='y', labelsize=20)
+        ax2.set_ylabel(r'$\%~\textrm{error}$', fontsize=30)
         ax2.grid(True, alpha=0.25)
         plt.xlim([-0.05, cp.kappa_nu_lmbda_c_eq_crit_factor + 0.05])
+        plt.xticks(fontsize=20)
         plt.xlabel(r'$\lambda_c^{eq}/(\lambda_c^{eq})^{crit}$', fontsize=30)
         save_current_figure_no_labels(self.savedir, "kappa_nu-lmbda_nu-vs-lmbda_c_eq__lmbda_c_eq_crit-method-comparison")
 

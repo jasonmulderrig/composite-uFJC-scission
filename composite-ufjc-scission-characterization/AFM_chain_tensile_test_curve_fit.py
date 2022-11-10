@@ -523,9 +523,9 @@ class AFMChainTensileTestCurveFitCharacterizer(CompositeuFJCScissionCharacterize
         chain_backbone_bond_type = cp.polymer_type_label2chain_backbone_bond_type_dict[polymer_type]
         self.data_file_prefix    = self.paper_authors+'-'+polymer_type+'-'+chain_backbone_bond_type+'-'+self.chain
 
-        f_c_max     = cp.chain_backbone_bond_type2f_c_max_dict[chain_backbone_bond_type]
+        f_c_max     = cp.chain_backbone_bond_type2f_c_max_dict[chain_backbone_bond_type] # nN
         zeta_b_char = cp.chain_backbone_bond_type2zeta_b_char_dict[chain_backbone_bond_type]
-        l_b_eq      = cp.chain_backbone_bond_type2l_b_eq_dict[chain_backbone_bond_type]
+        l_b_eq      = cp.chain_backbone_bond_type2l_b_eq_dict[chain_backbone_bond_type] # nm
 
         # Curve fit single chain AFM tensile test results
         r_nu, f_c = chain_data_file_load_func(self.data_file_prefix, cp.chain_data_directory) # nm, nN respectively
@@ -766,35 +766,43 @@ class AFMChainTensileTestCurveFitCharacterizer(CompositeuFJCScissionCharacterize
         fig = plt.figure()
         plt.scatter(self.r_nu, self.f_c, color='blue', marker='o', alpha=1, linewidth=2.5, label=cp.paper_authors2polymer_type_label_dict[self.paper_authors])
         plt.plot(self.r_nu_fit, self.f_c_fit, linestyle='--', color='red', alpha=1, linewidth=2.5, label=r'$u\textrm{FJC model fit}$')
-        plt.legend(loc='best')
+        plt.legend(loc='best', fontsize=18)
         plt.grid(True, alpha=0.25)
         plt.xlim(cp.paper_authors_chain2xlim_chain_mechanical_response_plot[self.paper_authors][self.chain])
+        plt.xticks(fontsize=20)
         plt.ylim(cp.paper_authors_chain2ylim_chain_mechanical_response_plot[self.paper_authors][self.chain])
+        plt.yticks(fontsize=20)
         save_current_figure(self.savedir, r'$r_{\nu}~(nm)$', 30, r'$f_c~(nN)$', 30, self.data_file_prefix+"-f_c-vs-r_nu-composite-uFJC-curve-fit")
 
         fig = plt.figure()
         plt.scatter(self.r_nu, self.f_c, color='blue', marker='o', alpha=1, linewidth=2.5, label=cp.paper_authors2polymer_type_label_dict[self.paper_authors])
         plt.plot(self.r_nu_fit_intgr_nu, self.f_c_fit_intgr_nu, linestyle='--', color='red', alpha=1, linewidth=2.5, label=r'$u\textrm{FJC model fit}$')
-        plt.legend(loc='best')
+        plt.legend(loc='best', fontsize=18)
         plt.grid(True, alpha=0.25)
         plt.xlim(cp.paper_authors_chain2xlim_chain_mechanical_response_plot[self.paper_authors][self.chain])
+        plt.xticks(fontsize=20)
         plt.ylim(cp.paper_authors_chain2ylim_chain_mechanical_response_plot[self.paper_authors][self.chain])
+        plt.yticks(fontsize=20)
         save_current_figure(self.savedir, r'$r_{\nu}~(nm)$', 30, r'$f_c~(nN)$', 30, self.data_file_prefix+"-intgr_nu-f_c-vs-r_nu-composite-uFJC-curve-fit")
         
         fig = plt.figure()
         plt.scatter(self.lmbda_c_eq, self.xi_c, color='blue', marker='o', alpha=1, linewidth=2.5, label=cp.paper_authors2polymer_type_label_dict[self.paper_authors])
         plt.plot(self.lmbda_c_eq_fit, self.xi_c_fit, linestyle='--', color='red', alpha=1, linewidth=2.5, label=r'$u\textrm{FJC model fit}$')
-        plt.legend(loc='best')
+        plt.legend(loc='best', fontsize=18)
         plt.grid(True, alpha=0.25)
         plt.xlim([0, 1.15])
+        plt.xticks(fontsize=20)
+        plt.yticks(fontsize=20)
         save_current_figure(self.savedir, r'$\lambda_c^{eq}$', 30, r'$\xi_{c}$', 30, self.data_file_prefix+"-xi_c-vs-lmbda_c_eq-composite-uFJC-curve-fit")
         
         fig = plt.figure()
         plt.scatter(self.lmbda_c_eq_intgr_nu, self.xi_c_intgr_nu, color='blue', marker='o', alpha=1, linewidth=2.5, label=cp.paper_authors2polymer_type_label_dict[self.paper_authors])
         plt.plot(self.lmbda_c_eq_fit_intgr_nu, self.xi_c_fit_intgr_nu, linestyle='--', color='red', alpha=1, linewidth=2.5, label=r'$u\textrm{FJC model fit}$')
-        plt.legend(loc='best')
+        plt.legend(loc='best', fontsize=18)
         plt.grid(True, alpha=0.25)
         plt.xlim([0, 1.15])
+        plt.xticks(fontsize=20)
+        plt.yticks(fontsize=20)
         save_current_figure(self.savedir, r'$\lambda_c^{eq}$', 30, r'$\xi_{c}$', 30, self.data_file_prefix+"-intgr_nu-xi_c-vs-lmbda_c_eq-gen-uFJC-curve-fit")
 
         # plot rate-dependent chain results
@@ -807,23 +815,28 @@ class AFMChainTensileTestCurveFitCharacterizer(CompositeuFJCScissionCharacterize
             ax3.semilogx(self.rate_dependent_t_steps___f_c_dot_chunk[f_c_dot_indx], self.rate_dependent_gamma_c___f_c_dot_chunk[f_c_dot_indx], linestyle='-', color=cp.f_c_dot_color_list[f_c_dot_indx], alpha=1, linewidth=2.5)
             ax4.semilogx(self.rate_dependent_t_steps___f_c_dot_chunk[f_c_dot_indx], self.rate_dependent_overline_epsilon_cnu_diss_hat___f_c_dot_chunk[f_c_dot_indx], linestyle='-', color=cp.f_c_dot_color_list[f_c_dot_indx], alpha=1, linewidth=2.5)
         ax1.hlines(y=self.xi_c_max, xmin=0, xmax=t_max, linestyle='--', color='black', alpha=1, linewidth=1)
-        ax1.legend(loc='best')
+        ax1.legend(loc='best', fontsize=12)
+        ax1.tick_params(axis='y', labelsize=16)
         ax1.set_ylabel(r'$\xi_c$', fontsize=20)
         ax1.grid(True, alpha=0.25)
+        ax2.tick_params(axis='y', labelsize=16)
         ax2.set_ylabel(r'$\lambda_{\nu}$', fontsize=20)
         ax2.grid(True, alpha=0.25)
+        ax3.tick_params(axis='y', labelsize=16)
         ax3.set_ylabel(r'$\gamma_c$', fontsize=20)
         ax3.grid(True, alpha=0.25)
+        ax4.tick_params(axis='y', labelsize=16)
         ax4.set_yticks([0.0, 0.25, 0.5])
         ax4.set_ylabel(r'$\overline{\hat{\varepsilon}_{c\nu}^{diss}}$', fontsize=20)
         ax4.grid(True, alpha=0.25)
-        plt.xlabel(r'$t~(sec)$', fontsize=30)
+        plt.xticks(fontsize=16)
+        plt.xlabel(r'$t~(sec)$', fontsize=20)
         save_current_figure_no_labels(self.savedir, self.data_file_prefix+"-rate-dependent-xi_c-lmbda_nu-gamma_c-overline_epsilon_cnu_diss_hat-vs-time")
         
         # plot rate-independent and rate-dependent chain results together
         # plot rate-dependent chain results
         lmbda_c_eq_max = 0
-        fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1, gridspec_kw={'height_ratios': [1.25, 1, 1.5, 1.5]}, sharex=True)
+        fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1, gridspec_kw={'height_ratios': [1.25, 0.75, 2, 1.5]}, sharex=True) # plt.subplots(4, 1, gridspec_kw={'height_ratios': [1.25, 1, 1.5, 1.5]}, sharex=True)
         ax1.scatter(self.lmbda_c_eq_intgr_nu, self.xi_c_intgr_nu, color='red', marker='o', alpha=1, linewidth=1, label=cp.paper_authors2polymer_type_label_dict[self.paper_authors])
         for f_c_dot_indx in range(len(cp.f_c_dot_list)):
             lmbda_c_eq_max = max([lmbda_c_eq_max, self.rate_dependent_lmbda_c_eq___f_c_dot_chunk[f_c_dot_indx][-1]])
@@ -839,25 +852,30 @@ class AFMChainTensileTestCurveFitCharacterizer(CompositeuFJCScissionCharacterize
         ax4.plot(self.rate_independent_lmbda_c_eq, self.rate_independent_overline_epsilon_cnu_sci_hat, linestyle='-', color='black', alpha=1, linewidth=2.5)
         ax4.plot(self.rate_independent_lmbda_c_eq, self.rate_independent_overline_epsilon_cnu_diss_hat, linestyle='-', color='blue', alpha=1, linewidth=2.5)
 
-        ax1.legend(loc='best')
+        ax1.legend(loc='best', fontsize=12)
+        ax1.tick_params(axis='y', labelsize=16)
         ax1.set_ylabel(r'$\xi_c$', fontsize=20)
         ax1.grid(True, alpha=0.25)
+        ax2.tick_params(axis='y', labelsize=16)
         ax2.set_ylabel(r'$\lambda_{\nu}$', fontsize=20)
         ax2.grid(True, alpha=0.25)
-        ax3.legend(loc='best')
+        ax3.legend(loc='best', fontsize=12)
+        ax3.tick_params(axis='y', labelsize=16)
         ax3.set_ylabel(r'$\gamma_c,~\hat{p}_c^{sci}$', fontsize=20)
         ax3.grid(True, alpha=0.25)
         ax4.set_yticks([0.0, 0.25, 0.5])
+        ax4.tick_params(axis='y', labelsize=16)
         ax4.set_ylabel(r'$\overline{\hat{\varepsilon}_{c\nu}^{sci}},~\overline{\hat{\varepsilon}_{c\nu}^{diss}}$', fontsize=20)
         ax4.grid(True, alpha=0.25)
         plt.xlim([-0.05, lmbda_c_eq_max + 0.05])
-        plt.xlabel(r'$\lambda_c^{eq}$', fontsize=30)
+        plt.xticks(fontsize=16)
+        plt.xlabel(r'$\lambda_c^{eq}$', fontsize=20)
         save_current_figure_no_labels(self.savedir, self.data_file_prefix+"-rate-independent-and-rate-dependent-chains-vs-lmbda_c_eq")
 
         # plot rate-independent and rate-dependent chain results together while omitting chain scission energy
         # plot rate-dependent chain results
         lmbda_c_eq_max = 0
-        fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1, gridspec_kw={'height_ratios': [1.25, 1, 1.5, 1.5]}, sharex=True)
+        fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1, gridspec_kw={'height_ratios': [1.25, 0.75, 2, 1.5]}, sharex=True) # plt.subplots(4, 1, gridspec_kw={'height_ratios': [1.25, 1, 1.5, 1.5]}, sharex=True)
         ax1.scatter(self.lmbda_c_eq_intgr_nu, self.xi_c_intgr_nu, color='red', marker='o', alpha=1, linewidth=1, label=cp.paper_authors2polymer_type_label_dict[self.paper_authors])
         for f_c_dot_indx in range(len(cp.f_c_dot_list)):
             lmbda_c_eq_max = max([lmbda_c_eq_max, self.rate_dependent_lmbda_c_eq___f_c_dot_chunk[f_c_dot_indx][-1]])
@@ -872,19 +890,24 @@ class AFMChainTensileTestCurveFitCharacterizer(CompositeuFJCScissionCharacterize
         ax3.plot(self.rate_independent_lmbda_c_eq, self.rate_independent_p_c_sci_hat, linestyle='-', color='blue', alpha=1, linewidth=2.5)
         ax4.plot(self.rate_independent_lmbda_c_eq, self.rate_independent_overline_epsilon_cnu_diss_hat, linestyle='-', color='blue', alpha=1, linewidth=2.5)
 
-        ax1.legend(loc='best')
+        ax1.legend(loc='best', fontsize=12)
+        ax1.tick_params(axis='y', labelsize=16)
         ax1.set_ylabel(r'$\xi_c$', fontsize=20)
         ax1.grid(True, alpha=0.25)
+        ax2.tick_params(axis='y', labelsize=16)
         ax2.set_ylabel(r'$\lambda_{\nu}$', fontsize=20)
         ax2.grid(True, alpha=0.25)
-        ax3.legend(loc='best')
+        ax3.tick_params(axis='y', labelsize=16)
+        ax3.legend(loc='best', fontsize=12)
         ax3.set_ylabel(r'$\gamma_c,~\hat{p}_c^{sci}$', fontsize=20)
         ax3.grid(True, alpha=0.25)
         ax4.set_yticks([0.0, 0.25, 0.5])
+        ax4.tick_params(axis='y', labelsize=16)
         ax4.set_ylabel(r'$\overline{\hat{\varepsilon}_{c\nu}^{sci}},~\overline{\hat{\varepsilon}_{c\nu}^{diss}}$', fontsize=20)
         ax4.grid(True, alpha=0.25)
         plt.xlim([-0.05, lmbda_c_eq_max + 0.05])
-        plt.xlabel(r'$\lambda_c^{eq}$', fontsize=30)
+        plt.xticks(fontsize=16)
+        plt.xlabel(r'$\lambda_c^{eq}$', fontsize=20)
         save_current_figure_no_labels(self.savedir, self.data_file_prefix+"-rate-independent-and-rate-dependent-chains-vs-lmbda_c_eq-no-epsilon_cnu_diss")
 
 
@@ -909,5 +932,9 @@ if __name__ == '__main__':
         AFM_chain_tensile_tests_characterizer_list[AFM_chain_tensile_test_indx].finalization()
     
     # characterizer = AFMChainTensileTestCurveFitCharacterizer(paper_authors = AFM_chain_tensile_test_list[0][0], chain = AFM_chain_tensile_test_list[0][1], T = T)
+    # characterizer.characterization()
+    # characterizer.finalization()
+
+    # characterizer = AFMChainTensileTestCurveFitCharacterizer(paper_authors = AFM_chain_tensile_test_list[9][0], chain = AFM_chain_tensile_test_list[9][1], T = T)
     # characterizer.characterization()
     # characterizer.finalization()

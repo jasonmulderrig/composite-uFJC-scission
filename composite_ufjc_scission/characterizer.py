@@ -1,10 +1,7 @@
 # import necessary libraries
 from __future__ import division
 from .default_parameters import default_parameters
-# from .polydisperse_chain_network import GeneralizeduFJCNetwork
-# from .single_chain import GeneralizeduFJC
 from .utility import generate_savedir
-# import numpy as np
 
 class CompositeuFJCScissionCharacterizer(object):
     

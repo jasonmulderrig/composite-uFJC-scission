@@ -26,7 +26,7 @@ class SegmentHelmholtzFreeEnergyFunctionCharacterizer(CompositeuFJCScissionChara
         p.characterizer.lmbda_c_eq_max = lmbda_c_eq_max
     
     def prefix(self):
-        return "segment_Helmholtz_free_energy_function"
+        return "segment_helmholtz_free_energy_function"
     
     def characterization(self):
 
@@ -76,10 +76,12 @@ class SegmentHelmholtzFreeEnergyFunctionCharacterizer(CompositeuFJCScissionChara
         plt.plot(self.lmbda_c_eq, self.u_nu, linestyle='-.', color='blue', alpha=1, linewidth=2.5, label=r'$u_{\nu}$')
         plt.plot(self.lmbda_c_eq, self.s_cnu, linestyle='-', color='green', alpha=1, linewidth=2.5, label=r'$s_{c\nu}$')
         plt.plot(self.lmbda_c_eq, self.psi_cnu, linestyle='-', color='red', alpha=1, linewidth=2.5, label=r'$\psi_{c\nu}$')
-        plt.legend(loc='best')
+        plt.legend(loc='best', fontsize=12)
         plt.ylim([-110, 10])
+        plt.yticks(fontsize=16)
+        plt.xticks(fontsize=16)
         plt.grid(True, alpha=0.25)
-        save_current_figure(self.savedir, r'$\lambda_c^{eq}$', 30, r'$u_{\nu},~s_{c\nu},~\psi_{c\nu}$', 30, "psi_cnu-vs-lmbda_c_eq")
+        save_current_figure(self.savedir, r'$\lambda_c^{eq}$', 20, r'$u_{\nu},~s_{c\nu},~\psi_{c\nu}$', 20, "psi_cnu-vs-lmbda_c_eq")
 
 if __name__ == '__main__':
 

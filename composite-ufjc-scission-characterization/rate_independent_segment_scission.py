@@ -87,17 +87,20 @@ class RateIndependentSegmentScissionCharacterizer(CompositeuFJCScissionCharacter
         ax2.plot(self.lmbda_nu_hat, self.p_nu_sci_hat, linestyle='-', color='blue', alpha=1, linewidth=2.5, label=r'$\hat{p}_{\nu}^{sci}$')
         ax2.plot(self.lmbda_nu_hat, self.p_nu_sur_hat, linestyle=':', color='blue', alpha=1, linewidth=2.5, label=r'$\hat{p}_{\nu}^{sur}$')
 
-        ax1.legend(loc='best', handlelength=3)
+        ax1.legend(loc='best', fontsize=14, handlelength=3)
         ax1.set_ylim([-0.05, 1.05])
+        ax1.tick_params(axis='y', labelsize=16)
         ax1.set_ylabel(r'$\overline{\hat{e}_{\nu}^{sci}},~\overline{\hat{\varepsilon}_{\nu}^{sci}},~\overline{\hat{\varepsilon}_{\nu}^{diss}}$', fontsize=20)
         ax1.grid(True, alpha=0.25)
-        ax2.legend(loc='best')
+        ax2.legend(loc='best', fontsize=14)
         ax2.set_ylim([-0.05, 1.05])
+        ax2.tick_params(axis='y', labelsize=16)
         ax2.set_ylabel(r'$\hat{p}_{\nu}^{sci},~\hat{p}_{\nu}^{sur}$', fontsize=20)
         ax2.grid(True, alpha=0.25)
         
         plt.xlim([self.lmbda_nu_hat[0], self.lmbda_nu_hat[-1]])
-        plt.xlabel(r'$\hat{\lambda}_{\nu}$', fontsize=30)
+        plt.xticks(fontsize=16)
+        plt.xlabel(r'$\hat{\lambda}_{\nu}$', fontsize=20)
         save_current_figure_no_labels(self.savedir, "rate-independent-segment-scission-indicators-vs-lmbda_nu_hat")
 
 if __name__ == '__main__':

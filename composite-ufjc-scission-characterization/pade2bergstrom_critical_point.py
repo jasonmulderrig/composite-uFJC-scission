@@ -59,9 +59,11 @@ class Pade2BergstromCriticalPointCharacterizer(CompositeuFJCScissionCharacterize
         fig = plt.figure()
         plt.plot(kappa_nu_pade2berg_crit, lmbda_c_eq_pade2berg_crit, linestyle='-', color='blue', alpha=1, linewidth=2.5, label=r'$\textrm{Exact calculation}$')
         plt.plot(kappa_nu_pade2berg_crit, lmbda_c_eq_pade2berg_crit_curve_fit, linestyle='--', color='red', alpha=1, linewidth=2.5, label=r'$\textrm{Curve fit}$')
-        plt.legend(loc='best')
+        plt.legend(loc='best', fontsize=12)
+        plt.xticks(fontsize=16)
+        plt.yticks(fontsize=16)
         plt.grid(True, alpha=0.25)
-        save_current_figure(self.savedir, r'$\kappa_{\nu}$', 30, r'$(\lambda_c^{eq})^{pade2berg}$', 30, "pade2berg-critical-point-equilibrium-chain-stretch-vs-kappa_nu")
+        save_current_figure(self.savedir, r'$\kappa_{\nu}$', 20, r'$(\lambda_c^{eq})^{pade2berg}$', 20, "pade2berg-critical-point-equilibrium-chain-stretch-vs-kappa_nu")
 
 if __name__ == '__main__':
 

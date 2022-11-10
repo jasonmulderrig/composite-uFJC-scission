@@ -1,7 +1,5 @@
 # import necessary libraries
 from types import SimpleNamespace
-import numpy as np
-from scipy import constants
 
 def default_parameters():
 

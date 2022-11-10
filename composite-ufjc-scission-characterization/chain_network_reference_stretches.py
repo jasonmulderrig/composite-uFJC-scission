@@ -54,15 +54,18 @@ class ChainNetworkReferenceStretches(CompositeuFJCScissionCharacterizer):
         
         ax1.semilogx(cp.nu_chain_network_list, A_nu_list, linestyle='-', color='blue', alpha=1, linewidth=2.5, label=r'$u\textrm{FJC}$')
         ax1.semilogx(cp.nu_chain_network_list, inext_gaussian_A_nu_list, linestyle='--', color='red', alpha=1, linewidth=2.5, label=r'$\textrm{inextensible Gaussian chain}$')
-        ax1.legend(loc='best')
-        ax1.set_ylabel(r'$\mathcal{A}_{\nu}$', fontsize=30)
+        ax1.legend(loc='best', fontsize=14)
+        ax1.tick_params(axis='y', labelsize=14)
+        ax1.set_ylabel(r'$\mathcal{A}_{\nu}$', fontsize=20)
         ax1.grid(True, alpha=0.25)
         
         ax2.loglog(cp.nu_chain_network_list, inext_gaussian_A_nu_err_list, linestyle='-', color='blue', alpha=1, linewidth=2.5)
-        ax2.set_ylabel(r'$\%~\textrm{error}$', fontsize=30)
+        ax2.tick_params(axis='y', labelsize=14)
+        ax2.set_ylabel(r'$\%~\textrm{error}$', fontsize=20)
         ax2.grid(True, alpha=0.25)
         
-        plt.xlabel(r'$\nu$', fontsize=30)
+        plt.xticks(fontsize=14)
+        plt.xlabel(r'$\nu$', fontsize=20)
         save_current_figure_no_labels(self.savedir, "A_nu-gen-ufjc-model-framework-and-inextensible-Gaussian-chain-comparison")
 
         # retrieve and plot results for constant zeta_b_char in each subplot
@@ -73,11 +76,13 @@ class ChainNetworkReferenceStretches(CompositeuFJCScissionCharacterizer):
             for kappa_nu_indx in range(len(cp.kappa_nu_chain_network_list)):
                 A_nu_list = A_nu_chain_network[zeta_nu_char_indx][kappa_nu_indx][:]
                 axs[zeta_nu_char_indx].semilogx(cp.nu_chain_network_list, A_nu_list, linestyle=cp.linestyle_list[kappa_nu_indx], color=cp.color_list[kappa_nu_indx], alpha=1, linewidth=2.5, label=cp.kappa_nu_label_chain_network_list[kappa_nu_indx])
+            axs[zeta_nu_char_indx].legend(loc='best', fontsize=12)
+            axs[zeta_nu_char_indx].tick_params(axis='y', labelsize=14)
             axs[zeta_nu_char_indx].set_ylabel(r'$\mathcal{A}_{\nu}$', fontsize=20)
-            axs[zeta_nu_char_indx].legend(loc='best')
             axs[zeta_nu_char_indx].grid(True, alpha=0.25)
-            axs[zeta_nu_char_indx].set_title(cp.zeta_nu_char_label_chain_network_list[zeta_nu_char_indx], fontsize=15)
+            axs[zeta_nu_char_indx].set_title(cp.zeta_nu_char_label_chain_network_list[zeta_nu_char_indx], fontsize=20)
         
+        plt.xticks(fontsize=14)
         plt.xlabel(r'$\nu$', fontsize=20)
         save_current_figure_no_labels(self.savedir, "zeta_nu_char-A_nu-vs-nu")
 
@@ -88,11 +93,13 @@ class ChainNetworkReferenceStretches(CompositeuFJCScissionCharacterizer):
             for kappa_nu_indx in range(len(cp.kappa_nu_chain_network_list)):
                 Lambda_nu_ref_list = Lambda_nu_ref_chain_network[zeta_nu_char_indx][kappa_nu_indx][:]
                 axs[zeta_nu_char_indx].semilogx(cp.nu_chain_network_list, Lambda_nu_ref_list, linestyle=cp.linestyle_list[kappa_nu_indx], color=cp.color_list[kappa_nu_indx], alpha=1, linewidth=2.5, label=cp.kappa_nu_label_chain_network_list[kappa_nu_indx])
+            axs[zeta_nu_char_indx].legend(loc='best', fontsize=12)
+            axs[zeta_nu_char_indx].tick_params(axis='y', labelsize=14)
             axs[zeta_nu_char_indx].set_ylabel(r'$\Lambda_{\nu}^{ref}$', fontsize=20)
-            axs[zeta_nu_char_indx].legend(loc='best')
             axs[zeta_nu_char_indx].grid(True, alpha=0.25)
-            axs[zeta_nu_char_indx].set_title(cp.zeta_nu_char_label_chain_network_list[zeta_nu_char_indx], fontsize=15)
+            axs[zeta_nu_char_indx].set_title(cp.zeta_nu_char_label_chain_network_list[zeta_nu_char_indx], fontsize=20)
         
+        plt.xticks(fontsize=14)
         plt.xlabel(r'$\nu$', fontsize=20)
         save_current_figure_no_labels(self.savedir, "zeta_nu_char-Lambda_nu_ref-vs-nu")
         
@@ -104,11 +111,13 @@ class ChainNetworkReferenceStretches(CompositeuFJCScissionCharacterizer):
             for zeta_nu_char_indx in range(len(cp.zeta_nu_char_chain_network_list)):
                 A_nu_list = A_nu_chain_network[zeta_nu_char_indx][kappa_nu_indx][:]
                 axs[kappa_nu_indx].semilogx(cp.nu_chain_network_list, A_nu_list, linestyle=cp.linestyle_list[zeta_nu_char_indx], color=cp.color_list[zeta_nu_char_indx], alpha=1, linewidth=2.5, label=cp.zeta_nu_char_label_chain_network_list[zeta_nu_char_indx])
+            axs[kappa_nu_indx].legend(loc='best', fontsize=12)
+            axs[kappa_nu_indx].tick_params(axis='y', labelsize=14)
             axs[kappa_nu_indx].set_ylabel(r'$\mathcal{A}_{\nu}$', fontsize=20)
-            axs[kappa_nu_indx].legend(loc='best')
             axs[kappa_nu_indx].grid(True, alpha=0.25)
-            axs[kappa_nu_indx].set_title(cp.kappa_nu_label_chain_network_list[kappa_nu_indx], fontsize=15)
+            axs[kappa_nu_indx].set_title(cp.kappa_nu_label_chain_network_list[kappa_nu_indx], fontsize=20)
         
+        plt.xticks(fontsize=14)
         plt.xlabel(r'$\nu$', fontsize=20)
         save_current_figure_no_labels(self.savedir, "kappa_nu-A_nu-vs-nu")
 
@@ -119,11 +128,13 @@ class ChainNetworkReferenceStretches(CompositeuFJCScissionCharacterizer):
             for zeta_nu_char_indx in range(len(cp.zeta_nu_char_chain_network_list)):
                 Lambda_nu_ref_list = Lambda_nu_ref_chain_network[zeta_nu_char_indx][kappa_nu_indx][:]
                 axs[kappa_nu_indx].semilogx(cp.nu_chain_network_list, Lambda_nu_ref_list, linestyle=cp.linestyle_list[zeta_nu_char_indx], color=cp.color_list[zeta_nu_char_indx], alpha=1, linewidth=2.5, label=cp.zeta_nu_char_label_chain_network_list[zeta_nu_char_indx])
+            axs[kappa_nu_indx].legend(loc='best', fontsize=12)
+            axs[kappa_nu_indx].tick_params(axis='y', labelsize=14)
             axs[kappa_nu_indx].set_ylabel(r'$\Lambda_{\nu}^{ref}$', fontsize=20)
-            axs[kappa_nu_indx].legend(loc='best')
             axs[kappa_nu_indx].grid(True, alpha=0.25)
-            axs[kappa_nu_indx].set_title(cp.kappa_nu_label_chain_network_list[kappa_nu_indx], fontsize=15)
+            axs[kappa_nu_indx].set_title(cp.kappa_nu_label_chain_network_list[kappa_nu_indx], fontsize=20)
         
+        plt.xticks(fontsize=14)
         plt.xlabel(r'$\nu$', fontsize=20)
         save_current_figure_no_labels(self.savedir, "kappa_nu-Lambda_nu_ref-vs-nu")
 

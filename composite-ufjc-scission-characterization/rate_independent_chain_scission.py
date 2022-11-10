@@ -125,15 +125,18 @@ class RateIndependentChainScissionCharacterizer(CompositeuFJCScissionCharacteriz
         ax2.plot([], [], linestyle='-', color='black', label=r'$\hat{p}_c^{sci}$')
         ax2.plot([], [], linestyle=':', color='black', label=r'$\hat{p}_c^{sur}$')
 
-        ax1.legend(loc='best')
+        ax1.legend(loc='best', fontsize=18)
         ax1.set_ylim([-0.05, 0.7])
-        ax1.set_ylabel(r'$\overline{\hat{\varepsilon}_{c\nu}^{sci}}~(-),~\overline{\hat{\varepsilon}_{c\nu}^{diss}}~(-~\cdot)$', fontsize=15)
+        ax1.tick_params(axis='y', labelsize=20)
+        ax1.set_ylabel(r'$\overline{\hat{\varepsilon}_{c\nu}^{sci}}~(-),~\overline{\hat{\varepsilon}_{c\nu}^{diss}}~(-~\cdot)$', fontsize=21)
         ax1.grid(True, alpha=0.25)
-        ax2.legend(loc='best')
+        ax2.legend(loc='best', fontsize=18)
         ax2.set_ylim([-0.05, 1.05])
-        ax2.set_ylabel(r'$\hat{p}_c^{sur},~\hat{p}_c^{sci}$', fontsize=15)
+        ax2.tick_params(axis='y', labelsize=20)
+        ax2.set_ylabel(r'$\hat{p}_c^{sur},~\hat{p}_c^{sci}$', fontsize=21)
         ax2.grid(True, alpha=0.25)
         plt.xlim([lmbda_nu_hat[0], lmbda_nu_hat[-1]])
+        plt.xticks(fontsize=20)
         plt.xlabel(r'$\hat{\lambda}_{\nu}$', fontsize=30)
         save_current_figure_no_labels(self.savedir, "rate-independent-chain-scission-indicators-vs-lmbda_nu_hat")
         
@@ -147,11 +150,13 @@ class RateIndependentChainScissionCharacterizer(CompositeuFJCScissionCharacteriz
             overline_epsilon_c_diss_hat   = [x*nu for x in overline_epsilon_cnu_diss_hat]
             plt.semilogy(lmbda_nu_hat, overline_epsilon_c_sci_hat, linestyle='-', color=cp.color_list[single_chain_indx], alpha=1, linewidth=2.5, label=cp.nu_label_single_chain_list[single_chain_indx])
             plt.semilogy(lmbda_nu_hat, overline_epsilon_c_diss_hat, linestyle=(0, (3, 1, 1, 1)), color=cp.color_list[single_chain_indx], alpha=1, linewidth=2.5)
-        plt.legend(loc='best')
+        plt.legend(loc='best', fontsize=18)
         plt.xlim([lmbda_nu_hat[0], lmbda_nu_hat[-1]])
+        plt.xticks(fontsize=20)
         plt.ylim([1e-5, 1e4])
+        plt.yticks(fontsize=20)
         plt.grid(True, alpha=0.25)
-        save_current_figure(self.savedir, r'$\hat{\lambda}_{\nu}$', 30, r'$\overline{\hat{\varepsilon}_c^{sci}}~(-),~\overline{\hat{\varepsilon}_c^{diss}}~(-~\cdot)$', 20, "rate-independent-chain-scission-energy-vs-lmbda_nu_hat")
+        save_current_figure(self.savedir, r'$\hat{\lambda}_{\nu}$', 30, r'$\overline{\hat{\varepsilon}_c^{sci}}~(-),~\overline{\hat{\varepsilon}_c^{diss}}~(-~\cdot)$', 30, "rate-independent-chain-scission-energy-vs-lmbda_nu_hat")
 
 if __name__ == '__main__':
 
