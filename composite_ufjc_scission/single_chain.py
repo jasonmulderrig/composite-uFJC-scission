@@ -1,6 +1,4 @@
-################################################################################################################################
-# General setup
-################################################################################################################################
+"""The core single-chain module for the composite uFJC scission model"""
 
 # Import necessary libraries
 from __future__ import division
@@ -8,25 +6,22 @@ import sys
 import numpy as np
 from scipy import integrate
 
-# Numerical tolerance parameters
+# Define numerical tolerance parameters
 min_exponent = np.log(sys.float_info.min)/np.log(10)
 max_exponent = np.log(sys.float_info.max)/np.log(10)
 eps_val      = np.finfo(float).eps
 cond_val     = eps_val*5e12
 
-################################################################################################################################
-# Composite extensible freely jointed chain
-################################################################################################################################
-
 class CompositeuFJC:
-    
-    ############################################################################################################################
-    # Constructor
-    ############################################################################################################################
+    """The composite uFJC scission single-chain model class."""
     
     def __init__(self, **kwargs):
+        """
+        Initializes the ``CompositeuFJC`` class, producing a composite
+        uFJC scission single chain model instance.
+        """
         
-        # Initialize default parameter values
+        # Get default parameter values
         rate_dependence          = kwargs.get("rate_dependence", None)
         omega_0                  = kwargs.get("omega_0", None)
         nu                       = kwargs.get("nu", None)
@@ -36,27 +31,56 @@ class CompositeuFJC:
         zeta_nu_char             = kwargs.get("zeta_nu_char", None)
         kappa_nu                 = kwargs.get("kappa_nu", None)
         
-        # Check the correctness of the specified parameters, calculate segment-level parameters from provided bond-level parameters if necessary, and retain specified parameters
-        if rate_dependence != 'rate_dependent' and rate_dependence != 'rate_independent':
-            sys.exit('Error: Need to specify the chain dependence on the rate of applied deformation. Either rate-dependent or rate-independent deformation can be used.')
+        # Check the correctness of the specified parameters
+        # Calculate segment-level parameters from provided bond-level
+        # parameters if necessary
+        if (rate_dependence != 'rate_dependent' and 
+            rate_dependence != 'rate_independent'):
+            error_string = """\
+                Error: Need to specify the chain dependence on the rate of \
+                applied deformation. Either rate-dependent or rate-independent \
+                deformation can be used. \
+                """
+            sys.exit(error_string)
         if rate_dependence == 'rate_dependent' and omega_0 is None:
-            sys.exit('Error: Need to specify the microscopic frequency of segments in the chains for rate-dependent deformation.')
-        if nu is None: # required to specify nu
-            sys.exit('Error: Need to specify nu in the composite uFJC')
-        elif nu_b is None: # take given zeta_nu_char and kappa_nu if nu_b is not specified
+            error_string = """\
+                Error: Need to specify the microscopic frequency of segments \
+                in the chains for rate-dependent deformation. \
+                """
+            sys.exit(error_string)
+        if nu is None:
+            sys.exit('Error: Need to specify nu in the composite uFJC.')
+        elif nu_b is None:
             if zeta_nu_char is None:
-                sys.exit('Error: Need to specify zeta_nu_char in the composite uFJC when nu_b is not specified')
+                error_string = """\
+                    Error: Need to specify zeta_nu_char in the composite uFJC \
+                    when nu_b is not specified.
+                    """
+                sys.exit(error_string)
             elif kappa_nu is None:
-                sys.exit('Error: Need to specify kappa_nu in the composite uFJC when nu_b is not specified')
-        elif nu_b is not None: # use given zeta_b_char and kappa_b to calculate zeta_nu_char and kappa_nu if nu_b is specified
+                error_string = """\
+                    Error: Need to specify kappa_nu in the composite uFJC \
+                    when nu_b is not specified. \
+                    """
+                sys.exit(error_string)
+        elif nu_b is not None:
             if zeta_b_char is None:
-                sys.exit('Error: Need to specify zeta_b_char in the composite uFJC when nu_b is specified')
+                error_string = """\
+                    Error: Need to specify zeta_b_char in the composite uFJC \
+                    when nu_b is specified. \
+                    """
+                sys.exit(error_string)
             elif kappa_b is None:
-                sys.exit('Error: Need to specify kappa_b in the composite uFJC when nu_b is specified')
+                error_string = """\
+                    Error: Need to specify kappa_b in the composite uFJC when \
+                    nu_b is specified
+                    """
+                sys.exit(error_string)
             else:
                 zeta_nu_char = nu_b*zeta_b_char
                 kappa_nu     = nu_b*kappa_b
         
+        # Retain specified parameters
         self.rate_dependence = rate_dependence
         self.omega_0         = omega_0
         self.nu              = nu
@@ -66,98 +90,210 @@ class CompositeuFJC:
         self.zeta_nu_char    = zeta_nu_char
         self.kappa_nu        = kappa_nu
         
-        # Analytically derived physical parameters; retain specified parameters
+        # Calculate and retain analytically derived parameters
         self.lmbda_nu_ref    = 1.
         self.lmbda_c_eq_ref  = 0.
         self.lmbda_nu_crit   = 1. + np.sqrt(self.zeta_nu_char/self.kappa_nu)
-        self.lmbda_c_eq_crit = 1. + np.sqrt(self.zeta_nu_char/self.kappa_nu) - np.sqrt(1./(self.kappa_nu*self.zeta_nu_char))
-        self.xi_c_crit       = np.sqrt(zeta_nu_char*kappa_nu)
+        self.lmbda_c_eq_crit = (1. + np.sqrt(self.zeta_nu_char/self.kappa_nu)
+                                - np.sqrt(1./(self.kappa_nu*self.zeta_nu_char)))
+        self.xi_c_crit = np.sqrt(zeta_nu_char*kappa_nu)
         
         # Parameters needed for numerical calculations
         self.lmbda_nu_hat_inc = 0.0005
         
-        # Numerically calculated parameters; retain specified parameters
+        # Calculate and retain numerically calculated parameters
         self.lmbda_c_eq_pade2berg_crit = self.lmbda_c_eq_pade2berg_crit_func()
-        self.lmbda_nu_pade2berg_crit   = self.lmbda_nu_func(self.lmbda_c_eq_pade2berg_crit)
+        self.lmbda_nu_pade2berg_crit   = self.lmbda_nu_func(
+            self.lmbda_c_eq_pade2berg_crit)
         self.epsilon_nu_diss_hat_crit  = self.epsilon_nu_diss_hat_crit_func()
         self.A_nu                      = self.A_nu_func()
         self.Lambda_nu_ref             = self.lmbda_nu_func(self.A_nu)
     
-    ############################################################################################################################
-    # Methods
-    ############################################################################################################################
-    
-    # Nondimensional harmonic segment potential energy
     def u_nu_har_func(self, lmbda_nu):
-        return 0.5*self.kappa_nu*( lmbda_nu - 1. )**2 - self.zeta_nu_char
+        """Nondimensional harmonic segment potential energy
+        
+        This function computes the nondimensional harmonic segment 
+        potential energy as a function of the segment stretch.
+        """
+        return 0.5 * self.kappa_nu * (lmbda_nu-1.)**2 - self.zeta_nu_char
     
-    # Nondimensional sub-critical chain state segment potential energy
     def u_nu_subcrit_func(self, lmbda_nu):
+        """Nondimensional sub-critical chain state segment potential
+        energy
+        
+        This function computes the nondimensional sub-critical chain
+        state segment potential energy as a function of the segment
+        stretch.
+        """
         return self.u_nu_har_func(lmbda_nu)
     
-    # Nondimensional super-critical chain state segment potential energy
     def u_nu_supercrit_func(self, lmbda_nu):
-        return -self.zeta_nu_char**2 / ( 2.*self.kappa_nu*( lmbda_nu - 1. )**2 )
-    
-    # Nondimensional uFJC segment potential energy conditional function
-    def u_nu_cond_func(self, lmbda_nu):
+        """Nondimensional super-critical chain state segment potential
+        energy
         
+        This function computes the nondimensional super-critical chain
+        state segment potential energy as a function of the segment
+        stretch.
+        """
+        return -self.zeta_nu_char**2 / (2.*self.kappa_nu*(lmbda_nu-1.)**2 )
+    
+    def u_nu_func(self, lmbda_nu):
+        """Nondimensional composite uFJC segment potential energy
+        
+        This function computes the nondimensional composite uFJC segment
+        potential energy as a function of the segment stretch.
+        """
         if lmbda_nu < self.lmbda_nu_crit:
             return self.u_nu_subcrit_func(lmbda_nu)
         
         else:
             return self.u_nu_supercrit_func(lmbda_nu)
     
-    # Nondimensional harmonic segment potential energy contribution
     def u_nu_har_comp_func(self, lmbda_nu):
-        return ( 1. - self.M_func( self.kappa_nu*np.sign( lmbda_nu - 1. )*( lmbda_nu - 1. )**2 - self.zeta_nu_char ) / ( self.M_func( self.kappa_nu*np.sign( lmbda_nu - 1. )*( lmbda_nu - 1. )**2 - self.zeta_nu_char ) + self.zeta_nu_char ))**2 * 0.5*self.kappa_nu*( lmbda_nu - 1. )**2 - self.zeta_nu_char
+        """Nondimensional harmonic segment potential energy contribution
+        to the alternate nondimensional composite uFJC segment potential
+        energy representation using Macaulay brackets
+        
+        This function computes the nondimensional harmonic segment
+        potential energy contribution to the alternate nondimensional
+        composite uFJC segment potential energy representation using 
+        Macaulay brackets as a function of the segment stretch.
+        """
+        return ((1.-self.M_func(self.kappa_nu*np.sign(lmbda_nu-1.)
+                *(lmbda_nu-1.)**2-self.zeta_nu_char)
+                /(self.M_func(self.kappa_nu*np.sign(lmbda_nu-1.)
+                *(lmbda_nu-1.)**2-self.zeta_nu_char)+self.zeta_nu_char))**2
+                * 0.5*self.kappa_nu*(lmbda_nu-1.)**2 - self.zeta_nu_char)
     
-    # Nondimensional segment scission energy contribution
     def u_nu_sci_comp_func(self, lmbda_nu):
-        return self.zeta_nu_char*self.M_func( self.kappa_nu*np.sign( lmbda_nu - 1. )*( lmbda_nu - 1. )**2 - self.zeta_nu_char ) / ( self.M_func( self.kappa_nu*np.sign( lmbda_nu - 1. )*( lmbda_nu - 1. )**2 - self.zeta_nu_char ) + self.zeta_nu_char ) - self.zeta_nu_char
+        """Nondimensional segment scission potential energy contribution
+        to the alternate nondimensional composite uFJC segment potential
+        energy representation using Macaulay brackets
+        
+        This function computes the nondimensional segment scission
+        potential energy contribution to the alternate nondimensional
+        composite uFJC segment potential energy representation using
+        Macaulay brackets as a function of the segment stretch.
+        """
+        return (self.zeta_nu_char*self.M_func(self.kappa_nu*np.sign(lmbda_nu-1.)
+                *(lmbda_nu-1.)**2-self.zeta_nu_char)
+                / (self.M_func(self.kappa_nu*np.sign(lmbda_nu-1.)
+                *(lmbda_nu-1.)**2-self.zeta_nu_char)+self.zeta_nu_char)
+                - self.zeta_nu_char)
     
-    # Nondimensional uFJC segment potential energy
-    def u_nu_func(self, lmbda_nu):
-        return self.u_nu_har_comp_func(lmbda_nu) + self.u_nu_sci_comp_func(lmbda_nu) + self.zeta_nu_char
+    def u_nu_M_func(self, lmbda_nu):
+        """Nondimensional composite uFJC segment potential energy
+        representation using Macaulay brackets
+        
+        This function computes the nondimensional composite uFJC segment
+        potential energy representation using Macaulay brackets as a
+        function of the segment stretch.
+        """
+        return (self.u_nu_har_comp_func(lmbda_nu) 
+                + self.u_nu_sci_comp_func(lmbda_nu) + self.zeta_nu_char)
     
-    # Macaulay brackets
     def M_func(self, x):
+        """Macaulay brackets
+        
+        This function computes the value of the Macaulay brackets as a
+        function of a number x.
+        """
         if x < 0:
             return 0.
         else:
             return x
     
-    # Segment stretch as a function of equilibrium chain stretch via the Bergstrom approximation
     def subcrit_lmbda_nu_berg_approx_func(self, lmbda_c_eq):
-        return ( lmbda_c_eq + 1. + np.sqrt( lmbda_c_eq**2 - 2.*lmbda_c_eq + 1. + 4./self.kappa_nu ))/2.
+        """Sub-critical chain state segment stretch as derived via the
+        Bergstrom approximant for the inverse Langevin function
+        
+        This function computes the sub-critical chain state segment
+        stretch (as derived via the Bergstrom approximant for the
+        inverse Langevin function) as a function of the equilibrium
+        chain stretch.
+        """
+        return ((lmbda_c_eq+1.+np.sqrt(lmbda_c_eq**2-2.*lmbda_c_eq+1.
+                +4./self.kappa_nu)) / 2.)
     
-    # Segment stretch as a function of equilibrium chain stretch via the Pade approximation
     def subcrit_lmbda_nu_pade_approx_func(self, lmbda_c_eq):
-        if lmbda_c_eq == 0.: # analytical solution, achieved with the use of the Pade approximant
+        """Sub-critical chain state segment stretch as derived via the
+        Pade approximant for the inverse Langevin function
+        
+        This function computes the sub-critical chain state segment
+        stretch (as derived via the Pade approximant for the inverse
+        Langevin function) as a function of the equilibrium chain
+        stretch.
+        """
+        if lmbda_c_eq == 0.: # analytical solution
             return 1.
         
-        else: # Pade approximant
+        else:
             alpha_tilde = 1.
-            beta_tilde  = -(( 3.*( self.kappa_nu + 1. ) + lmbda_c_eq*( 2.*self.kappa_nu + 3. ))/( self.kappa_nu + 1. ))
-            gamma_tilde = (( 2.*self.kappa_nu + lmbda_c_eq*( 4.*self.kappa_nu + 6. + lmbda_c_eq*( self.kappa_nu + 3. )))/( self.kappa_nu + 1. ))
-            delta_tilde = (( 2. - lmbda_c_eq*( 2.*self.kappa_nu + lmbda_c_eq*( self.kappa_nu + 3. + lmbda_c_eq )))/( self.kappa_nu + 1. ))
-            pi_tilde    = ( 3.*alpha_tilde*gamma_tilde - beta_tilde**2 )/( 3.*alpha_tilde**2 )
-            rho_tilde   = ( 2.*beta_tilde**3 - 9.*alpha_tilde*beta_tilde*gamma_tilde + 27.*alpha_tilde**2*delta_tilde )/( 27.*alpha_tilde**3 )
             
-            arccos_arg = 3.*rho_tilde/(2.*pi_tilde)*np.sqrt(-3./pi_tilde)
-            return 2.*np.sqrt(-pi_tilde/3.)*np.cos( 1./3.*np.arccos(arccos_arg) - 2.*np.pi/3. ) - beta_tilde/(3.*alpha_tilde)
+            beta_tilde_trm_i  = -3. * (self.kappa_nu+1.)
+            beta_tilde_trm_ii = -(2.*self.kappa_nu+3.)
+            beta_tilde_nmrtr = (beta_tilde_trm_i 
+                                + lmbda_c_eq * beta_tilde_trm_ii)
+            beta_tilde_dnmntr = self.kappa_nu + 1.
+            beta_tilde  = beta_tilde_nmrtr / beta_tilde_dnmntr
+            
+            gamma_tilde_trm_i = 2. * self.kappa_nu
+            gamma_tilde_trm_ii = 4. * self.kappa_nu + 6.
+            gamma_tilde_trm_iii = self.kappa_nu + 3.
+            gamma_tilde_nmrtr = (gamma_tilde_trm_i + lmbda_c_eq
+                                    * (gamma_tilde_trm_ii+lmbda_c_eq
+                                        *gamma_tilde_trm_iii))
+            gamma_tilde_dnmntr = self.kappa_nu + 1.
+            gamma_tilde  = gamma_tilde_nmrtr / gamma_tilde_dnmntr
+
+            delta_tilde_trm_i = 2.
+            delta_tilde_trm_ii = 2. * self.kappa_nu
+            delta_tilde_trm_iii = self.kappa_nu + 3
+            delta_tilde_nmrtr = (delta_tilde_trm_i - lmbda_c_eq 
+                                    * (delta_tilde_trm_ii+lmbda_c_eq
+                                    *(delta_tilde_trm_iii+lmbda_c_eq)))
+            delta_tilde_dnmntr = self.kappa_nu + 1.
+            delta_tilde  = delta_tilde_nmrtr / delta_tilde_dnmntr
+
+            pi_tilde_nmrtr = 3. * alpha_tilde * gamma_tilde - beta_tilde**2
+            pi_tilde_dnmntr = 3. * alpha_tilde**2
+            pi_tilde = pi_tilde_nmrtr / pi_tilde_dnmntr
+
+            rho_tilde_nmrtr = (2. * beta_tilde**3 
+                                - 9. * alpha_tilde * beta_tilde * gamma_tilde 
+                                + 27. * alpha_tilde**2 * delta_tilde)
+            rho_tilde_dnmntr = 27. * alpha_tilde**3
+            rho_tilde = rho_tilde_nmrtr / rho_tilde_dnmntr
+            
+            arccos_arg = 3. * rho_tilde / (2.*pi_tilde) * np.sqrt(-3./pi_tilde)
+            return (2. * np.sqrt(-pi_tilde/3.) * np.cos(1./3.
+                    *np.arccos(arccos_arg)-2.*np.pi/3.)
+                    - beta_tilde/(3.*alpha_tilde))
     
-    # Function to calculate the critical equilibrium chain stretch value, as a function of nondimensional segment stiffness, below and above which the Pade and Bergstrom approximates are to be respectively used
     def lmbda_c_eq_pade2berg_crit_func(self):
-        n = 0.818706900266885 # Calculated from scipy optimize curve_fit analysis
-        b = 0.61757545643322586 # Calculated from scipy optimize curve_fit analysis
+        """Pade-to-Bergstrom (P2B) critical equilibrium chain stretch
+        value
+        
+        This function returns Pade-to-Bergstrom (P2B) critical 
+        equilibrium chain stretch value as determined via a scipy 
+        optimize curve_fit analysis.
+        """
+        n = 0.818706900266885
+        b = 0.61757545643322586
         return 1./(self.kappa_nu**n) + b
     
-    # Function to calculate the segment stretch and equilibrium stretch values below and above which the Pade and Bergstrom approximates are to be respectively used
     def pade2berg_crit_func(self):
+        """Pade-to-Bergstrom (P2B) critical segment stretch and critical
+        equilibrium chain stretch values
+        
+        This function numerically calculates the Pade-to-Bergstrom (P2B)
+        critical segment stretch and critical equilibrium chain stretch
+        values
+        """
         lmbda_c_eq_min   = 0.
         lmbda_c_eq_max   = 1.
-        lmbda_c_eq_steps = np.linspace(lmbda_c_eq_min, lmbda_c_eq_max, int(1e4)+1)
+        lmbda_c_eq_steps = np.linspace(lmbda_c_eq_min, lmbda_c_eq_max,
+            int(1e4)+1)
         
         # Make arrays to allocate results
         lmbda_c_eq         = []
@@ -165,23 +301,33 @@ class CompositeuFJC:
         lmbda_nu_padeapprx = []
         
         for lmbda_c_eq_indx in range(len(lmbda_c_eq_steps)):
-            lmbda_c_eq_val         = lmbda_c_eq_steps[lmbda_c_eq_indx]
-            lmbda_nu_bergapprx_val = self.subcrit_lmbda_nu_berg_approx_func(lmbda_c_eq_val)
-            lmbda_nu_padeapprx_val = self.subcrit_lmbda_nu_pade_approx_func(lmbda_c_eq_val)
+            lmbda_c_eq_val = lmbda_c_eq_steps[lmbda_c_eq_indx]
+            lmbda_nu_bergapprx_val = self.subcrit_lmbda_nu_berg_approx_func(
+                lmbda_c_eq_val)
+            lmbda_nu_padeapprx_val = self.subcrit_lmbda_nu_pade_approx_func(
+                lmbda_c_eq_val)
             
-            lmbda_c_eq         = np.append(lmbda_c_eq, lmbda_c_eq_val)
-            lmbda_nu_bergapprx = np.append(lmbda_nu_bergapprx, lmbda_nu_bergapprx_val)
-            lmbda_nu_padeapprx = np.append(lmbda_nu_padeapprx, lmbda_nu_padeapprx_val)
+            lmbda_c_eq = np.append(lmbda_c_eq, lmbda_c_eq_val)
+            lmbda_nu_bergapprx = np.append(lmbda_nu_bergapprx,
+                lmbda_nu_bergapprx_val)
+            lmbda_nu_padeapprx = np.append(lmbda_nu_padeapprx,
+                lmbda_nu_padeapprx_val)
         
-        pade2berg_crit_indx       = np.argmin(np.abs(lmbda_nu_padeapprx-lmbda_nu_bergapprx))
-        lmbda_nu_pade2berg_crit   = min([lmbda_nu_bergapprx[pade2berg_crit_indx], lmbda_nu_padeapprx[pade2berg_crit_indx]])
+        pade2berg_crit_indx = np.argmin(
+            np.abs(lmbda_nu_padeapprx-lmbda_nu_bergapprx))
+        lmbda_nu_pade2berg_crit   = min(
+            [lmbda_nu_bergapprx[pade2berg_crit_indx],
+            lmbda_nu_padeapprx[pade2berg_crit_indx]])
         lmbda_c_eq_pade2berg_crit = lmbda_c_eq[pade2berg_crit_indx]
         return lmbda_nu_pade2berg_crit, lmbda_c_eq_pade2berg_crit
     
-    # Equilibrium chain stretch as a function of segment stretch
     def lmbda_c_eq_func(self, lmbda_nu):
+        """Equilibrium chain stretch
         
-        if lmbda_nu == 1.: # analytical solution, achieved with the use of the Pade approximant
+        This function computes the equilibrium chain stretch as a 
+        function of the segment stretch.
+        """
+        if lmbda_nu == 1.: # analytical solution (Pade approximant)
             return 0.
         
         elif lmbda_nu < self.lmbda_nu_pade2berg_crit: # Pade approximant
@@ -201,10 +347,13 @@ class CompositeuFJC:
         else: # Bergstrom approximant
             return lmbda_nu - self.kappa_nu/self.zeta_nu_char**2*( lmbda_nu - 1. )**3
     
-    # Segment stretch as a function of equilibrium chain stretch
     def lmbda_nu_func(self, lmbda_c_eq):
+        """Segment stretch
         
-        if lmbda_c_eq == 0.: # analytical solution, achieved with the use of the Pade approximant
+        This function computes the segment stretch as a function of the
+        equilibrium chain stretch.
+        """
+        if lmbda_c_eq == 0.: # analytical solution (Pade approximant)
             return 1.
         
         elif lmbda_c_eq < self.lmbda_c_eq_pade2berg_crit: # Pade approximant
@@ -232,24 +381,48 @@ class CompositeuFJC:
             arccos_arg = 3.*rho_tilde/(2.*pi_tilde)*np.sqrt(-3./pi_tilde)
             return 2.*np.sqrt(-pi_tilde/3.)*np.cos( 1./3.*np.arccos(arccos_arg) - 2.*np.pi/3. ) - beta_tilde/(3.*alpha_tilde)
 
-    # Jedynak R[9,2] inverse Langevin approximate
     def inv_L_func(self, lmbda_comp_nu):
+        """Jedynak R[9,2] inverse Langevin approximant
+        
+        This function computes the Jedynak R[9,2] inverse Langevin
+        approximant as a function of the scalar result of the
+        equilibrium chain stretch minus the segment stretch plus one
+        """
         return lmbda_comp_nu*( 3. - 1.00651*lmbda_comp_nu**2 - 0.962251*lmbda_comp_nu**4 + 1.47353*lmbda_comp_nu**6 - 0.48953*lmbda_comp_nu**8 )/( ( 1. - lmbda_comp_nu )*( 1. + 1.01524*lmbda_comp_nu ) )
     
-    # Nondimensional entropic free energy contribution per segment as calculated by the Jedynak R[9,2] inverse Langevin approximate
     def s_cnu_func(self, lmbda_comp_nu):
+        """Nondimensional chain-level entropic free energy contribution
+        per segment as calculated by the Jedynak R[9,2] inverse Langevin
+        approximate
+        
+        This function computes the nondimensionalchain-level entropic
+        free energy contribution per segment as calculated by the
+        Jedynak R[9,2] inverse Langevin approximate as a function of the
+        scalar result of the equilibrium chain stretch minus the segment
+        stretch plus one
+        """
         return 0.0602726941412868*lmbda_comp_nu**8 + 0.00103401966455583*lmbda_comp_nu**7 - 0.162726405850159*lmbda_comp_nu**6 - 0.00150537112388157*lmbda_comp_nu**5 \
             - 0.00350216312906114*lmbda_comp_nu**4 - 0.00254138511870934*lmbda_comp_nu**3 + 0.488744117329956*lmbda_comp_nu**2 + 0.0071635921950366*lmbda_comp_nu \
                 - 0.999999503781195*np.log(1.00000000002049 - lmbda_comp_nu) - 0.992044340231098*np.log(lmbda_comp_nu + 0.98498877114821) - 0.0150047080499398
     
-    # Nondimensional Helmholtz free energy per segment
     def psi_cnu_func(self, lmbda_nu, lmbda_c_eq):
+        """Nondimensional chain-level Helmholtz free energy per segment
+        
+        This function computes the nondimensional chain-level Helmholtz
+        free energy per segment as a function of the segment stretch and
+        the equilibrium chain stretch
+        """
         lmbda_comp_nu = lmbda_c_eq - lmbda_nu + 1.
         
         return self.u_nu_func(lmbda_nu) + self.s_cnu_func(lmbda_comp_nu)
     
-    # Nondimensional chain force
     def xi_c_func(self, lmbda_nu, lmbda_c_eq):
+        """Nondimensional chain force
+        
+        This function computes the nondimensional chain force as a
+        function of the segment stretch and the equilibrium chain
+        stretch
+        """
         lmbda_comp_nu = lmbda_c_eq - lmbda_nu + 1.
         
         return self.inv_L_func(lmbda_comp_nu)
@@ -340,7 +513,7 @@ class CompositeuFJC:
     def epsilon_nu_diss_hat_func(self, lmbda_nu_hat_max, lmbda_nu_hat_val, lmbda_nu_hat_val_prior, epsilon_nu_diss_hat_val_prior):
         if lmbda_nu_hat_val < lmbda_nu_hat_max: # dissipated energy cannot be destroyed
             return epsilon_nu_diss_hat_val_prior
-        elif lmbda_nu_hat_max > self.lmbda_nu_crit: # completely broken segments previously dissipated energy
+        elif lmbda_nu_hat_max > self.lmbda_nu_crit: # dissipated energy from completely broken segments remains fixed
             return epsilon_nu_diss_hat_val_prior
         else:
             if ( lmbda_nu_hat_val - 1. ) <= self.lmbda_nu_hat_inc:
@@ -350,6 +523,25 @@ class CompositeuFJC:
             
             # the lmbda_nu_hat increment here is guaranteed to be non-negative
             return epsilon_nu_diss_hat_val_prior + epsilon_nu_diss_hat_prime_val*( lmbda_nu_hat_val - lmbda_nu_hat_val_prior )
+    
+    # Integrand of the statistical expected value of the rate-independent nondimensional segment scission energy
+    def expctd_val_epsilon_nu_sci_hat_intgrnd_func(self, lmbda_nu_hat_max, lmbda_nu_hat_val, expctd_val_epsilon_nu_sci_hat_intgrnd_val_prior):
+        if lmbda_nu_hat_val < lmbda_nu_hat_max: # statistical expected value of the nondimensional segment scission energy cannot be destroyed
+            return expctd_val_epsilon_nu_sci_hat_intgrnd_val_prior
+        elif lmbda_nu_hat_max > self.lmbda_nu_crit: # statistical expected value of the nondimensional segment scission energy from completely broken segments remains fixed
+            return expctd_val_epsilon_nu_sci_hat_intgrnd_val_prior
+        else:
+            if ( lmbda_nu_hat_val - 1. ) <= self.lmbda_nu_hat_inc:
+                return 0
+            else:
+                epsilon_nu_sci_hat_val       = self.epsilon_nu_sci_hat_func(lmbda_nu_hat_val)
+                p_nu_sci_hat_prime_val       = self.p_nu_sci_hat_func(lmbda_nu_hat_val)*(np.cbrt(self.zeta_nu_char**2*self.kappa_nu/( lmbda_nu_hat_val - 1. )) - self.kappa_nu*( lmbda_nu_hat_val - 1. ))
+                epsilon_nu_sci_hat_prime_val = 1./( lmbda_nu_hat_val - 1. ) - (self.kappa_nu/( np.sinh(self.kappa_nu*( lmbda_nu_hat_val - 1. )) ))**2*( lmbda_nu_hat_val - 1. ) + self.kappa_nu*( lmbda_nu_hat_val - 1. )
+                return epsilon_nu_sci_hat_val*(p_nu_sci_hat_prime_val/epsilon_nu_sci_hat_prime_val)
+    
+    # History-dependent integral of the statistical expected value of the rate-independent nondimensional segment scission energy (which is equivalent to the previously-defined nondimensional rate-independent dissipated segment scission energy)
+    def expctd_val_epsilon_nu_sci_hat_cum_intgrl_func(self, expctd_val_epsilon_nu_sci_hat_intgrnd_val, epsilon_nu_sci_hat_val, expctd_val_epsilon_nu_sci_hat_intgrnd_val_prior, epsilon_nu_sci_hat_prior, expctd_val_epsilon_nu_sci_hat_val_prior):
+        return expctd_val_epsilon_nu_sci_hat_val_prior + integrate.trapezoid([expctd_val_epsilon_nu_sci_hat_intgrnd_val_prior, expctd_val_epsilon_nu_sci_hat_intgrnd_val], x=[epsilon_nu_sci_hat_prior, epsilon_nu_sci_hat_val])
 
     # Nondimensional rate-independent dissipated segment scission energy for a chain at the critical state
     def epsilon_nu_diss_hat_crit_func(self):
@@ -409,7 +601,7 @@ class CompositeuFJC:
             
             if lmbda_nu_hat_val < lmbda_nu_hat_max: # dissipated energy cannot be destroyed
                 return epsilon_cnu_diss_hat_val_prior
-            elif lmbda_nu_hat_max > self.lmbda_nu_crit: # completely broken chains previously dissipated energy
+            elif lmbda_nu_hat_max > self.lmbda_nu_crit: # dissipated energy from completely broken chains remains fixed
                 return epsilon_cnu_diss_hat_val_prior
             else:
                 if ( lmbda_nu_hat_val - 1. ) <= self.lmbda_nu_hat_inc:
