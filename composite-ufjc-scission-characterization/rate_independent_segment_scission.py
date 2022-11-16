@@ -36,6 +36,8 @@ class RateIndependentSegmentScissionCharacterizer(CompositeuFJCScissionCharacter
         p_nu_sci_hat        = []
         p_nu_sur_hat        = []
         epsilon_nu_diss_hat = []
+        expctd_val_epsilon_nu_sci_hat_intgrnd = []
+        expctd_val_epsilon_nu_sci_hat         = []
 
         # initialization
         lmbda_nu_hat_max = 0
@@ -51,8 +53,12 @@ class RateIndependentSegmentScissionCharacterizer(CompositeuFJCScissionCharacter
             
             if lmbda_nu_hat_indx == 0: # initialization
                 epsilon_nu_diss_hat_val = 0
+                expctd_val_epsilon_nu_sci_hat_intgrnd_val = 0
+                expctd_val_epsilon_nu_sci_hat_val         = 0
             else:
                 epsilon_nu_diss_hat_val = single_chain.epsilon_nu_diss_hat_func(lmbda_nu_hat_max, lmbda_nu_hat_val, lmbda_nu_hat[lmbda_nu_hat_indx-1], epsilon_nu_diss_hat[lmbda_nu_hat_indx-1])
+                expctd_val_epsilon_nu_sci_hat_intgrnd_val = single_chain.expctd_val_epsilon_nu_sci_hat_intgrnd_func(lmbda_nu_hat_max = lmbda_nu_hat_max, lmbda_nu_hat_val = lmbda_nu_hat_val, expctd_val_epsilon_nu_sci_hat_intgrnd_val_prior = expctd_val_epsilon_nu_sci_hat_intgrnd[lmbda_nu_hat_indx-1])
+                expctd_val_epsilon_nu_sci_hat_val         = single_chain.expctd_val_epsilon_nu_sci_hat_cum_intgrl_func(expctd_val_epsilon_nu_sci_hat_intgrnd_val = expctd_val_epsilon_nu_sci_hat_intgrnd_val, epsilon_nu_sci_hat_val = epsilon_nu_sci_hat_val, expctd_val_epsilon_nu_sci_hat_intgrnd_val_prior = expctd_val_epsilon_nu_sci_hat_intgrnd[lmbda_nu_hat_indx-1], epsilon_nu_sci_hat_prior = epsilon_nu_sci_hat[lmbda_nu_hat_indx-1], expctd_val_epsilon_nu_sci_hat_val_prior = expctd_val_epsilon_nu_sci_hat[lmbda_nu_hat_indx-1])
             
             lmbda_nu_hat.append(lmbda_nu_hat_val)
             e_nu_sci_hat.append(e_nu_sci_hat_val)
@@ -60,10 +66,13 @@ class RateIndependentSegmentScissionCharacterizer(CompositeuFJCScissionCharacter
             p_nu_sci_hat.append(p_nu_sci_hat_val)
             p_nu_sur_hat.append(p_nu_sur_hat_val)
             epsilon_nu_diss_hat.append(epsilon_nu_diss_hat_val)
+            expctd_val_epsilon_nu_sci_hat_intgrnd.append(expctd_val_epsilon_nu_sci_hat_intgrnd_val)
+            expctd_val_epsilon_nu_sci_hat.append(expctd_val_epsilon_nu_sci_hat_val)
         
         overline_e_nu_sci_hat        = [e_nu_sci_hat_val/single_chain.zeta_nu_char for e_nu_sci_hat_val in e_nu_sci_hat]
         overline_epsilon_nu_sci_hat  = [epsilon_nu_sci_hat_val/single_chain.zeta_nu_char for epsilon_nu_sci_hat_val in epsilon_nu_sci_hat]
         overline_epsilon_nu_diss_hat = [epsilon_nu_diss_hat_val/single_chain.zeta_nu_char for epsilon_nu_diss_hat_val in epsilon_nu_diss_hat]
+        overline_expctd_val_epsilon_nu_sci_hat = [expctd_val_epsilon_nu_sci_hat_val/single_chain.zeta_nu_char for expctd_val_epsilon_nu_sci_hat_val in expctd_val_epsilon_nu_sci_hat]
         
         self.single_chain = single_chain
         
@@ -73,6 +82,7 @@ class RateIndependentSegmentScissionCharacterizer(CompositeuFJCScissionCharacter
         self.p_nu_sci_hat                 = p_nu_sci_hat
         self.p_nu_sur_hat                 = p_nu_sur_hat
         self.overline_epsilon_nu_diss_hat = overline_epsilon_nu_diss_hat
+        self.overline_expctd_val_epsilon_nu_sci_hat = overline_expctd_val_epsilon_nu_sci_hat
 
     def finalization(self):
         ppp = self.parameters.post_processing
@@ -84,6 +94,7 @@ class RateIndependentSegmentScissionCharacterizer(CompositeuFJCScissionCharacter
         ax1.plot(self.lmbda_nu_hat, self.overline_e_nu_sci_hat, linestyle=':', color='blue', alpha=1, linewidth=2.5, label=r'$\overline{\hat{e}_{\nu}^{sci}}$')
         ax1.plot(self.lmbda_nu_hat, self.overline_epsilon_nu_sci_hat, linestyle='-', color='blue', alpha=1, linewidth=2.5, label=r'$\overline{\hat{\varepsilon}_{\nu}^{sci}}$')
         ax1.plot(self.lmbda_nu_hat, self.overline_epsilon_nu_diss_hat, linestyle=(0, (3, 1, 1, 1)), color='blue', alpha=1, linewidth=2.5, label=r'$\overline{\hat{\varepsilon}_{\nu}^{diss}}$')
+        # ax1.plot(self.lmbda_nu_hat, self.overline_expctd_val_epsilon_nu_sci_hat, linestyle='-', color='orange', alpha=1, linewidth=2.5, label=r'$E\left[\overline{\hat{\varepsilon}_{\nu}^{sci}}\right]$')
         ax2.plot(self.lmbda_nu_hat, self.p_nu_sci_hat, linestyle='-', color='blue', alpha=1, linewidth=2.5, label=r'$\hat{p}_{\nu}^{sci}$')
         ax2.plot(self.lmbda_nu_hat, self.p_nu_sur_hat, linestyle=':', color='blue', alpha=1, linewidth=2.5, label=r'$\hat{p}_{\nu}^{sur}$')
 
@@ -91,6 +102,7 @@ class RateIndependentSegmentScissionCharacterizer(CompositeuFJCScissionCharacter
         ax1.set_ylim([-0.05, 1.05])
         ax1.tick_params(axis='y', labelsize=16)
         ax1.set_ylabel(r'$\overline{\hat{e}_{\nu}^{sci}},~\overline{\hat{\varepsilon}_{\nu}^{sci}},~\overline{\hat{\varepsilon}_{\nu}^{diss}}$', fontsize=20)
+        # ax1.set_ylabel(r'$\overline{\hat{e}_{\nu}^{sci}},~\overline{\hat{\varepsilon}_{\nu}^{sci}},~\overline{\hat{\varepsilon}_{\nu}^{diss}},~E\left[\overline{\hat{\varepsilon}_{\nu}^{sci}}\right]$', fontsize=20)
         ax1.grid(True, alpha=0.25)
         ax2.legend(loc='best', fontsize=14)
         ax2.set_ylim([-0.05, 1.05])
