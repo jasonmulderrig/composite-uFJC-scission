@@ -4,6 +4,7 @@ from composite_ufjc_scission import CompositeuFJCScissionCharacterizer, Composit
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 class RateIndependentSegmentScissionCharacterizer(CompositeuFJCScissionCharacterizer):
 
     def __init__(self):

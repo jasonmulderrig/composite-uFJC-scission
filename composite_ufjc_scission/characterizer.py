@@ -5,13 +5,14 @@ from __future__ import division
 from .default_parameters import default_parameters
 from .utility import generate_savedir
 
+
 class CompositeuFJCScissionCharacterizer(object):
     """Characterizer class for composite uFJCs with scission"""
 
     def __init__(self):
-        """Initializes the ``CompositeuFJCScissionCharacterizer`` 
-        class, producing a composite uFJC scission model 
-        characterization instance.
+        """Initializes the ``CompositeuFJCScissionCharacterizer`` class,
+        producing a composite uFJC scission model characterization
+        instance.
         """
 
         # Set default parameters and user-defined parameters
@@ -32,9 +33,9 @@ class CompositeuFJCScissionCharacterizer(object):
     def prefix(self):
         """Set characterization prefix.
 
-        This function sets the prefix for the characterization, which 
-        is used as the name for the directory where finalized results 
-        are saved. Can be modified via class inheritance.
+        This function sets the prefix for the characterization, which is
+        used as the name for the directory where finalized results are
+        saved. Can be modified via class inheritance.
         """
         return "characterizer"
 

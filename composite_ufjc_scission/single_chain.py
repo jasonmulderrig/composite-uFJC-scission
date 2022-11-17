@@ -1,6 +1,4 @@
-"""
-The core single-chain module for the composite uFJC scission model
-"""
+"""The core single-chain module for the composite uFJC scission model"""
 
 # Import necessary libraries
 from __future__ import division
@@ -13,6 +11,7 @@ min_exponent = np.log(sys.float_info.min) / np.log(10)
 max_exponent = np.log(sys.float_info.max) / np.log(10)
 eps_val      = np.finfo(float).eps
 cond_val     = eps_val * 5e12
+
 
 class CompositeuFJC:
     """The composite uFJC scission single-chain model class."""
@@ -152,10 +151,9 @@ class CompositeuFJC:
             return self.u_nu_supercrit_func(lmbda_nu)
     
     def u_nu_har_comp_func(self, lmbda_nu):
-        """Nondimensional harmonic segment potential energy 
-        contribution to the alternate nondimensional composite uFJC 
-        segment potential energy representation using Macaulay 
-        brackets
+        """Nondimensional harmonic segment potential energy contribution
+        to the alternate nondimensional composite uFJC segment potential
+        energy representation using Macaulay brackets
         
         This function computes the nondimensional harmonic segment
         potential energy contribution to the alternate nondimensional
@@ -170,10 +168,9 @@ class CompositeuFJC:
                 * self.u_nu_har_func(lmbda_nu))
     
     def u_nu_sci_comp_func(self, lmbda_nu):
-        """Nondimensional segment scission potential energy
-        contribution to the alternate nondimensional composite uFJC 
-        segment potential energy representation using Macaulay 
-        brackets
+        """Nondimensional segment scission potential energy contribution
+        to the alternate nondimensional composite uFJC segment potential
+        energy representation using Macaulay brackets
         
         This function computes the nondimensional segment scission
         potential energy contribution to the alternate nondimensional
@@ -190,9 +187,9 @@ class CompositeuFJC:
         """Nondimensional composite uFJC segment potential energy
         representation using Macaulay brackets
         
-        This function computes the nondimensional composite uFJC 
-        segment potential energy representation using Macaulay 
-        brackets as a function of the segment stretch.
+        This function computes the nondimensional composite uFJC segment
+        potential energy representation using Macaulay brackets as a
+        function of the segment stretch.
         """
         return (self.u_nu_har_comp_func(lmbda_nu) 
                 + self.u_nu_sci_comp_func(lmbda_nu))
@@ -257,7 +254,7 @@ class CompositeuFJC:
             delta_tilde_dnmntr = self.kappa_nu + 1.
             delta_tilde  = delta_tilde_nmrtr / delta_tilde_dnmntr
 
-            pi_tilde_nmrtr = 3. * alpha_tilde * gamma_tilde - beta_tilde**2
+            pi_tilde_nmrtr  = 3. * alpha_tilde * gamma_tilde - beta_tilde**2
             pi_tilde_dnmntr = 3. * alpha_tilde**2
             pi_tilde = pi_tilde_nmrtr / pi_tilde_dnmntr
 
@@ -285,12 +282,12 @@ class CompositeuFJC:
         return 1. / self.kappa_nu**n + b
     
     def pade2berg_crit_func(self):
-        """Pade-to-Bergstrom (P2B) critical segment stretch and
-        critical equilibrium chain stretch values
+        """Pade-to-Bergstrom (P2B) critical segment stretch and critical
+        equilibrium chain stretch values
         
-        This function numerically calculates the Pade-to-Bergstrom 
-        (P2B) critical segment stretch and critical equilibrium chain
-        stretch values
+        This function numerically calculates the Pade-to-Bergstrom (P2B)
+        critical segment stretch and critical equilibrium chain stretch
+        values
         """
         lmbda_c_eq_min   = 0.
         lmbda_c_eq_max   = 1.
@@ -337,24 +334,24 @@ class CompositeuFJC:
         elif lmbda_nu < self.lmbda_nu_pade2berg_crit:
             alpha_tilde = 1.
             
-            trm_i = self.kappa_nu + 3.
+            trm_i  = self.kappa_nu + 3.
             trm_ii = 1.
             beta_tilde = trm_i * (trm_ii-lmbda_nu)
 
-            trm_i = 2. * self.kappa_nu + 3.
-            trm_ii = 2.
+            trm_i   = 2. * self.kappa_nu + 3.
+            trm_ii  = 2.
             trm_iii = 2. * self.kappa_nu
             gamma_tilde = trm_i * (lmbda_nu**2-trm_ii*lmbda_nu) + trm_iii
             
-            trm_i = self.kappa_nu + 1.
-            trm_ii = 3.
+            trm_i   = self.kappa_nu + 1.
+            trm_ii  = 3.
             trm_iii = 2.
-            trm_iv = self.kappa_nu
-            trm_v = 1.
+            trm_iv  = self.kappa_nu
+            trm_v   = 1.
             delta_tilde = (trm_i * (trm_ii*lmbda_nu**2-lmbda_nu**3)
                             - trm_iii * (trm_iv*lmbda_nu+trm_v))
             
-            pi_tilde_nmrtr = 3. * alpha_tilde * gamma_tilde - beta_tilde**2
+            pi_tilde_nmrtr  = 3. * alpha_tilde * gamma_tilde - beta_tilde**2
             pi_tilde_dnmntr = 3. * alpha_tilde**2
             pi_tilde = pi_tilde_nmrtr / pi_tilde_dnmntr
 
@@ -394,7 +391,7 @@ class CompositeuFJC:
             
             trm_i  = -3. * (self.kappa_nu+1.)
             trm_ii = -(2.*self.kappa_nu+3.)
-            beta_tilde_nmrtr = trm_i + lmbda_c_eq * trm_ii
+            beta_tilde_nmrtr  = trm_i + lmbda_c_eq * trm_ii
             beta_tilde_dnmntr = self.kappa_nu + 1.
             beta_tilde  = beta_tilde_nmrtr / beta_tilde_dnmntr
             
@@ -413,7 +410,7 @@ class CompositeuFJC:
             delta_tilde_dnmntr = self.kappa_nu + 1.
             delta_tilde  = delta_tilde_nmrtr / delta_tilde_dnmntr
 
-            pi_tilde_nmrtr = 3. * alpha_tilde * gamma_tilde - beta_tilde**2
+            pi_tilde_nmrtr  = 3. * alpha_tilde * gamma_tilde - beta_tilde**2
             pi_tilde_dnmntr = 3. * alpha_tilde**2
             pi_tilde = pi_tilde_nmrtr / pi_tilde_dnmntr
 
@@ -468,14 +465,14 @@ class CompositeuFJC:
                 / ((1.-lmbda_comp_nu)*(1.+1.01524*lmbda_comp_nu)))
     
     def s_cnu_func(self, lmbda_comp_nu):
-        """Nondimensional chain-level entropic free energy 
-        contribution per segment as calculated by the Jedynak R[9,2]
-        inverse Langevin approximate
+        """Nondimensional chain-level entropic free energy contribution
+        per segment as calculated by the Jedynak R[9,2] inverse Langevin
+        approximate
         
-        This function computes the nondimensionalchain-level entropic
+        This function computes the nondimensional chain-level entropic
         free energy contribution per segment as calculated by the
-        Jedynak R[9,2] inverse Langevin approximate as a function of 
-        the result of the equilibrium chain stretch minus the segment
+        Jedynak R[9,2] inverse Langevin approximate as a function of the
+        result of the equilibrium chain stretch minus the segment
         stretch plus one
         """
         return (0.0602726941412868 * lmbda_comp_nu**8
@@ -491,12 +488,11 @@ class CompositeuFJC:
                 - 0.0150047080499398)
     
     def psi_cnu_func(self, lmbda_nu, lmbda_c_eq):
-        """Nondimensional chain-level Helmholtz free energy per 
-        segment
+        """Nondimensional chain-level Helmholtz free energy per segment
         
-        This function computes the nondimensional chain-level
-        Helmholtz free energy per segment as a function of the segment
-        stretch and the equilibrium chain stretch
+        This function computes the nondimensional chain-level Helmholtz
+        free energy per segment as a function of the segment stretch and
+        the equilibrium chain stretch
         """
         lmbda_comp_nu = lmbda_c_eq - lmbda_nu + 1.
         
@@ -514,8 +510,8 @@ class CompositeuFJC:
         return self.inv_L_func(lmbda_comp_nu)
     
     def u_nu_tot_hat_func(self, lmbda_nu_hat, lmbda_nu):
-        """Nondimensional total segment potential under an applied 
-        chain force
+        """Nondimensional total segment potential under an applied chain
+        force
         
         This function computes the nondimensional total segment
         potential under an applied chain force as a function of the
@@ -528,7 +524,7 @@ class CompositeuFJC:
                 - lmbda_nu * self.xi_c_func(lmbda_nu_hat, lmbda_c_eq_hat))
     
     def u_nu_hat_func(self, lmbda_nu_hat, lmbda_nu):
-        """Nondimensional total distorted segment potential under an 
+        """Nondimensional total distorted segment potential under an
         applied chain force
         
         This function computes the nondimensional total distorted
@@ -564,10 +560,10 @@ class CompositeuFJC:
         nondimensional total distorted segment potential under an 
         applied chain force
         
-        This function computes the segment stretch corresponding to 
-        the local minimum of the nondimensional total distorted
-        segment potential under an applied chain force as a function 
-        of the applied segment stretch
+        This function computes the segment stretch corresponding to the
+        local minimum of the nondimensional total distorted segment
+        potential under an applied chain force as a function of the
+        applied segment stretch
         """
         lmbda_c_eq_hat = self.lmbda_c_eq_func(lmbda_nu_hat)
         
@@ -579,10 +575,10 @@ class CompositeuFJC:
         nondimensional total distorted segment potential under an 
         applied chain force
         
-        This function computes the segment stretch corresponding to 
-        the local maximum of the nondimensional total distorted
-        segment potential under an applied chain force as a function 
-        of the applied segment stretch
+        This function computes the segment stretch corresponding to the
+        local maximum of the nondimensional total distorted segment
+        potential under an applied chain force as a function of the
+        applied segment stretch
         """
         lmbda_c_eq_hat = self.lmbda_c_eq_func(lmbda_nu_hat)
         
@@ -647,25 +643,25 @@ class CompositeuFJC:
     def p_c_sur_hat_func(self, lmbda_nu_hat):
         """Rate-independent probability of chain survival
         
-        This function computes the rate-independent probability of
-        chain survival as a function of the applied segment stretch
+        This function computes the rate-independent probability of chain
+        survival as a function of the applied segment stretch
         """
         return self.p_nu_sur_hat_func(lmbda_nu_hat)**self.nu
     
     def p_c_sci_hat_func(self, lmbda_nu_hat):
         """Rate-independent probability of chain scission
         
-        This function computes the rate-independent probability of
-        chain scission as a function of the applied segment stretch
+        This function computes the rate-independent probability of chain
+        scission as a function of the applied segment stretch
         """
         return 1. - self.p_c_sur_hat_func(lmbda_nu_hat)
     
     def upsilon_c_func(self, k_cond_val, lmbda_nu_hat):
         """Rate-independent chain degradation
         
-        This function computes the rate-independent chain degradation
-        as a function of an additive conditioning parameter and the
-        applied segment stretch
+        This function computes the rate-independent chain degradation as
+        a function of an additive conditioning parameter and the applied
+        segment stretch
         """
         return ((1.-k_cond_val) * self.p_c_sur_hat_func(lmbda_nu_hat) 
                 + k_cond_val)
@@ -673,17 +669,17 @@ class CompositeuFJC:
     def d_c_func(self, k_cond_val, lmbda_nu_hat):
         """Rate-independent chain damage
         
-        This function computes the rate-independent chain damage
-        as a function of an additive conditioning parameter and the
-        applied segment stretch
+        This function computes the rate-independent chain damage as a
+        function of an additive conditioning parameter and the applied
+        segment stretch
         """
         return 1. - self.upsilon_c_func(k_cond_val, lmbda_nu_hat)
     
     def epsilon_cnu_sci_hat_func(self, lmbda_nu_hat):
         """Nondimensional chain scission energy
         
-        This function computes the nondimensional chain scission
-        energy as a function of the applied segment stretch
+        This function computes the nondimensional chain scission energy
+        as a function of the applied segment stretch
         """
         return self.epsilon_nu_sci_hat_func(lmbda_nu_hat)
     
@@ -728,10 +724,10 @@ class CompositeuFJC:
         """Integrand of the statistical expected value of the
         rate-independent nondimensional segment scission energy
         
-        This function computes the integrand of the statistical
-        expected value of the rate-independent nondimensional segment
-        scission energy as a function of its prior value and the
-        current and maximum applied segment stretch values
+        This function computes the integrand of the statistical expected
+        value of the rate-independent nondimensional segment scission
+        energy as a function of its prior value and the current and
+        maximum applied segment stretch values
         """
         # statistical expected value of the nondimensional segment
         # scission energy cannot be destroyed
@@ -769,16 +765,15 @@ class CompositeuFJC:
             epsilon_nu_sci_hat_val,
             expctd_val_epsilon_nu_sci_hat_intgrnd_val_prior,
             epsilon_nu_sci_hat_prior, expctd_val_epsilon_nu_sci_hat_val_prior):
-        """History-dependent integral of the statistical expected 
-        value of the rate-independent nondimensional segment scission
-        energy
+        """History-dependent integral of the statistical expected value
+        of the rate-independent nondimensional segment scission energy
         
         This function computes the history-dependent integral of the
         statistical expected value of the rate-independent 
         nondimensional segment scission energy as a function of its
         prior value and the current and prior values of both the
-        nondimensional segment scission energy and the integrand of
-        the statistical expected value of the rate-independent
+        nondimensional segment scission energy and the integrand of the
+        statistical expected value of the rate-independent
         nondimensional segment scission energy
         """
         return (
@@ -815,7 +810,8 @@ class CompositeuFJC:
             lmbda_nu_hat_val = lmbda_nu_hat_steps[lmbda_nu_hat_indx]
             lmbda_nu_hat_max = max([lmbda_nu_hat_max, lmbda_nu_hat_val])
             
-            if lmbda_nu_hat_indx == 0: # preserve initialization and continue on
+            # preserve initialization and continue on
+            if lmbda_nu_hat_indx == 0:
                 epsilon_nu_diss_hat_crit_val = 0
             else:
                 epsilon_nu_diss_hat_crit_val = self.epsilon_nu_diss_hat_func(
@@ -831,13 +827,13 @@ class CompositeuFJC:
     def p_nu_sci_hat_cum_intgrl_func(
             self, p_nu_sci_hat_val, t_val, p_nu_sci_hat_prior, t_prior, 
             p_nu_sci_hat_cum_intgrl_val_prior):
-        """History-dependent time integral of the probability of
-        segment scission
+        """History-dependent time integral of the probability of segment
+        scission
         
-        This function computes the history-dependent time integral of 
-        the probability of segment scission as a function of its
-        prior value and the current and prior values of both the
-        probability of segment scission and time
+        This function computes the history-dependent time integral of
+        the probability of segment scission as a function of its prior
+        value and the current and prior values of both the probability
+        of segment scission and time
         """
         return p_nu_sci_hat_cum_intgrl_val_prior + integrate.trapezoid(
             [p_nu_sci_hat_prior, p_nu_sci_hat_val], x=[t_prior, t_val])
@@ -845,18 +841,18 @@ class CompositeuFJC:
     def gamma_c_func(self, p_nu_sci_hat_cum_intgrl_val):
         """Rate-dependent probability of chain scission
         
-        This function computes the rate-dependent probability of
-        chain scission as a function of the history-dependent time
-        integral of the probability of segment scission
+        This function computes the rate-dependent probability of chain
+        scission as a function of the history-dependent time integral of
+        the probability of segment scission
         """
         return 1. - np.exp(-self.nu*self.omega_0*p_nu_sci_hat_cum_intgrl_val)
     
     def rho_c_func(self, p_nu_sci_hat_cum_intgrl_val):
-        """Rate-dependent probability of chain survivaln
+        """Rate-dependent probability of chain survival
         
-        This function computes the rate-dependent probability of
-        chain survival as a function of the history-dependent time
-        integral of the probability of segment scission
+        This function computes the rate-dependent probability of chain
+        survival as a function of the history-dependent time integral of
+        the probability of segment scission
         """
         return 1. - self.gamma_c_func(p_nu_sci_hat_cum_intgrl_val)
 
@@ -865,14 +861,13 @@ class CompositeuFJC:
         
         This function computes the nondimensional dissipated chain
         scission energy for both rate-independent and rate-dependent
-        cases. For the rate-independent case, this is a function of
-        its prior value, as well as the current, prior, and maximum
-        applied segment stretch values. For the rate-dependent case, 
-        this is a function of its prior value, the current applied
-        segment stretch, the current and prior values of time, the
-        current probability of segment scission, and the 
-        history-dependent time integral of the probability of segment
-        scission
+        cases. For the rate-independent case, this is a function of its
+        prior value, as well as the current, prior, and maximum applied
+        segment stretch values. For the rate-dependent case, this is a
+        function of its prior value, the current applied segment
+        stretch, the current and prior values of time, the current
+        probability of segment scission, and the history-dependent time
+        integral of the probability of segment scission
         """
         if self.rate_dependence == 'rate_independent':
             # Initialize parameter values
@@ -1013,11 +1008,11 @@ class CompositeuFJC:
     
     def I_func(self, n, nu):
         """Intact equilibrium chain configuration partition function
-        integration through all admissible end-to-end chain distances
-        up to the critical point
+        integration through all admissible end-to-end chain distances up
+        to the critical point
         
-        This function numerically computes the intact equilibrium
-        chain configuration partition function through all admissible
+        This function numerically computes the intact equilibrium chain
+        configuration partition function through all admissible
         end-to-end chain distances up to the critical point as a 
         function of integer n and segment number nu
         """

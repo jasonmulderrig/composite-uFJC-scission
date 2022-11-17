@@ -1,7 +1,12 @@
 #!/bin/bash
 
-# Ideally, the composite-uFJC-scission virtual environment should be activated
-# The CompositeuFJCScissionCharacterizer objects in chain_network_reference_stretches.py and pade2bergstrom_critical_point.py below must be acted upon only by the finalization() module, with the pickle objects being loaded in that module already created
+# Ideally, the composite-uFJC-scission virtual environment should be
+# activated
+# The CompositeuFJCScissionCharacterizer objects in
+# chain_network_reference_stretches.py and
+# pade2bergstrom_critical_point.py below must be acted upon only by the
+# finalization() module, with the pickle objects being loaded in that
+# module already created
 
 python3 chain_helmholtz_free_energy_minimization_method_comparison.py
 python3 chain_mechanical_response.py

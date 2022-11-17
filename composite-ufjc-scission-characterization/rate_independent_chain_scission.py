@@ -4,6 +4,7 @@ from composite_ufjc_scission import CompositeuFJCScissionCharacterizer, Composit
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 class RateIndependentChainScissionCharacterizer(CompositeuFJCScissionCharacterizer):
 
     def __init__(self):
@@ -16,10 +17,10 @@ class RateIndependentChainScissionCharacterizer(CompositeuFJCScissionCharacteriz
         """
         p = self.parameters
 
-        p.characterizer.lmbda_nu_inc      = 0.0001
-        p.characterizer.lmbda_nu_min      = 0.50
-        p.characterizer.lmbda_nu_max      = 2.50
-        p.characterizer.lmbda_nu_hat_num  = 4
+        p.characterizer.lmbda_nu_inc     = 0.0001
+        p.characterizer.lmbda_nu_min     = 0.50
+        p.characterizer.lmbda_nu_max     = 2.50
+        p.characterizer.lmbda_nu_hat_num = 4
 
         p.characterizer.color_list = ['orange', 'blue', 'green', 'red', 'purple']
     

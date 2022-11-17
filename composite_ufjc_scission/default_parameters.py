@@ -5,11 +5,12 @@ The default parameters module for the composite uFJC scission model
 # import necessary libraries
 from types import SimpleNamespace
 
+
 def default_parameters():
     """Save default parameters.
     
-    This core function stores the default parameters from each subset
-    of parameters to a main parameters NameSpace object, which is then
+    This core function stores the default parameters from each subset of
+    parameters to a main parameters NameSpace object, which is then
     returned.
     """
     parameters = SimpleNamespace()
@@ -28,7 +29,7 @@ def default_characterizer_parameters():
     characterizer = SimpleNamespace()
 
     # 5, 125, 3125
-    nu_single_chain_list = [int(5**(2*i- )) for i in range(1, 4)]
+    nu_single_chain_list = [int(5**(2*i-1)) for i in range(1, 4)]
     nu_label_single_chain_list = [
         r'$\nu='+str(nu_single_chain_list[i])+'$'
         for i in range(len(nu_single_chain_list))
