@@ -28,7 +28,7 @@ def default_characterizer_parameters():
     characterizer = SimpleNamespace()
 
     # 5, 125, 3125
-    nu_single_chain_list = [int(5**( 2*i - 1 )) for i in range(1, 4)]
+    nu_single_chain_list = [int(5**(2*i- )) for i in range(1, 4)]
     nu_label_single_chain_list = [
         r'$\nu='+str(nu_single_chain_list[i])+'$'
         for i in range(len(nu_single_chain_list))

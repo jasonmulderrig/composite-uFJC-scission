@@ -31,8 +31,8 @@ def create_savedir(savedir):
 def save_pickle_object(savedir, object, object_filename):
     """Save Python object in a .pickle file.
 
-    This function saves a Python object in a .pickle file in a specified
-    directory with a specified .pickle filename.
+    This function saves a Python object in a .pickle file in a 
+    specified directory with a specified .pickle filename.
     """
     object2file = open(savedir+object_filename+'.pickle', 'wb')
     pickle.dump(object, object2file, pickle.HIGHEST_PROTOCOL)
