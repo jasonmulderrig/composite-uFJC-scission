@@ -9,10 +9,10 @@ import numpy as np
 from scipy import integrate
 
 # Define numerical tolerance parameters
-min_exponent = np.log(sys.float_info.min)/np.log(10)
-max_exponent = np.log(sys.float_info.max)/np.log(10)
+min_exponent = np.log(sys.float_info.min) / np.log(10)
+max_exponent = np.log(sys.float_info.max) / np.log(10)
 eps_val      = np.finfo(float).eps
-cond_val     = eps_val*5e12
+cond_val     = eps_val * 5e12
 
 class CompositeuFJC:
     """The composite uFJC scission single-chain model class."""
@@ -145,7 +145,7 @@ class CompositeuFJC:
         This function computes the nondimensional composite uFJC 
         segment potential energy as a function of the segment stretch.
         """
-        if lmbda_nu < self.lmbda_nu_crit:
+        if lmbda_nu <= self.lmbda_nu_crit:
             return self.u_nu_subcrit_func(lmbda_nu)
         
         else:
@@ -236,28 +236,24 @@ class CompositeuFJC:
         else:
             alpha_tilde = 1.
             
-            beta_tilde_trm_i  = -3. * (self.kappa_nu+1.)
-            beta_tilde_trm_ii = -(2.*self.kappa_nu+3.)
-            beta_tilde_nmrtr = (beta_tilde_trm_i 
-                                + lmbda_c_eq * beta_tilde_trm_ii)
+            trm_i  = -3. * (self.kappa_nu+1.)
+            trm_ii = -(2.*self.kappa_nu+3.)
+            beta_tilde_nmrtr = trm_i + lmbda_c_eq * trm_ii
             beta_tilde_dnmntr = self.kappa_nu + 1.
             beta_tilde  = beta_tilde_nmrtr / beta_tilde_dnmntr
             
-            gamma_tilde_trm_i   = 2. * self.kappa_nu
-            gamma_tilde_trm_ii  = 4. * self.kappa_nu + 6.
-            gamma_tilde_trm_iii = self.kappa_nu + 3.
-            gamma_tilde_nmrtr = (gamma_tilde_trm_i + lmbda_c_eq
-                                    * (gamma_tilde_trm_ii+lmbda_c_eq
-                                        *gamma_tilde_trm_iii))
+            trm_i   = 2. * self.kappa_nu
+            trm_ii  = 4. * self.kappa_nu + 6.
+            trm_iii = self.kappa_nu + 3.
+            gamma_tilde_nmrtr = trm_i + lmbda_c_eq * (trm_ii+lmbda_c_eq*trm_iii)
             gamma_tilde_dnmntr = self.kappa_nu + 1.
             gamma_tilde  = gamma_tilde_nmrtr / gamma_tilde_dnmntr
 
-            delta_tilde_trm_i   = 2.
-            delta_tilde_trm_ii  = 2. * self.kappa_nu
-            delta_tilde_trm_iii = self.kappa_nu + 3.
-            delta_tilde_nmrtr = (delta_tilde_trm_i - lmbda_c_eq 
-                                    * (delta_tilde_trm_ii+lmbda_c_eq
-                                    *(delta_tilde_trm_iii+lmbda_c_eq)))
+            trm_i   = 2.
+            trm_ii  = 2. * self.kappa_nu
+            trm_iii = self.kappa_nu + 3.
+            delta_tilde_nmrtr = (trm_i - lmbda_c_eq
+                                    * (trm_ii+lmbda_c_eq*(trm_iii+lmbda_c_eq)))
             delta_tilde_dnmntr = self.kappa_nu + 1.
             delta_tilde  = delta_tilde_nmrtr / delta_tilde_dnmntr
 
@@ -341,26 +337,22 @@ class CompositeuFJC:
         elif lmbda_nu < self.lmbda_nu_pade2berg_crit:
             alpha_tilde = 1.
             
-            beta_tilde_trm_i = self.kappa_nu + 3.
-            beta_tilde_trm_ii = 1. - lmbda_nu
-            beta_tilde = beta_tilde_trm_i * beta_tilde_trm_ii
+            trm_i = self.kappa_nu + 3.
+            trm_ii = 1.
+            beta_tilde = trm_i * (trm_ii-lmbda_nu)
 
-            gamma_tilde_trm_i = 2. * self.kappa_nu + 3.
-            gamma_tilde_trm_ii = 2.
-            gamma_tilde_trm_iii = 2. * self.kappa_nu
-            gamma_tilde = (gamma_tilde_trm_i
-                            *(lmbda_nu**2-gamma_tilde_trm_ii*lmbda_nu) 
-                            + gamma_tilde_trm_iii)
+            trm_i = 2. * self.kappa_nu + 3.
+            trm_ii = 2.
+            trm_iii = 2. * self.kappa_nu
+            gamma_tilde = trm_i * (lmbda_nu**2-trm_ii*lmbda_nu) + trm_iii
             
-            delta_tilde_trm_i = self.kappa_nu + 1.
-            delta_tilde_trm_ii = 3.
-            delta_tilde_trm_iii = 2.
-            delta_tilde_trm_iv = self.kappa_nu
-            delta_tilde_trm_v = 1.
-            delta_tilde = (delta_tilde_trm_i
-                            * (delta_tilde_trm_ii*lmbda_nu**2-lmbda_nu**3)
-                            - delta_tilde_trm_iii
-                            * (delta_tilde_trm_iv*lmbda_nu+delta_tilde_trm_v))
+            trm_i = self.kappa_nu + 1.
+            trm_ii = 3.
+            trm_iii = 2.
+            trm_iv = self.kappa_nu
+            trm_v = 1.
+            delta_tilde = (trm_i * (trm_ii*lmbda_nu**2-lmbda_nu**3)
+                            - trm_iii * (trm_iv*lmbda_nu+trm_v))
             
             pi_tilde_nmrtr = 3. * alpha_tilde * gamma_tilde - beta_tilde**2
             pi_tilde_dnmntr = 3. * alpha_tilde**2
@@ -378,7 +370,7 @@ class CompositeuFJC:
                     - beta_tilde / (3.*alpha_tilde))
         
         # Bergstrom approximant
-        elif lmbda_nu < self.lmbda_nu_crit:
+        elif lmbda_nu <= self.lmbda_nu_crit:
             return lmbda_nu - 1. / (self.kappa_nu*(lmbda_nu-1.))
         
         # Bergstrom approximant
@@ -400,28 +392,24 @@ class CompositeuFJC:
         elif lmbda_c_eq < self.lmbda_c_eq_pade2berg_crit:
             alpha_tilde = 1.
             
-            beta_tilde_trm_i  = -3. * (self.kappa_nu+1.)
-            beta_tilde_trm_ii = -(2.*self.kappa_nu+3.)
-            beta_tilde_nmrtr = (beta_tilde_trm_i 
-                                + lmbda_c_eq * beta_tilde_trm_ii)
+            trm_i  = -3. * (self.kappa_nu+1.)
+            trm_ii = -(2.*self.kappa_nu+3.)
+            beta_tilde_nmrtr = trm_i + lmbda_c_eq * trm_ii
             beta_tilde_dnmntr = self.kappa_nu + 1.
             beta_tilde  = beta_tilde_nmrtr / beta_tilde_dnmntr
             
-            gamma_tilde_trm_i   = 2. * self.kappa_nu
-            gamma_tilde_trm_ii  = 4. * self.kappa_nu + 6.
-            gamma_tilde_trm_iii = self.kappa_nu + 3.
-            gamma_tilde_nmrtr = (gamma_tilde_trm_i + lmbda_c_eq
-                                    * (gamma_tilde_trm_ii+lmbda_c_eq
-                                        *gamma_tilde_trm_iii))
+            trm_i   = 2. * self.kappa_nu
+            trm_ii  = 4. * self.kappa_nu + 6.
+            trm_iii = self.kappa_nu + 3.
+            gamma_tilde_nmrtr = trm_i + lmbda_c_eq * (trm_ii+lmbda_c_eq*trm_iii)
             gamma_tilde_dnmntr = self.kappa_nu + 1.
             gamma_tilde  = gamma_tilde_nmrtr / gamma_tilde_dnmntr
 
-            delta_tilde_trm_i   = 2.
-            delta_tilde_trm_ii  = 2. * self.kappa_nu
-            delta_tilde_trm_iii = self.kappa_nu + 3.
-            delta_tilde_nmrtr = (delta_tilde_trm_i - lmbda_c_eq 
-                                    * (delta_tilde_trm_ii+lmbda_c_eq
-                                    *(delta_tilde_trm_iii+lmbda_c_eq)))
+            trm_i   = 2.
+            trm_ii  = 2. * self.kappa_nu
+            trm_iii = self.kappa_nu + 3.
+            delta_tilde_nmrtr = (trm_i - lmbda_c_eq 
+                                    * (trm_ii+lmbda_c_eq*(trm_iii+lmbda_c_eq)))
             delta_tilde_dnmntr = self.kappa_nu + 1.
             delta_tilde  = delta_tilde_nmrtr / delta_tilde_dnmntr
 
@@ -441,7 +429,7 @@ class CompositeuFJC:
                     - beta_tilde / (3.*alpha_tilde))
         
         # Bergstrom approximant
-        elif lmbda_c_eq < self.lmbda_c_eq_crit:
+        elif lmbda_c_eq <= self.lmbda_c_eq_crit:
             sqrt_arg = lmbda_c_eq**2 - 2. * lmbda_c_eq + 1. + 4. / self.kappa_nu
             return (lmbda_c_eq+1.+np.sqrt(sqrt_arg)) / 2.
         
@@ -525,7 +513,7 @@ class CompositeuFJC:
         
         return self.inv_L_func(lmbda_comp_nu)
     
-    def u_nu_tot_hat_func(self, lmbda_nu, lmbda_nu_hat): # u_nu_tot_hat_func(self, lmbda_nu_hat, lmbda_nu)
+    def u_nu_tot_hat_func(self, lmbda_nu_hat, lmbda_nu):
         """Nondimensional total segment potential under an applied 
         chain force
         
@@ -539,7 +527,7 @@ class CompositeuFJC:
         return (self.u_nu_func(lmbda_nu)
                 - lmbda_nu * self.xi_c_func(lmbda_nu_hat, lmbda_c_eq_hat))
     
-    def u_nu_hat_func(self, lmbda_nu, lmbda_nu_hat): # u_nu_hat_func(self, lmbda_nu_hat, lmbda_nu)
+    def u_nu_hat_func(self, lmbda_nu_hat, lmbda_nu):
         """Nondimensional total distorted segment potential under an 
         applied chain force
         
@@ -602,10 +590,11 @@ class CompositeuFJC:
             return np.inf
         
         else:
-            return (1. + np.cbrt(
-                    self.zeta_nu_char**2
-                    /(self.kappa_nu
-                    *self.xi_c_func(lmbda_nu_hat, lmbda_c_eq_hat))))
+            cbrt_arg_nmrtr = self.zeta_nu_char**2
+            cbrt_arg_dnmntr = (self.kappa_nu 
+                                * self.xi_c_func(lmbda_nu_hat, lmbda_c_eq_hat))
+            cbrt_arg = cbrt_arg_nmrtr / cbrt_arg_dnmntr
+            return 1. + np.cbrt(cbrt_arg)
     
     def e_nu_sci_hat_func(self, lmbda_nu_hat):
         """Nondimensional segment scission activation energy barrier
@@ -625,8 +614,8 @@ class CompositeuFJC:
             return 0.
         
         else:
-            return (self.u_nu_hat_func(lmbda_nu_locmax_hat, lmbda_nu_hat) 
-                    - self.u_nu_hat_func(lmbda_nu_locmin_hat, lmbda_nu_hat))
+            return (self.u_nu_hat_func(lmbda_nu_hat, lmbda_nu_locmax_hat) 
+                    - self.u_nu_hat_func(lmbda_nu_hat, lmbda_nu_locmin_hat))
     
     def epsilon_nu_sci_hat_func(self, lmbda_nu_hat):
         """Nondimensional segment scission energy
@@ -808,7 +797,8 @@ class CompositeuFJC:
         dissipated segment scission energy for a chain at the critical
         state
         """        
-        # Define the values of the applied segment stretch to calculate over
+        # Define the values of the applied segment stretch to 
+        # calculate over
         lmbda_nu_hat_num_steps = (int(
             np.around(
                 (self.lmbda_nu_crit-self.lmbda_nu_ref)/self.lmbda_nu_hat_inc))

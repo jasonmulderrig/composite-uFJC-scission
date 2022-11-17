@@ -53,12 +53,12 @@ class TotalDistortedSegmentPotentialEnergyFunctionCharacterizer(CompositeuFJCSci
         for lmbda_nu_hat_indx in range(cp.lmbda_nu_hat_num):
             lmbda_nu_hat        = lmbda_nu_hat_steps[lmbda_nu_hat_indx]
             lmbda_nu_locmin_hat = single_chain.lmbda_nu_locmin_hat_func(lmbda_nu_hat)
-            u_nu_locmin_hat = single_chain.u_nu_hat_func(lmbda_nu_locmin_hat, lmbda_nu_hat)
+            u_nu_locmin_hat = single_chain.u_nu_hat_func(lmbda_nu_hat, lmbda_nu_locmin_hat)
             lmbda_nu_locmax_hat = single_chain.lmbda_nu_locmax_hat_func(lmbda_nu_hat)
             if lmbda_nu_locmax_hat == np.inf:
                 u_nu_locmax_hat = np.nan
             else:
-                u_nu_locmax_hat = single_chain.u_nu_hat_func(lmbda_nu_locmax_hat, lmbda_nu_hat)
+                u_nu_locmax_hat = single_chain.u_nu_hat_func(lmbda_nu_hat, lmbda_nu_locmax_hat)
             
             # Make arrays to allocate results
             lmbda_nu = []
@@ -67,7 +67,7 @@ class TotalDistortedSegmentPotentialEnergyFunctionCharacterizer(CompositeuFJCSci
             # Calculate results through specified segment stretch values
             for lmbda_nu_indx in range(lmbda_nu_num_steps):
                 lmbda_nu_val = lmbda_nu_steps[lmbda_nu_indx]
-                u_nu_hat_val = single_chain.u_nu_hat_func(lmbda_nu_val, lmbda_nu_hat)
+                u_nu_hat_val = single_chain.u_nu_hat_func(lmbda_nu_hat, lmbda_nu_val)
                 
                 lmbda_nu.append(lmbda_nu_val)
                 u_nu_hat.append(u_nu_hat_val)
