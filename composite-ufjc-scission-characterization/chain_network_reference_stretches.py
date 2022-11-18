@@ -148,7 +148,8 @@ class ChainNetworkReferenceStretches(CompositeuFJCScissionCharacterizer):
             self.savedir,
             "A_nu-gen-ufjc-model-framework-and-inextensible-Gaussian-chain-comparison")
 
-        # retrieve and plot results for constant zeta_nu_char in subplots
+        # retrieve and plot results for constant zeta_nu_char in
+        # subplots
         fig, axs = plt.subplots(
             len(cp.zeta_nu_char_chain_network_list), sharex=True)
         axs = axs.ravel()

@@ -107,7 +107,8 @@ class ChainHelmholtzFreeEnergyMinimizationMethodComparisonCharacterizer(
             return (u_nu_func(lmbda_nu, zeta_nu_char, kappa_nu) 
                     + s_cnu_func(lmbda_comp_nu))
         
-        def supercrit_psi_cnu_func(lmbda_nu, lmbda_c_eq, zeta_nu_char, kappa_nu):
+        def supercrit_psi_cnu_func(
+                lmbda_nu, lmbda_c_eq, zeta_nu_char, kappa_nu):
             """Nondimensional super-critical chain state chain-level
             Helmholtz free energy per segment
             
@@ -162,8 +163,7 @@ class ChainHelmholtzFreeEnergyMinimizationMethodComparisonCharacterizer(
         
         cp = self.parameters.characterizer
 
-        # Evaluate zeta_nu_char
-        # Here, nu=125 and kappa_nu=1000
+        # Evaluate zeta_nu_char for nu=125 and kappa_nu=1000
         psi_minimization_zeta_nu_char_single_chain_list = [
             CompositeuFJC(
                 rate_dependence='rate_independent',
@@ -204,7 +204,8 @@ class ChainHelmholtzFreeEnergyMinimizationMethodComparisonCharacterizer(
             # calculate over
             lmbda_c_eq_num_steps = (int(
                 np.around(
-                    (lmbda_c_eq_max-cp.lmbda_c_eq_min)/cp.lmbda_c_eq_inc)) + 1)
+                    (lmbda_c_eq_max-cp.lmbda_c_eq_min)/cp.lmbda_c_eq_inc))
+                + 1)
             lmbda_c_eq_steps = np.linspace(
                 cp.lmbda_c_eq_min, lmbda_c_eq_max, lmbda_c_eq_num_steps)
 
@@ -278,8 +279,7 @@ class ChainHelmholtzFreeEnergyMinimizationMethodComparisonCharacterizer(
         )
 
 
-        # Evaluate kappa_nu
-        # Here, nu=125 and zeta_nu_char=100
+        # Evaluate kappa_nu for nu=125 and zeta_nu_char=100
         psi_minimization_kappa_nu_single_chain_list = [
             CompositeuFJC(
                 rate_dependence='rate_independent',
@@ -320,7 +320,8 @@ class ChainHelmholtzFreeEnergyMinimizationMethodComparisonCharacterizer(
             # calculate over
             lmbda_c_eq_num_steps = (int(
                 np.around(
-                    (lmbda_c_eq_max-cp.lmbda_c_eq_min)/cp.lmbda_c_eq_inc)) + 1)
+                    (lmbda_c_eq_max-cp.lmbda_c_eq_min)/cp.lmbda_c_eq_inc))
+                + 1)
             lmbda_c_eq_steps = np.linspace(
                 cp.lmbda_c_eq_min, lmbda_c_eq_max, lmbda_c_eq_num_steps)
 

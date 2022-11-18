@@ -776,7 +776,7 @@ class AFMChainTensileTestCurveFitCharacterizer(
                             delta_tilde = (zeta_nu_char**2 / kappa_nu 
                                             * lmbda_c_eq_val - 1.)
 
-                            pi_tilde_nmrtr = (3. * alpha_tilde * gamma_tilde 
+                            pi_tilde_nmrtr = (3. * alpha_tilde * gamma_tilde
                                                 - beta_tilde**2)
                             pi_tilde_dnmntr = 3. * alpha_tilde**2
                             pi_tilde = pi_tilde_nmrtr / pi_tilde_dnmntr
@@ -848,7 +848,8 @@ class AFMChainTensileTestCurveFitCharacterizer(
             
             r_nu_fit_num_steps = (int(
                 np.around(
-                    (r_nu_fit_max-cp.r_nu_fit_min)/cp.r_nu_fit_inc)) + 1)
+                    (r_nu_fit_max-cp.r_nu_fit_min)/cp.r_nu_fit_inc))
+                + 1)
             r_nu_fit = np.linspace(
                 cp.r_nu_fit_min, r_nu_fit_max, r_nu_fit_num_steps) # nm
             
@@ -1226,7 +1227,8 @@ class AFMChainTensileTestCurveFitCharacterizer(
                 rate_independent_single_chain.p_c_sci_hat_func(lmbda_nu_val)
             )
             epsilon_cnu_sci_hat_val = (
-                rate_independent_single_chain.epsilon_cnu_sci_hat_func(lmbda_nu_val)
+                rate_independent_single_chain.epsilon_cnu_sci_hat_func(
+                    lmbda_nu_val)
             )
 
             if f_c_indx == 0: # initialization

@@ -61,7 +61,8 @@ class TotalSegmentPotentialEnergyFunctionCharacterizer(
         # Define the segment stretch values to calculate over
         lmbda_nu_num_steps = (int(
             np.around(
-                (cp.lmbda_nu_max-cp.lmbda_nu_min)/cp.lmbda_nu_inc)) + 1)
+                (cp.lmbda_nu_max-cp.lmbda_nu_min)/cp.lmbda_nu_inc))
+            + 1)
         lmbda_nu_steps = np.linspace(
             cp.lmbda_nu_min, cp.lmbda_nu_max, lmbda_nu_num_steps)
         

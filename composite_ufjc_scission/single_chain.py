@@ -163,9 +163,10 @@ class CompositeuFJC:
         sgn = np.sign(lmbda_nu-1.)
         M_arg = sgn * self.kappa_nu * (lmbda_nu-1.)**2 - self.zeta_nu_char
         M_val = self.M_func(M_arg)
-
-        return ((1.-M_val/(M_val+self.zeta_nu_char))**2 
-                * self.u_nu_har_func(lmbda_nu))
+        M_val_frac = M_val / (M_val+self.zeta_nu_char)
+        nonneg_u_nu_har_val = self.u_nu_har_func(lmbda_nu) + self.zeta_nu_char
+        
+        return (1.-M_val_frac)**2 * nonneg_u_nu_har_val - self.zeta_nu_char
     
     def u_nu_sci_comp_func(self, lmbda_nu):
         """Nondimensional segment scission potential energy contribution
@@ -180,8 +181,9 @@ class CompositeuFJC:
         sgn = np.sign(lmbda_nu-1.)
         M_arg = sgn * self.kappa_nu * (lmbda_nu-1.)**2 - self.zeta_nu_char
         M_val = self.M_func(M_arg)
+        M_val_frac = M_val / (M_val+self.zeta_nu_char)
 
-        return self.zeta_nu_char * (M_val/(M_val+self.zeta_nu_char)-1.)
+        return self.zeta_nu_char * (M_val_frac-1.)
     
     def u_nu_M_func(self, lmbda_nu):
         """Nondimensional composite uFJC segment potential energy
@@ -212,7 +214,7 @@ class CompositeuFJC:
         This function computes the sub-critical chain state segment
         stretch (as derived via the Bergstrom approximant for the
         inverse Langevin function) as a function of the equilibrium
-        chain stretch.
+        chain stretch and nondimensional segment stiffness.
         """
         sqrt_arg = lmbda_c_eq**2 - 2. * lmbda_c_eq + 1. + 4. / self.kappa_nu
         return (lmbda_c_eq+1.+np.sqrt(sqrt_arg)) / 2.
@@ -224,7 +226,7 @@ class CompositeuFJC:
         This function computes the sub-critical chain state segment
         stretch (as derived via the Pade approximant for the inverse
         Langevin function) as a function of the equilibrium chain
-        stretch.
+        stretch and nondimensional segment stiffness.
         """
         # analytical solution
         if lmbda_c_eq == 0.:
@@ -797,7 +799,7 @@ class CompositeuFJC:
         lmbda_nu_hat_num_steps = (int(
             np.around(
                 (self.lmbda_nu_crit-self.lmbda_nu_ref)/self.lmbda_nu_hat_inc))
-                + 1)
+            + 1)
         lmbda_nu_hat_steps = np.linspace(
             self.lmbda_nu_ref, self.lmbda_nu_crit, lmbda_nu_hat_num_steps)
 

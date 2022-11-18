@@ -47,7 +47,7 @@ class TotalDistortedSegmentPotentialEnergyFunctionCharacterizer(
         """Define characterization routine"""
         cp = self.parameters.characterizer
 
-        # nu=125, zeta_nu_char=100, kappa_nu=1000
+        # nu=125, zeta_nu_char=100, and kappa_nu=1000
         single_chain = CompositeuFJC(
             rate_dependence='rate_independent',
             nu=cp.nu_single_chain_list[1],
@@ -61,7 +61,8 @@ class TotalDistortedSegmentPotentialEnergyFunctionCharacterizer(
         # Define the segment stretch values to calculate over
         lmbda_nu_num_steps = (int(
             np.around(
-                (cp.lmbda_nu_max-cp.lmbda_nu_min)/cp.lmbda_nu_inc)) + 1)
+                (cp.lmbda_nu_max-cp.lmbda_nu_min)/cp.lmbda_nu_inc))
+            + 1)
         lmbda_nu_steps = np.linspace(
             cp.lmbda_nu_min, cp.lmbda_nu_max, lmbda_nu_num_steps)
         

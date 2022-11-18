@@ -54,8 +54,7 @@ class ChainMechanicalResponseCharacterizer(CompositeuFJCScissionCharacterizer):
 
         cp = self.parameters.characterizer
 
-        # Evaluate zeta_nu_char
-        # Here, nu=125 and kappa_nu=1000
+        # Evaluate zeta_nu_char for nu=125 and kappa_nu=1000
         chain_mech_resp_zeta_nu_char_single_chain_list = [
             CompositeuFJC(
                 rate_dependence='rate_independent',
@@ -132,8 +131,7 @@ class ChainMechanicalResponseCharacterizer(CompositeuFJCScissionCharacterizer):
             chain_mech_resp_zeta_nu_char_xi_c_exact___single_chain_chunk
         )
 
-        # Evaluate kappa_nu
-        # Here, nu=125 and zeta_nu_char=1000
+        # Evaluate kappa_nu for nu=125 and zeta_nu_char=1000
         chain_mech_resp_kappa_nu_single_chain_list = [
             CompositeuFJC(
                 rate_dependence='rate_independent',

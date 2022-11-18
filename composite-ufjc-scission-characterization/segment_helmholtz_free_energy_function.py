@@ -48,7 +48,7 @@ class SegmentHelmholtzFreeEnergyFunctionCharacterizer(
         """Define characterization routine"""
         cp = self.parameters.characterizer
 
-        # nu=125, zeta_nu_char=100, kappa_nu=1000
+        # nu=125, zeta_nu_char=100, and kappa_nu=1000
         single_chain = CompositeuFJC(
             rate_dependence='rate_independent',
             nu=cp.nu_single_chain_list[1],
@@ -58,7 +58,8 @@ class SegmentHelmholtzFreeEnergyFunctionCharacterizer(
         # Define the equilibrium stretch values to calculate over
         lmbda_c_eq_num_steps = (int(
             np.around(
-                (cp.lmbda_c_eq_max-cp.lmbda_c_eq_min)/cp.lmbda_c_eq_inc)) + 1)
+                (cp.lmbda_c_eq_max-cp.lmbda_c_eq_min)/cp.lmbda_c_eq_inc))
+            + 1)
         lmbda_c_eq_steps = np.linspace(
             cp.lmbda_c_eq_min, cp.lmbda_c_eq_max, lmbda_c_eq_num_steps)
         
@@ -68,7 +69,8 @@ class SegmentHelmholtzFreeEnergyFunctionCharacterizer(
         s_cnu      = []
         psi_cnu    = []
         
-        # Calculate results through specified equilibrium chain stretch values
+        # Calculate results through specified equilibrium chain stretch
+        # values
         for lmbda_c_eq_indx in range(lmbda_c_eq_num_steps):
             lmbda_c_eq_val = lmbda_c_eq_steps[lmbda_c_eq_indx]
             lmbda_nu_val   = single_chain.lmbda_nu_func(lmbda_c_eq_val)
