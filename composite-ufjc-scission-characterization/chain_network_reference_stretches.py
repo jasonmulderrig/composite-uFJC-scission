@@ -3,7 +3,7 @@ with varying segment number, nondimensional characteristic segment
 potential energy scale, and nondimensional segment stiffness
 """
 
-# import necessary libraries
+# import external modules
 from __future__ import division
 from composite_ufjc_scission import (
     CompositeuFJCScissionCharacterizer,
@@ -51,6 +51,7 @@ class ChainNetworkReferenceStretches(CompositeuFJCScissionCharacterizer):
                 [
                     CompositeuFJC(
                         rate_dependence='rate_independent',
+                        scission_model='exact',
                         nu=cp.nu_chain_network_list[nu_indx],
                         zeta_nu_char=cp.zeta_nu_char_chain_network_list[zeta_nu_char_indx],
                         kappa_nu=cp.kappa_nu_chain_network_list[kappa_nu_indx])
