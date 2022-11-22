@@ -1,4 +1,4 @@
-"""The core single-chain module for the composite uFJC scission model"""
+"""The core single-chain module for the composite uFJC model"""
 
 # Import external modules
 from __future__ import division
@@ -7,11 +7,16 @@ import numpy as np
 
 
 class CoreCompositeuFJC(object):
-    """The composite uFJC scission single-chain model class."""
+    """The composite uFJC single-chain model class.
+    
+    This class contains methods specifying the core functions and
+    parameters underpinning the composite uFJC single-chain model
+    independent of scission.
+    """
     def __init__(self, **kwargs):
         """
-        Initializes the ``CompositeuFJC`` class, producing a composite
-        uFJC scission single chain model instance.
+        Initializes the ``CoreCompositeuFJC`` class, producing a
+        composite uFJC single chain model instance.
         """
         # Define and store numerical tolerance parameters
         min_exponent = np.log(sys.float_info.min) / np.log(10)

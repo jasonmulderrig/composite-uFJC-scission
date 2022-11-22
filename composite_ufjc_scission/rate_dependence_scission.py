@@ -1,4 +1,6 @@
-"""The single-chain module for the composite uFJC scission model"""
+"""The module for the composite uFJC scission model specifying the
+rate-dependent nature of scission
+"""
 
 # Import external modules
 from __future__ import division
@@ -10,11 +12,22 @@ from .scission_model import ScissionModelCompositeuFJC
 
 
 class RateDependenceScissionCompositeuFJC(ScissionModelCompositeuFJC):
-    """The composite uFJC scission single-chain model class."""
+    """The composite uFJC scission model class specifying the
+    rate-dependent nature of scission.
+
+    This class contains methods specifying the rate-dependent nature of
+    scission for the composite uFJC chain model, which involve defining
+    both energetic and probabilistic quantities. It inherits all
+    attributes and methods from the ``ScissionModelCompositeuFJC``
+    class, which inherits all attributes and methods from the
+    ``CoreCompositeuFJC`` class.
+    """
     def __init__(self, **kwargs):
         """
-        Initializes the ``CompositeuFJC`` class, producing a composite
-        uFJC scission single chain model instance.
+        Initializes the ``RateDependenceScissionCompositeuFJC`` class. 
+        
+        Initialize and inherit all attributes and methods from the
+        ``ScissionModelCompositeuFJC`` class instance
         """
         ScissionModelCompositeuFJC.__init__(self, **kwargs)
     
@@ -52,8 +65,7 @@ class RateDependenceScissionCompositeuFJC(ScissionModelCompositeuFJC):
     
     def rate_dependent_epsilon_nu_diss_hat_func(
             self, p_nu_sci_hat_val, p_nu_sci_hat_cum_intgrl_val, t_val,
-            lmbda_nu_hat_val, t_prior,
-            rate_dependent_epsilon_nu_diss_hat_val_prior):
+            lmbda_nu_hat_val, t_prior, epsilon_nu_diss_hat_val_prior):
         """Nondimensional rate-dependent dissipated segment scission
         energy
         
@@ -71,8 +83,8 @@ class RateDependenceScissionCompositeuFJC(ScissionModelCompositeuFJC):
             * p_nu_sci_hat_val * epsilon_nu_sci_hat_val
         )
         
-        return (rate_dependent_epsilon_nu_diss_hat_val_prior 
-                + epsilon_nu_diss_hat_dot_val * (t_val-t_prior))
+        return (epsilon_nu_diss_hat_val_prior + epsilon_nu_diss_hat_dot_val
+                * (t_val-t_prior))
     
     def rate_dependent_expctd_val_epsilon_nu_sci_hat_intgrnd_func(
             self, p_nu_sci_hat_val, p_nu_sci_hat_cum_intgrl_val, t_val,
@@ -99,10 +111,10 @@ class RateDependenceScissionCompositeuFJC(ScissionModelCompositeuFJC):
                 * self.omega_0 * p_nu_sci_hat_val / epsilon_nu_sci_hat_dot_val)
     
     def rate_dependent_expctd_val_epsilon_nu_sci_hat_cum_intgrl_func(
-            self, rate_dependent_expctd_val_epsilon_nu_sci_hat_intgrnd_val,
+            self, expctd_val_epsilon_nu_sci_hat_intgrnd_val,
             epsilon_nu_sci_hat_val,
-            rate_dependent_expctd_val_epsilon_nu_sci_hat_intgrnd_val_prior,
-            epsilon_nu_sci_hat_prior, rate_dependent_expctd_val_epsilon_nu_sci_hat_val_prior):
+            expctd_val_epsilon_nu_sci_hat_intgrnd_val_prior,
+            epsilon_nu_sci_hat_prior, expctd_val_epsilon_nu_sci_hat_val_prior):
         """History-dependent integral of the statistical expected value
         of the rate-dependent nondimensional segment scission energy
         
@@ -115,10 +127,9 @@ class RateDependenceScissionCompositeuFJC(ScissionModelCompositeuFJC):
         nondimensional segment scission energy
         """
         return (
-            rate_dependent_expctd_val_epsilon_nu_sci_hat_val_prior
-            + integrate.trapezoid(
-                [rate_dependent_expctd_val_epsilon_nu_sci_hat_intgrnd_val_prior,
-                rate_dependent_expctd_val_epsilon_nu_sci_hat_intgrnd_val],
+            expctd_val_epsilon_nu_sci_hat_val_prior + integrate.trapezoid(
+                [expctd_val_epsilon_nu_sci_hat_intgrnd_val_prior,
+                expctd_val_epsilon_nu_sci_hat_intgrnd_val],
                 x=[epsilon_nu_sci_hat_prior, epsilon_nu_sci_hat_val])
         )
     
@@ -163,8 +174,7 @@ class RateDependenceScissionCompositeuFJC(ScissionModelCompositeuFJC):
     
     def rate_dependent_epsilon_cnu_diss_hat_func(
             self, p_nu_sci_hat_val, p_nu_sci_hat_cum_intgrl_val, t_val,
-            lmbda_nu_hat_val, t_prior,
-            rate_dependent_epsilon_cnu_diss_hat_val_prior):
+            lmbda_nu_hat_val, t_prior, epsilon_cnu_diss_hat_val_prior):
         """Nondimensional rate-dependent dissipated chain scission
         energy
         
@@ -182,8 +192,8 @@ class RateDependenceScissionCompositeuFJC(ScissionModelCompositeuFJC):
             * self.omega_0 * p_nu_sci_hat_val * epsilon_nu_sci_hat_val
         )
         
-        return (rate_dependent_epsilon_cnu_diss_hat_val_prior 
-                + epsilon_cnu_diss_hat_dot_val * (t_val-t_prior))
+        return (epsilon_cnu_diss_hat_val_prior + epsilon_cnu_diss_hat_dot_val
+                * (t_val-t_prior))
     
     def rate_dependent_expctd_val_epsilon_cnu_sci_hat_intgrnd_func(
             self, p_nu_sci_hat_val, p_nu_sci_hat_cum_intgrl_val, t_val,
@@ -212,11 +222,11 @@ class RateDependenceScissionCompositeuFJC(ScissionModelCompositeuFJC):
                 / epsilon_cnu_sci_hat_dot_val)
     
     def rate_dependent_expctd_val_epsilon_cnu_sci_hat_cum_intgrl_func(
-            self, rate_dependent_expctd_val_epsilon_cnu_sci_hat_intgrnd_val,
+            self, expctd_val_epsilon_cnu_sci_hat_intgrnd_val,
             epsilon_cnu_sci_hat_val,
-            rate_dependent_expctd_val_epsilon_cnu_sci_hat_intgrnd_val_prior,
+            expctd_val_epsilon_cnu_sci_hat_intgrnd_val_prior,
             epsilon_cnu_sci_hat_prior,
-            rate_dependent_expctd_val_epsilon_cnu_sci_hat_val_prior):
+            expctd_val_epsilon_cnu_sci_hat_val_prior):
         """History-dependent integral of the statistical expected value
         of the rate-dependent nondimensional chain scission energy
         
@@ -229,16 +239,15 @@ class RateDependenceScissionCompositeuFJC(ScissionModelCompositeuFJC):
         nondimensional chain scission energy
         """
         return (
-            rate_dependent_expctd_val_epsilon_cnu_sci_hat_val_prior
-            + integrate.trapezoid(
-                [rate_dependent_expctd_val_epsilon_cnu_sci_hat_intgrnd_val_prior,
-                rate_dependent_expctd_val_epsilon_cnu_sci_hat_intgrnd_val],
+            expctd_val_epsilon_cnu_sci_hat_val_prior + integrate.trapezoid(
+                [expctd_val_epsilon_cnu_sci_hat_intgrnd_val_prior,
+                expctd_val_epsilon_cnu_sci_hat_intgrnd_val],
                 x=[epsilon_cnu_sci_hat_prior, epsilon_cnu_sci_hat_val])
         )
     
     def rate_independent_epsilon_nu_diss_hat_func(
             self, lmbda_nu_hat_max, lmbda_nu_hat_val, lmbda_nu_hat_val_prior,
-            rate_independent_epsilon_nu_diss_hat_val_prior):
+            epsilon_nu_diss_hat_val_prior):
         """Nondimensional rate-independent dissipated segment scission
         energy
         
@@ -249,10 +258,10 @@ class RateDependenceScissionCompositeuFJC(ScissionModelCompositeuFJC):
         """
         # dissipated energy cannot be destroyed
         if lmbda_nu_hat_val < lmbda_nu_hat_max:
-            return rate_independent_epsilon_nu_diss_hat_val_prior
+            return epsilon_nu_diss_hat_val_prior
         # dissipated energy from fully broken segments remains fixed
         elif lmbda_nu_hat_max > self.lmbda_nu_crit:
-            return rate_independent_epsilon_nu_diss_hat_val_prior
+            return epsilon_nu_diss_hat_val_prior
         else:
             if (lmbda_nu_hat_val-1.) <= self.lmbda_nu_hat_inc:
                 epsilon_nu_diss_hat_prime_val = 0
@@ -267,13 +276,13 @@ class RateDependenceScissionCompositeuFJC(ScissionModelCompositeuFJC):
             
             # the lmbda_nu_hat increment here is guaranteed to be 
             # non-negative
-            return (rate_independent_epsilon_nu_diss_hat_val_prior 
+            return (epsilon_nu_diss_hat_val_prior 
                     + epsilon_nu_diss_hat_prime_val
                     * (lmbda_nu_hat_val-lmbda_nu_hat_val_prior))
     
     def rate_independent_expctd_val_epsilon_nu_sci_hat_intgrnd_func(
             self, lmbda_nu_hat_max, lmbda_nu_hat_val, 
-            rate_independent_expctd_val_epsilon_nu_sci_hat_intgrnd_val_prior):
+            expctd_val_epsilon_nu_sci_hat_intgrnd_val_prior):
         """Integrand of the statistical expected value of the
         rate-independent nondimensional segment scission energy
         
@@ -286,13 +295,13 @@ class RateDependenceScissionCompositeuFJC(ScissionModelCompositeuFJC):
         # scission energy cannot be destroyed
         if lmbda_nu_hat_val < lmbda_nu_hat_max:
             return (
-                rate_independent_expctd_val_epsilon_nu_sci_hat_intgrnd_val_prior
+                expctd_val_epsilon_nu_sci_hat_intgrnd_val_prior
             )
         # statistical expected value of the nondimensional segment
         # scission energy from fully broken segments remains fixed
         elif lmbda_nu_hat_max > self.lmbda_nu_crit:
             return (
-                rate_independent_expctd_val_epsilon_nu_sci_hat_intgrnd_val_prior
+                expctd_val_epsilon_nu_sci_hat_intgrnd_val_prior
             )
         else:
             if (lmbda_nu_hat_val-1.) <= self.lmbda_nu_hat_inc:
@@ -318,11 +327,10 @@ class RateDependenceScissionCompositeuFJC(ScissionModelCompositeuFJC):
                         / epsilon_nu_sci_hat_prime_val)
     
     def rate_independent_expctd_val_epsilon_nu_sci_hat_cum_intgrl_func(
-            self, rate_independent_expctd_val_epsilon_nu_sci_hat_intgrnd_val,
+            self, expctd_val_epsilon_nu_sci_hat_intgrnd_val,
             epsilon_nu_sci_hat_val,
-            rate_independent_expctd_val_epsilon_nu_sci_hat_intgrnd_val_prior,
-            epsilon_nu_sci_hat_prior,
-            rate_independent_expctd_val_epsilon_nu_sci_hat_val_prior):
+            expctd_val_epsilon_nu_sci_hat_intgrnd_val_prior,
+            epsilon_nu_sci_hat_prior, expctd_val_epsilon_nu_sci_hat_val_prior):
         """History-dependent integral of the statistical expected value
         of the rate-independent nondimensional segment scission energy
         
@@ -335,10 +343,9 @@ class RateDependenceScissionCompositeuFJC(ScissionModelCompositeuFJC):
         nondimensional segment scission energy
         """
         return (
-            rate_independent_expctd_val_epsilon_nu_sci_hat_val_prior
-            + integrate.trapezoid(
-                [rate_independent_expctd_val_epsilon_nu_sci_hat_intgrnd_val_prior,
-                rate_independent_expctd_val_epsilon_nu_sci_hat_intgrnd_val],
+            expctd_val_epsilon_nu_sci_hat_val_prior + integrate.trapezoid(
+                [expctd_val_epsilon_nu_sci_hat_intgrnd_val_prior,
+                expctd_val_epsilon_nu_sci_hat_intgrnd_val],
                 x=[epsilon_nu_sci_hat_prior, epsilon_nu_sci_hat_val])
         )
     
@@ -363,7 +370,7 @@ class RateDependenceScissionCompositeuFJC(ScissionModelCompositeuFJC):
     
     def rate_independent_epsilon_cnu_diss_hat_func(
             self, lmbda_nu_hat_max, lmbda_nu_hat_val, lmbda_nu_hat_val_prior,
-            rate_independent_epsilon_cnu_diss_hat_val_prior):
+            epsilon_cnu_diss_hat_val_prior):
         """Nondimensional rate-independent dissipated chain scission
         energy
         
@@ -374,10 +381,10 @@ class RateDependenceScissionCompositeuFJC(ScissionModelCompositeuFJC):
         """
         # dissipated energy cannot be destroyed
         if lmbda_nu_hat_val < lmbda_nu_hat_max:
-            return rate_independent_epsilon_cnu_diss_hat_val_prior
+            return epsilon_cnu_diss_hat_val_prior
         # dissipated energy from fully broken chains remains fixed
         elif lmbda_nu_hat_max > self.lmbda_nu_crit:
-            return rate_independent_epsilon_cnu_diss_hat_val_prior
+            return epsilon_cnu_diss_hat_val_prior
         else:
             if (lmbda_nu_hat_val-1.) <= self.lmbda_nu_hat_inc:
                 epsilon_cnu_diss_hat_prime_val = 0
@@ -396,13 +403,13 @@ class RateDependenceScissionCompositeuFJC(ScissionModelCompositeuFJC):
             
             # the lmbda_nu_hat increment here is guaranteed to be 
             # non-negative
-            return (rate_independent_epsilon_cnu_diss_hat_val_prior 
+            return (epsilon_cnu_diss_hat_val_prior 
                     + epsilon_cnu_diss_hat_prime_val
                     * (lmbda_nu_hat_val-lmbda_nu_hat_val_prior))
     
     def rate_independent_expctd_val_epsilon_cnu_sci_hat_intgrnd_func(
             self, lmbda_nu_hat_max, lmbda_nu_hat_val,
-            rate_independent_expctd_val_epsilon_cnu_sci_hat_intgrnd_val_prior):
+            expctd_val_epsilon_cnu_sci_hat_intgrnd_val_prior):
         """Integrand of the statistical expected value of the
         rate-independent nondimensional chain scission energy
         
@@ -415,13 +422,13 @@ class RateDependenceScissionCompositeuFJC(ScissionModelCompositeuFJC):
         # scission energy cannot be destroyed
         if lmbda_nu_hat_val < lmbda_nu_hat_max:
             return (
-                rate_independent_expctd_val_epsilon_cnu_sci_hat_intgrnd_val_prior
+                expctd_val_epsilon_cnu_sci_hat_intgrnd_val_prior
             )
         # statistical expected value of the nondimensional chain
         # scission energy from fully broken chain remains fixed
         elif lmbda_nu_hat_max > self.lmbda_nu_crit:
             return (
-                rate_independent_expctd_val_epsilon_cnu_sci_hat_intgrnd_val_prior
+                expctd_val_epsilon_cnu_sci_hat_intgrnd_val_prior
             )
         else:
             if (lmbda_nu_hat_val-1.) <= self.lmbda_nu_hat_inc:
@@ -449,11 +456,11 @@ class RateDependenceScissionCompositeuFJC(ScissionModelCompositeuFJC):
                         / epsilon_cnu_sci_hat_prime_val)
     
     def rate_independent_expctd_val_epsilon_cnu_sci_hat_cum_intgrl_func(
-            self, rate_independent_expctd_val_epsilon_cnu_sci_hat_intgrnd_val,
+            self, expctd_val_epsilon_cnu_sci_hat_intgrnd_val,
             epsilon_cnu_sci_hat_val,
-            rate_independent_expctd_val_epsilon_cnu_sci_hat_intgrnd_val_prior,
+            expctd_val_epsilon_cnu_sci_hat_intgrnd_val_prior,
             epsilon_cnu_sci_hat_prior,
-            rate_independent_expctd_val_epsilon_cnu_sci_hat_val_prior):
+            expctd_val_epsilon_cnu_sci_hat_val_prior):
         """History-dependent integral of the statistical expected value
         of the rate-independent nondimensional chain scission energy
         
@@ -466,9 +473,8 @@ class RateDependenceScissionCompositeuFJC(ScissionModelCompositeuFJC):
         nondimensional chain scission energy
         """
         return (
-            rate_independent_expctd_val_epsilon_cnu_sci_hat_val_prior
-            + integrate.trapezoid(
-                [rate_independent_expctd_val_epsilon_cnu_sci_hat_intgrnd_val_prior,
-                rate_independent_expctd_val_epsilon_cnu_sci_hat_intgrnd_val],
+            expctd_val_epsilon_cnu_sci_hat_val_prior + integrate.trapezoid(
+                [expctd_val_epsilon_cnu_sci_hat_intgrnd_val_prior,
+                expctd_val_epsilon_cnu_sci_hat_intgrnd_val],
                 x=[epsilon_cnu_sci_hat_prior, epsilon_cnu_sci_hat_val])
         )

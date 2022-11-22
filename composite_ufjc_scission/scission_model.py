@@ -1,4 +1,6 @@
-"""The single-chain module for the composite uFJC scission model"""
+"""The module for the composite uFJC scission model specifying the
+fundamental scission model
+"""
 
 # Import external modules
 from __future__ import division
@@ -10,11 +12,22 @@ from .core import CoreCompositeuFJC
 
 
 class ScissionModelCompositeuFJC(CoreCompositeuFJC):
-    """The composite uFJC scission single-chain model class."""
+    """The composite uFJC scission model class specifying the
+    fundamental scission model.
+
+    This class contains methods specifying the fundamental scission 
+    model, which involve defining both energetic and probabilistic
+    quantities. It inherits all attributes and methods from the 
+    ``CoreCompositeuFJC`` class.
+    """
     def __init__(self, **kwargs):
         """
-        Initializes the ``CompositeuFJC`` class, producing a composite
-        uFJC scission single chain model instance.
+        Initializes the ``ScissionModelCompositeuFJC`` class. 
+        
+        Initialize and inherit all attributes and methods from the
+        ``CoreCompositeuFJC`` class instance. Calculate and retain
+        parameters that intrinsically depend on the fundamental scission
+        model in the composite uFJC scission model.
         """
         CoreCompositeuFJC.__init__(self, **kwargs)
 
