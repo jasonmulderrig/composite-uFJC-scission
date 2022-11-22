@@ -6,7 +6,7 @@ import sys
 import numpy as np
 
 
-class CoreCompositeuFJC(object):
+class CompositeuFJC(object):
     """The composite uFJC single-chain model class.
     
     This class contains methods specifying the core functions and
@@ -30,41 +30,16 @@ class CoreCompositeuFJC(object):
         self.cond_val     = cond_val
 
         # Get default parameter values
-        rate_dependence = kwargs.get("rate_dependence", None)
-        scission_model  = kwargs.get("scission_model", None)
-        omega_0         = kwargs.get("omega_0", None)
-        nu              = kwargs.get("nu", None)
-        nu_b            = kwargs.get("nu_b", None)
-        zeta_b_char     = kwargs.get("zeta_b_char", None)
-        kappa_b         = kwargs.get("kappa_b", None)
-        zeta_nu_char    = kwargs.get("zeta_nu_char", None)
-        kappa_nu        = kwargs.get("kappa_nu", None)
+        nu           = kwargs.get("nu", None)
+        nu_b         = kwargs.get("nu_b", None)
+        zeta_b_char  = kwargs.get("zeta_b_char", None)
+        kappa_b      = kwargs.get("kappa_b", None)
+        zeta_nu_char = kwargs.get("zeta_nu_char", None)
+        kappa_nu     = kwargs.get("kappa_nu", None)
         
         # Check the correctness of the specified parameters
         # Calculate segment-level parameters from provided bond-level
         # parameters if necessary
-        if (rate_dependence != 'rate_dependent' and 
-            rate_dependence != 'rate_independent'):
-            error_message = """\
-                Error: Need to specify the chain dependence on the rate of \
-                applied deformation. Either rate-dependent or rate-independent \
-                deformation can be used. \
-                """
-            sys.exit(error_message)
-        if (scission_model != 'exact' and 
-            scission_model != 'shifted_weibull_approximation'):
-            error_message = """\
-                Error: Need to specify the chain scission model. Either the \
-                exact stochastic model or the shifted Weibull approximation of \
-                the exact stochastic model can be used. \
-                """
-            sys.exit(error_message)
-        if rate_dependence == 'rate_dependent' and omega_0 is None:
-            error_message = """\
-                Error: Need to specify the microscopic frequency of segments \
-                in the chains for rate-dependent deformation. \
-                """
-            sys.exit(error_message)
         if nu is None:
             sys.exit('Error: Need to specify nu in the composite uFJC.')
         elif nu_b is None:
@@ -98,9 +73,6 @@ class CoreCompositeuFJC(object):
                 kappa_nu     = nu_b * kappa_b
         
         # Retain specified parameters
-        self.rate_dependence = rate_dependence
-        self.scission_model  = scission_model
-        self.omega_0         = omega_0
         self.nu              = nu
         self.nu_b            = nu_b
         self.zeta_b_char     = zeta_b_char

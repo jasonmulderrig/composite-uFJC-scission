@@ -6,7 +6,7 @@ composite uFJCs with varying nondimensional segment stiffness
 from __future__ import division
 from composite_ufjc_scission import (
     CompositeuFJCScissionCharacterizer,
-    CompositeuFJC,
+    RateIndependentScissionCompositeuFJC,
     latex_formatting_figure,
     save_current_figure,
     save_pickle_object,
@@ -61,8 +61,7 @@ class Pade2BergstromCriticalPointCharacterizer(
         cp = self.parameters.characterizer
 
         single_chain_list = [
-            CompositeuFJC(
-                rate_dependence='rate_independent', scission_model='exact',
+            RateIndependentScissionCompositeuFJC(
                 nu=25, zeta_nu_char=100,
                 kappa_nu=cp.kappa_nu_pade2berg_crit_list[kappa_nu_indx])
             for kappa_nu_indx in range(len(cp.kappa_nu_pade2berg_crit_list))

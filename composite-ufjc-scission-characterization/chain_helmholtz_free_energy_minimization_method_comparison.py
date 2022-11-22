@@ -8,7 +8,7 @@ energy scale
 from __future__ import division
 from composite_ufjc_scission import (
     CompositeuFJCScissionCharacterizer,
-    CompositeuFJC,
+    RateIndependentScissionCompositeuFJC,
     latex_formatting_figure,
     save_current_figure,
     save_current_figure_no_labels
@@ -165,8 +165,7 @@ class ChainHelmholtzFreeEnergyMinimizationMethodComparisonCharacterizer(
 
         # Evaluate zeta_nu_char for nu=125 and kappa_nu=1000
         psi_minimization_zeta_nu_char_single_chain_list = [
-            CompositeuFJC(
-                rate_dependence='rate_independent', scission_model='exact',
+            RateIndependentScissionCompositeuFJC(
                 nu=cp.nu_single_chain_list[1],
                 zeta_nu_char=cp.psi_minimization_zeta_nu_char_single_chain_list[single_chain_indx],
                 kappa_nu=cp.kappa_nu_single_chain_list[2])
@@ -281,8 +280,7 @@ class ChainHelmholtzFreeEnergyMinimizationMethodComparisonCharacterizer(
 
         # Evaluate kappa_nu for nu=125 and zeta_nu_char=100
         psi_minimization_kappa_nu_single_chain_list = [
-            CompositeuFJC(
-                rate_dependence='rate_independent', scission_model='exact',
+            RateIndependentScissionCompositeuFJC(
                 nu=cp.nu_single_chain_list[1],
                 zeta_nu_char=cp.zeta_nu_char_single_chain_list[2],
                 kappa_nu=cp.psi_minimization_kappa_nu_single_chain_list[single_chain_indx])

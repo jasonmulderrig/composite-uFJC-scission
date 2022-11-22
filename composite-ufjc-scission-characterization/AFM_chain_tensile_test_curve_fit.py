@@ -5,7 +5,8 @@ characterization module for composite uFJCs that undergo scission
 # import external modules
 from __future__ import division
 from composite_ufjc_scission import (CompositeuFJCScissionCharacterizer,
-CompositeuFJC,
+RateIndependentScissionCompositeuFJC,
+RateDependentScissionCompositeuFJC,
 latex_formatting_figure,
 save_current_figure,
 save_current_figure_no_labels
@@ -1072,8 +1073,7 @@ class AFMChainTensileTestCurveFitCharacterizer(
         # Initialize a rate-dependent CompositeuFJC which matches the
         # chain used in the AFM tensile test where the bond and segment
         # numbers in the chain are strictly integer values
-        rate_dependent_single_chain = CompositeuFJC(
-            rate_dependence='rate_dependent', scission_model='exact',
+        rate_dependent_single_chain = RateDependentScissionCompositeuFJC(
             nu=intgr_nu, zeta_nu_char=zeta_nu_char_intgr_nu,
             kappa_nu=kappa_nu_intgr_nu, omega_0=omega_0)
 
@@ -1148,7 +1148,7 @@ class AFMChainTensileTestCurveFitCharacterizer(
                             p_nu_sci_hat_cum_intgrl_val)
                     )
                     epsilon_cnu_diss_hat_val = (
-                        rate_dependent_single_chain.rate_dependent_epsilon_cnu_diss_hat_func(
+                        rate_dependent_single_chain.epsilon_cnu_diss_hat_func(
                             p_nu_sci_hat_val, p_nu_sci_hat_cum_intgrl_val,
                             t_val, lmbda_nu_val, t_steps[f_c_indx-1],
                             epsilon_cnu_diss_hat[f_c_indx-1])
@@ -1190,8 +1190,7 @@ class AFMChainTensileTestCurveFitCharacterizer(
         # Initialize a rate-independent CompositeuFJC which matches the
         # chain used in the AFM tensile test where the bond and segment
         # numbers in the chain are strictly integer values
-        rate_independent_single_chain = CompositeuFJC(
-            rate_dependence='rate_independent', scission_model='exact',
+        rate_independent_single_chain = RateIndependentScissionCompositeuFJC(
             nu=intgr_nu, zeta_nu_char=zeta_nu_char_intgr_nu,
             kappa_nu=kappa_nu_intgr_nu)
 
@@ -1234,7 +1233,7 @@ class AFMChainTensileTestCurveFitCharacterizer(
                 epsilon_cnu_diss_hat_val = 0
             else:
                 epsilon_cnu_diss_hat_val = (
-                    rate_independent_single_chain.rate_independent_epsilon_cnu_diss_hat_func(
+                    rate_independent_single_chain.epsilon_cnu_diss_hat_func(
                         lmbda_nu_max, lmbda_nu_val,
                         lmbda_nu[f_c_indx-1], epsilon_cnu_diss_hat[f_c_indx-1])
                 )

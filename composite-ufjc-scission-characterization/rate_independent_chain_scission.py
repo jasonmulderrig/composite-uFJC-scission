@@ -6,7 +6,7 @@ composite uFJCs
 from __future__ import division
 from composite_ufjc_scission import (
     CompositeuFJCScissionCharacterizer,
-    CompositeuFJC,
+    RateIndependentScissionCompositeuFJC,
     latex_formatting_figure,
     save_current_figure,
     save_current_figure_no_labels
@@ -52,8 +52,7 @@ class RateIndependentChainScissionCharacterizer(
 
         # zeta_nu_char=100 and kappa_nu=1000
         single_chain_list = [
-            CompositeuFJC(
-                rate_dependence='rate_independent', scission_model='exact',
+            RateIndependentScissionCompositeuFJC(
                 nu=cp.nu_single_chain_list[single_chain_indx],
                 zeta_nu_char=cp.zeta_nu_char_single_chain_list[2],
                 kappa_nu=cp.kappa_nu_single_chain_list[2])
@@ -129,7 +128,7 @@ class RateIndependentChainScissionCharacterizer(
                     epsilon_cnu_diss_hat_val = 0
                 else:
                     epsilon_cnu_diss_hat_val = (
-                        single_chain.rate_independent_epsilon_cnu_diss_hat_func(
+                        single_chain.epsilon_cnu_diss_hat_func(
                             lmbda_nu_hat_max, lmbda_nu_hat_val,
                             lmbda_nu_hat[lmbda_nu_hat_indx-1],
                             epsilon_cnu_diss_hat[lmbda_nu_hat_indx-1])

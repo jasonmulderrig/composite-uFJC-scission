@@ -7,7 +7,7 @@ potential energy scale, and nondimensional segment stiffness
 from __future__ import division
 from composite_ufjc_scission import (
     CompositeuFJCScissionCharacterizer,
-    CompositeuFJC,
+    RateIndependentScissionCompositeuFJC,
     latex_formatting_figure,
     save_current_figure_no_labels,
     save_pickle_object,
@@ -49,9 +49,7 @@ class ChainNetworkReferenceStretches(CompositeuFJCScissionCharacterizer):
         single_chain_chain_network_list = [
             [
                 [
-                    CompositeuFJC(
-                        rate_dependence='rate_independent',
-                        scission_model='exact',
+                    RateIndependentScissionCompositeuFJC(
                         nu=cp.nu_chain_network_list[nu_indx],
                         zeta_nu_char=cp.zeta_nu_char_chain_network_list[zeta_nu_char_indx],
                         kappa_nu=cp.kappa_nu_chain_network_list[kappa_nu_indx])
