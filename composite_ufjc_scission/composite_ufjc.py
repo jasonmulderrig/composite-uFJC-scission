@@ -7,9 +7,7 @@ from __future__ import division
 from .rate_dependence_scission import (
     RateIndependentScission, RateDependentScission
 )
-from .scission_model import (
-    AnalyticalScissionCompositeuFJC, WeibullScissionCompositeuFJC
-)
+from .scission_model import AnalyticalScissionCompositeuFJC
 
 
 class RateIndependentScissionCompositeuFJC(
@@ -68,63 +66,3 @@ class RateDependentScissionCompositeuFJC(
         """
         RateDependentScission.__init__(self, **kwargs)
         AnalyticalScissionCompositeuFJC.__init__(self, **kwargs)
-
-
-class RateIndependentWeibullScissionCompositeuFJC(
-        RateIndependentScission, WeibullScissionCompositeuFJC):
-    """The composite uFJC single-chain model class with rate-independent
-    stochastic scission approximated by Weibull statistics.
-    
-    This class is a representation of the composite uFJC single-chain
-    model with rate-independent stochastic scission approximated by
-    Weibull statistics; an instance of this class is a composite uFJC
-    single-chain model instance with rate-independent stochastic
-    scission approximated by Weibull statistics. It inherits all
-    attributes and methods from the ``RateIndependentScission`` class.
-    It also inherits all attributes and methods from the
-    ``WeibullScissionCompositeuFJC`` class, which inherits all
-    attributes and methods from the ``CompositeuFJC`` class.
-    """
-    def __init__(self, **kwargs):
-        """
-        Initializes the ``RateIndependentScissionCompositeuFJC`` class,
-        producing a composite uFJC single-chain model instance with
-        rate-independent stochastic scission approximated by Weibull
-        statistics.
-        
-        Initialize and inherit all attributes and methods from the
-        ``RateIndependentScission`` class instance and the
-        ``WeibullScissionCompositeuFJC`` class instance
-        """
-        RateIndependentScission.__init__(self)
-        WeibullScissionCompositeuFJC.__init__(self, **kwargs)
-
-
-class RateDependentWeibullScissionCompositeuFJC(
-        RateDependentScission, WeibullScissionCompositeuFJC):
-    """The composite uFJC single-chain model class with rate-dependent
-    stochastic scission approximated by Weibull statistics.
-    
-    This class is a representation of the composite uFJC single-chain
-    model with rate-dependent stochastic scission approximated by
-    Weibull statistics; an instance of this class is a composite uFJC
-    single-chain model instance with rate-dependent stochastic scission
-    approximated by Weibull statistics. It inherits all attributes and
-    methods from the ``RateDependentScission`` class. It also inherits
-    all attributes and methods from the ``WeibullScissionCompositeuFJC``
-    class, which inherits all attributes and methods from the
-    ``CompositeuFJC`` class.
-    """
-    def __init__(self, **kwargs):
-        """
-        Initializes the ``RateDependentScissionCompositeuFJC`` class,
-        producing a composite uFJC single-chain model instance with
-        rate-dependent stochastic scission approximated by Weibull
-        statistics.
-        
-        Initialize and inherit all attributes and methods from the
-        ``RateDependentScission`` class instance and the
-        ``WeibullScissionCompositeuFJC`` class instance
-        """
-        RateDependentScission.__init__(self, **kwargs)
-        WeibullScissionCompositeuFJC.__init__(self, **kwargs)
