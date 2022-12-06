@@ -10,8 +10,8 @@ def default_parameters():
     """Save default parameters.
     
     This core function stores the default parameters from each subset of
-    parameters to a main parameters NameSpace object, which is then
-    returned.
+    parameters to a main parameters SimpleNamespace object, which is
+    then returned.
     """
     parameters = SimpleNamespace()
     subset_list = ["characterizer", "post_processing"]
@@ -24,7 +24,7 @@ def default_characterizer_parameters():
     """Save default characterizer parameters.
     
     This function stores the default characterizer parameters to a
-    characterizer NameSpace object, which is then returned.
+    characterizer SimpleNamespace object, which is then returned.
     """
     characterizer = SimpleNamespace()
 
@@ -133,7 +133,7 @@ def default_post_processing_parameters():
     """Save default post-processing parameters.
     
     This function stores the default post-processing parameters to a
-    characterizer NameSpace object, which is then returned.
+    characterizer SimpleNamespace object, which is then returned.
     """
     
     post_processing = SimpleNamespace()

@@ -335,6 +335,32 @@ class SegmentPotentialEnergyFunctionCharacterizer(
         save_current_figure(
             self.savedir, r'$\lambda_{\nu}$', 20, r'$\overline{u}_{\nu}$', 20,
             "anharmonic-overline_u_nu-vs-lmbda_nu")
+        
+        fig = plt.figure()
+        plt.axvline(
+            x=self.single_chain.lmbda_nu_crit, linestyle=':',
+            color='black', alpha=1, linewidth=1)
+        plt.plot(
+            self.lmbda_nu, self.tilde_u_nu_lj, linestyle='-',
+            color='green', alpha=1, linewidth=2.5,
+            label=r'$\textrm{Lennard-Jones}$')
+        plt.plot(
+            self.lmbda_nu, self.tilde_u_nu_morse, linestyle='-',
+            color='red', alpha=1, linewidth=2.5,
+            label=r'$\textrm{Morse}$')
+        plt.plot(
+            self.lmbda_nu, self.tilde_u_nu, linestyle='-',
+            color='black', alpha=1, linewidth=2.5,
+            label=r'$\textrm{composite}$')
+        plt.legend(loc='best', fontsize=12)
+        plt.xlim([self.lmbda_nu[0], self.lmbda_nu[-1]])
+        plt.xticks(fontsize=16)
+        plt.ylim([-0.05, 1.05])
+        plt.yticks(fontsize=16)
+        plt.grid(True, alpha=0.25)
+        save_current_figure(
+            self.savedir, r'$\lambda_{\nu}$', 20, r'$\tilde{u}_{\nu}$', 20,
+            "anharmonic-tilde_u_nu-vs-lmbda_nu")
 
         fig = plt.figure()
         plt.plot(
