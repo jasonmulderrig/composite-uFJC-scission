@@ -160,7 +160,7 @@ class AnalyticalScissionCompositeuFJC(CompositeuFJC):
         lmbda_nu = self.lmbda_nu_func(lmbda_c_eq)
         psi_cnu  = self.psi_cnu_func(lmbda_nu, lmbda_c_eq)
         
-        return np.exp(-nu*(psi_cnu+self.zeta_nu_char)) * lmbda_c_eq**(n-1)
+        return np.exp(-nu*(psi_cnu+self.zeta_nu_char)) * lmbda_c_eq**n
     
     def I_func(self, n, nu):
         """Intact equilibrium chain configuration partition function
@@ -183,9 +183,9 @@ class AnalyticalScissionCompositeuFJC(CompositeuFJC):
         This function numerically computes the reference equilibrium
         chain stretch
         """
-        I_5 = self.I_func(5, self.nu)
-        I_3 = self.I_func(3, self.nu)
+        I_4 = self.I_func(4, self.nu) # fourth moment of chain pdf
+        I_2 = self.I_func(2, self.nu) # second moment of chain pdf
         sqrt_arg = (1. / (1.+self.nu*np.exp(-self.epsilon_nu_diss_hat_crit))
-                    * I_5 / I_3)
+                    * I_4 / I_2)
         
         return np.sqrt(sqrt_arg)
