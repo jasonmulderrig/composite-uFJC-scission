@@ -148,7 +148,7 @@ class AnalyticalScissionCompositeuFJC(CompositeuFJC):
         
         return epsilon_nu_diss_hat_crit_val
     
-    def I_intgrnd_func(self, lmbda_c_eq, n, nu):
+    def I_intgrnd_func(self, lmbda_c_eq, n):
         """Integrand involved in the intact equilibrium chain
         configuration partition function integration
         
@@ -160,9 +160,9 @@ class AnalyticalScissionCompositeuFJC(CompositeuFJC):
         lmbda_nu = self.lmbda_nu_func(lmbda_c_eq)
         psi_cnu  = self.psi_cnu_func(lmbda_nu, lmbda_c_eq)
         
-        return np.exp(-nu*(psi_cnu+self.zeta_nu_char)) * lmbda_c_eq**n
+        return np.exp(-self.nu*(psi_cnu+self.zeta_nu_char)) * lmbda_c_eq**(n+2)
     
-    def I_func(self, n, nu):
+    def I_func(self, n):
         """Intact equilibrium chain configuration partition function
         integration through all admissible end-to-end chain distances up
         to the critical point
@@ -174,7 +174,7 @@ class AnalyticalScissionCompositeuFJC(CompositeuFJC):
         """
         return integrate.quad(
             self.I_intgrnd_func, self.lmbda_c_eq_ref, self.lmbda_c_eq_crit,
-            args=(n,nu), epsabs=1.0e-12, epsrel=1.0e-12)[0]
+            args=n, epsabs=1.0e-12, epsrel=1.0e-12)[0]
     
     # Reference equilibrium chain stretch
     def A_nu_func(self):
@@ -183,9 +183,11 @@ class AnalyticalScissionCompositeuFJC(CompositeuFJC):
         This function numerically computes the reference equilibrium
         chain stretch
         """
-        I_4 = self.I_func(4, self.nu) # fourth moment of chain pdf
-        I_2 = self.I_func(2, self.nu) # second moment of chain pdf
+        # second moment of the intact chain configuration pdf
+        I_2 = self.I_func(2)
+        # zeroth moment of the intact chain configuration pdf
+        I_0 = self.I_func(0)
         sqrt_arg = (1. / (1.+self.nu*np.exp(-self.epsilon_nu_diss_hat_crit))
-                    * I_4 / I_2)
+                    * I_2 / I_0)
         
         return np.sqrt(sqrt_arg)
