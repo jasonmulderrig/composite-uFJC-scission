@@ -595,7 +595,7 @@ class CompositeuFJC(object):
             return 0.
         
         else:
-            return (self.u_nu_hat_func(lmbda_nu_hat, lmbda_nu_locmax_hat) 
+            return (self.u_nu_hat_func(lmbda_nu_hat, lmbda_nu_locmax_hat)
                     - self.u_nu_hat_func(lmbda_nu_hat, lmbda_nu_locmin_hat))
     
     def epsilon_nu_sci_hat_func(self, lmbda_nu_hat):
