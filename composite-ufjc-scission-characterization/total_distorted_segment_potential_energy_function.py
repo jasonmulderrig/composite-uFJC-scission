@@ -48,22 +48,28 @@ class TotalDistortedSegmentPotentialEnergyFunctionCharacterizer(
         cp = self.parameters.characterizer
 
         # nu=125, zeta_nu_char=100, and kappa_nu=1000
-        single_chain = RateIndependentScissionCompositeuFJC(
-            nu=cp.nu_single_chain_list[1],
-            zeta_nu_char=cp.zeta_nu_char_single_chain_list[2],
-            kappa_nu=cp.kappa_nu_single_chain_list[2])
+        single_chain = (
+            RateIndependentScissionCompositeuFJC(
+                nu=cp.nu_single_chain_list[1],
+                zeta_nu_char=cp.zeta_nu_char_single_chain_list[2],
+                kappa_nu=cp.kappa_nu_single_chain_list[2])
+        )
 
         # Define the applied segment stretch values to the chain
-        lmbda_nu_hat_steps = np.linspace(
-            single_chain.lmbda_nu_ref, single_chain.lmbda_nu_crit,
-            cp.lmbda_nu_hat_num)
+        lmbda_nu_hat_steps = (
+            np.linspace(
+                single_chain.lmbda_nu_ref, single_chain.lmbda_nu_crit,
+                cp.lmbda_nu_hat_num)
+        )
         # Define the segment stretch values to calculate over
-        lmbda_nu_num_steps = (int(
-            np.around(
+        lmbda_nu_num_steps = (
+            int(np.around(
                 (cp.lmbda_nu_max-cp.lmbda_nu_min)/cp.lmbda_nu_inc))
-            + 1)
-        lmbda_nu_steps = np.linspace(
-            cp.lmbda_nu_min, cp.lmbda_nu_max, lmbda_nu_num_steps)
+            + 1
+        )
+        lmbda_nu_steps = (
+            np.linspace(cp.lmbda_nu_min, cp.lmbda_nu_max, lmbda_nu_num_steps)
+        )
         
         lmbda_nu_hat___hat_chunk = [
             0. for lmbda_nu_hat_indx in range(cp.lmbda_nu_hat_num)
@@ -129,10 +135,12 @@ class TotalDistortedSegmentPotentialEnergyFunctionCharacterizer(
                 lmbda_nu.append(lmbda_nu_val)
                 u_nu_hat.append(u_nu_hat_val)
             
-            overline_u_nu_locmin_hat = (u_nu_locmin_hat
-                                        / single_chain.zeta_nu_char)
-            overline_u_nu_locmax_hat = (u_nu_locmax_hat
-                                        / single_chain.zeta_nu_char)
+            overline_u_nu_locmin_hat = (
+                u_nu_locmin_hat / single_chain.zeta_nu_char
+            )
+            overline_u_nu_locmax_hat = (
+                u_nu_locmax_hat / single_chain.zeta_nu_char
+            )
             overline_u_nu_hat = [
                 u_nu_hat_val/single_chain.zeta_nu_char
                 for u_nu_hat_val in u_nu_hat

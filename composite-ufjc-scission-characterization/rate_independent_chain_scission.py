@@ -90,29 +90,39 @@ class RateIndependentChainScissionCharacterizer(
             
             # Define the applied segment stretch values to
             # calculate over
-            lmbda_nu_hat_num_steps = (int(
-                np.around(
+            lmbda_nu_hat_num_steps = (
+                int(np.around(
                     (single_chain.lmbda_nu_crit-single_chain.lmbda_nu_ref)/single_chain.lmbda_nu_hat_inc))
-                + 1)
-            lmbda_nu_hat_steps = np.linspace(
-                single_chain.lmbda_nu_ref, single_chain.lmbda_nu_crit,
-                lmbda_nu_hat_num_steps)
+                + 1
+            )
+            lmbda_nu_hat_steps = (
+                np.linspace(
+                    single_chain.lmbda_nu_ref, single_chain.lmbda_nu_crit,
+                    lmbda_nu_hat_num_steps)
+            )
             
             # Make arrays to allocate results
-            lmbda_nu_hat         = []
-            p_c_sur_hat          = []
-            p_c_sci_hat          = []
-            epsilon_cnu_sci_hat  = []
-            epsilon_cnu_diss_hat = []
+            lmbda_nu_hat     = []
+            lmbda_nu_hat_max = []
+            p_c_sur_hat     = []
+            p_c_sur_hat_err = []
+            p_c_sci_hat     = []
+            p_c_sci_hat_err = []
+            epsilon_cnu_sci_hat     = []
+            epsilon_cnu_sci_hat_err = []
+            epsilon_cnu_diss_hat     = []
+            epsilon_cnu_diss_hat_err = []
 
             # initialization
-            lmbda_nu_hat_max = 0
+            lmbda_nu_hat_max_val = 0
             
             # Calculate results through specified applied segment
             # stretch values
             for lmbda_nu_hat_indx in range(lmbda_nu_hat_num_steps):
                 lmbda_nu_hat_val = lmbda_nu_hat_steps[lmbda_nu_hat_indx]
-                lmbda_nu_hat_max = max([lmbda_nu_hat_max, lmbda_nu_hat_val])
+                lmbda_nu_hat_max_val = (
+                    max([lmbda_nu_hat_max_val, lmbda_nu_hat_val])
+                )
                 p_c_sur_hat_val = (
                     single_chain.p_c_sur_hat_func(lmbda_nu_hat_val)
                 )
@@ -129,12 +139,15 @@ class RateIndependentChainScissionCharacterizer(
                 else:
                     epsilon_cnu_diss_hat_val = (
                         single_chain.epsilon_cnu_diss_hat_func(
-                            lmbda_nu_hat_max, lmbda_nu_hat_val,
+                            lmbda_nu_hat_max_val, 
+                            lmbda_nu_hat_max[lmbda_nu_hat_indx-1],
+                            lmbda_nu_hat_val,
                             lmbda_nu_hat[lmbda_nu_hat_indx-1],
                             epsilon_cnu_diss_hat[lmbda_nu_hat_indx-1])
                     )
                 
                 lmbda_nu_hat.append(lmbda_nu_hat_val)
+                lmbda_nu_hat_max.append(lmbda_nu_hat_max_val)
                 p_c_sur_hat.append(p_c_sur_hat_val)
                 p_c_sci_hat.append(p_c_sci_hat_val)
                 epsilon_cnu_sci_hat.append(epsilon_cnu_sci_hat_val)

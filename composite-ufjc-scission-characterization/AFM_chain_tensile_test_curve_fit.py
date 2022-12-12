@@ -233,16 +233,22 @@ class AFMChainTensileTestCurveFitCharacterizer(
             if (self.paper_authors == "al-maawali-et-al"or
             self.paper_authors == "ortiz-and-hadziioannou" or
             self.paper_authors == "yamamoto-et-al"):
-                data_file_name = (data_file_prefix
-                +"-force-nN-vs-chain-end-to-end-distance-nm")
+                data_file_name = (
+                    data_file_prefix
+                    + "-force-nN-vs-chain-end-to-end-distance-nm"
+                )
             else:
-                data_file_name = (data_file_prefix
-                +"-force-pN-vs-chain-end-to-end-distance-nm")
+                data_file_name = (
+                    data_file_prefix
+                    + "-force-pN-vs-chain-end-to-end-distance-nm"
+                )
             # nm, nN or pN respectively
             # pre-arranged in ascending r_nu values
-            r_nu, f_c = np.loadtxt(
-                chain_data_directory+data_file_name+".csv", delimiter=',',
-                unpack=True)
+            r_nu, f_c = (
+                np.loadtxt(
+                    chain_data_directory+data_file_name+".csv", delimiter=',',
+                    unpack=True)
+            )
             if (self.paper_authors == "al-maawali-et-al" or
             self.paper_authors == "ortiz-and-hadziioannou" or
             self.paper_authors == "yamamoto-et-al"):
@@ -310,8 +316,10 @@ class AFMChainTensileTestCurveFitCharacterizer(
                     characteristic segment potential energy scale and
                     nondimensional segment stiffness
                     """
-                    return (1. + np.sqrt(zeta_nu_char/kappa_nu)
-                            - np.sqrt(1./(kappa_nu*zeta_nu_char)))
+                    return (
+                        1. + np.sqrt(zeta_nu_char/kappa_nu)
+                        - np.sqrt(1./(kappa_nu*zeta_nu_char))
+                    )
                 
                 def lmbda_nu_func(lmbda_c_eq):
                     """Segment stretch
@@ -341,87 +349,107 @@ class AFMChainTensileTestCurveFitCharacterizer(
                             trm_i   = 2. * kappa_nu
                             trm_ii  = 4. * kappa_nu + 6.
                             trm_iii = kappa_nu + 3.
-                            gamma_tilde_nmrtr = (trm_i + lmbda_c_eq_val 
-                                                    * (trm_ii
-                                                    +lmbda_c_eq_val*trm_iii))
+                            gamma_tilde_nmrtr = (
+                                trm_i + lmbda_c_eq_val 
+                                * (trm_ii+lmbda_c_eq_val*trm_iii)
+                            )
                             gamma_tilde_dnmntr = kappa_nu + 1.
                             gamma_tilde = gamma_tilde_nmrtr / gamma_tilde_dnmntr
                             
                             trm_i   = 2.
                             trm_ii  = 2. * kappa_nu
                             trm_iii = kappa_nu + 3.
-                            delta_tilde_nmrtr = (trm_i - lmbda_c_eq_val 
-                                                    * (trm_ii+lmbda_c_eq_val
-                                                    *(trm_iii+lmbda_c_eq_val)))
+                            delta_tilde_nmrtr = (
+                                trm_i - lmbda_c_eq_val * 
+                                (trm_ii+lmbda_c_eq_val*(trm_iii+lmbda_c_eq_val))
+                            )
                             delta_tilde_dnmntr = kappa_nu + 1.
                             delta_tilde = delta_tilde_nmrtr / delta_tilde_dnmntr
 
-                            pi_tilde_nmrtr  = (3. * alpha_tilde * gamma_tilde
-                                                - beta_tilde**2)
+                            pi_tilde_nmrtr  = (
+                                3. * alpha_tilde * gamma_tilde - beta_tilde**2
+                            )
                             pi_tilde_dnmntr = 3. * alpha_tilde**2
                             pi_tilde = pi_tilde_nmrtr / pi_tilde_dnmntr
 
-                            rho_tilde_nmrtr = (2. * beta_tilde**3
-                                                - 9. * alpha_tilde * beta_tilde
-                                                * gamma_tilde + 27. 
-                                                * alpha_tilde**2 * delta_tilde)
+                            rho_tilde_nmrtr = (
+                                2. * beta_tilde**3
+                                - 9. * alpha_tilde * beta_tilde * gamma_tilde
+                                + 27. * alpha_tilde**2 * delta_tilde
+                            )
                             rho_tilde_dnmntr = 27. * alpha_tilde**3
                             rho_tilde = rho_tilde_nmrtr / rho_tilde_dnmntr
 
-                            arccos_arg = (3. * rho_tilde / (2.*pi_tilde)
-                                            * np.sqrt(-3./pi_tilde))
+                            arccos_arg = (
+                                3. * rho_tilde / (2.*pi_tilde)
+                                * np.sqrt(-3./pi_tilde)
+                            )
                             
                             if arccos_arg >= 1. - 1.e-14:
                                 arccos_arg =  1. - 1.e-14
                             elif arccos_arg < -1. + 1.e-14:
                                 arccos_arg =  -1. + 1.e-14
                             
-                            cos_arg = (1. / 3. * np.arccos(arccos_arg)
-                                        - 2. * np.pi / 3.)
-                            lmbda_nu_val = (2. * np.sqrt(-pi_tilde/3.)
-                                            * np.cos(cos_arg)
-                                            - beta_tilde / (3.*alpha_tilde))
+                            cos_arg = (
+                                1. / 3. * np.arccos(arccos_arg)
+                                - 2. * np.pi / 3.
+                            )
+                            lmbda_nu_val = (
+                                2. * np.sqrt(-pi_tilde/3.) * np.cos(cos_arg)
+                                - beta_tilde / (3.*alpha_tilde)
+                            )
                         
                         # Bergstrom approximate
                         elif lmbda_c_eq_val <= lmbda_c_eq_crit:
-                            sqrt_arg = (lmbda_c_eq_val**2 - 2. * lmbda_c_eq_val
-                                        + 1. + 4. / kappa_nu)
-                            lmbda_nu_val = ((lmbda_c_eq_val+1.+np.sqrt(sqrt_arg))
-                                            / 2.)
+                            sqrt_arg = (
+                                lmbda_c_eq_val**2 - 2. * lmbda_c_eq_val + 1.
+                                + 4. / kappa_nu
+                            )
+                            lmbda_nu_val = (
+                                (lmbda_c_eq_val+1.+np.sqrt(sqrt_arg)) / 2.
+                            )
                         
                         # Bergstrom approximate
                         else:
                             alpha_tilde = 1.
                             beta_tilde  = -3.
                             gamma_tilde = 3. - zeta_nu_char**2 / kappa_nu
-                            delta_tilde = (zeta_nu_char**2 / kappa_nu 
-                                            * lmbda_c_eq_val - 1.)
+                            delta_tilde = (
+                                zeta_nu_char**2 / kappa_nu * lmbda_c_eq_val - 1.
+                            )
 
-                            pi_tilde_nmrtr = (3. * alpha_tilde * gamma_tilde 
-                                                - beta_tilde**2)
+                            pi_tilde_nmrtr = (
+                                3. * alpha_tilde * gamma_tilde - beta_tilde**2
+                            )
                             pi_tilde_dnmntr = 3. * alpha_tilde**2
                             pi_tilde = pi_tilde_nmrtr / pi_tilde_dnmntr
 
-                            rho_tilde_nmrtr = (2. * beta_tilde**3
-                                                - 9. * alpha_tilde * beta_tilde
-                                                * gamma_tilde + 27. 
-                                                * alpha_tilde**2 * delta_tilde)
+                            rho_tilde_nmrtr = (
+                                2. * beta_tilde**3
+                                - 9. * alpha_tilde * beta_tilde * gamma_tilde
+                                + 27. * alpha_tilde**2 * delta_tilde
+                            )
                             rho_tilde_dnmntr = 27. * alpha_tilde**3
                             rho_tilde = rho_tilde_nmrtr / rho_tilde_dnmntr
 
-                            arccos_arg = (3. * rho_tilde / (2.*pi_tilde)
-                                            * np.sqrt(-3./pi_tilde))
+                            arccos_arg = (
+                                3. * rho_tilde / (2.*pi_tilde)
+                                * np.sqrt(-3./pi_tilde)
+                            )
                             
                             if arccos_arg >= 1. - 1.e-14:
                                 arccos_arg =  1. - 1.e-14
                             elif arccos_arg < -1. + 1.e-14:
                                 arccos_arg =  -1. + 1.e-14
                             
-                            cos_arg = (1. / 3. * np.arccos(arccos_arg)
-                                        - 2. * np.pi / 3.)
-                            lmbda_nu_val = (2. * np.sqrt(-pi_tilde/3.)
-                                            * np.cos(cos_arg)
-                                            - beta_tilde / (3.*alpha_tilde))
+                            cos_arg = (
+                                1. / 3. * np.arccos(arccos_arg)
+                                - 2. * np.pi / 3.
+                            )
+                            lmbda_nu_val = (
+                                2. * np.sqrt(-pi_tilde/3.) * np.cos(cos_arg)
+                                - beta_tilde / (3.*alpha_tilde)
+                            )
                         
                         lmbda_nu.append(lmbda_nu_val)
                     
@@ -442,12 +470,12 @@ class AFMChainTensileTestCurveFitCharacterizer(
                         the result of the equilibrium chain stretch
                         minus the segment stretch plus one
                         """
-                        return (lmbda_comp_nu * (3.-1.00651*lmbda_comp_nu**2
-                                -0.962251*lmbda_comp_nu**4
-                                +1.47353*lmbda_comp_nu**6
-                                -0.48953*lmbda_comp_nu**8)
-                                / ((1.-lmbda_comp_nu)
-                                *(1.+1.01524*lmbda_comp_nu)))
+                        return (
+                            lmbda_comp_nu * (3.-1.00651*lmbda_comp_nu**2
+                            -0.962251*lmbda_comp_nu**4+1.47353*lmbda_comp_nu**6
+                            -0.48953*lmbda_comp_nu**8)
+                            / ((1.-lmbda_comp_nu)*(1.+1.01524*lmbda_comp_nu))
+                        )
                     
                     lmbda_comp_nu = lmbda_c_eq - lmbda_nu + 1.
                     
@@ -455,8 +483,9 @@ class AFMChainTensileTestCurveFitCharacterizer(
                 
                 nu_b = l_nu_eq / l_b_eq
                 zeta_nu_char = nu_b * zeta_b_char
-                lmbda_c_eq_pade2berg_crit = lmbda_c_eq_pade2berg_crit_func(
-                    kappa_nu)
+                lmbda_c_eq_pade2berg_crit = (
+                    lmbda_c_eq_pade2berg_crit_func(kappa_nu)
+                )
                 lmbda_c_eq_crit = lmbda_c_eq_crit_func(zeta_nu_char, kappa_nu)
                 lmbda_c_eq = r_nu / (nu*l_nu_eq) # nm/nm
                 lmbda_nu = lmbda_nu_func(lmbda_c_eq)
@@ -500,8 +529,10 @@ class AFMChainTensileTestCurveFitCharacterizer(
                     characteristic segment potential energy scale and
                     nondimensional segment stiffness
                     """
-                    return (1. + np.sqrt(zeta_nu_char/kappa_nu)
-                            - np.sqrt(1./(kappa_nu*zeta_nu_char)))
+                    return (
+                        1. + np.sqrt(zeta_nu_char/kappa_nu)
+                        - np.sqrt(1./(kappa_nu*zeta_nu_char))
+                    )
                 
                 def lmbda_nu_func(lmbda_c_eq):
                     """Segment stretch
@@ -531,87 +562,107 @@ class AFMChainTensileTestCurveFitCharacterizer(
                             trm_i   = 2. * kappa_nu
                             trm_ii  = 4. * kappa_nu + 6.
                             trm_iii = kappa_nu + 3.
-                            gamma_tilde_nmrtr = (trm_i + lmbda_c_eq_val 
-                                                    * (trm_ii
-                                                    +lmbda_c_eq_val*trm_iii))
+                            gamma_tilde_nmrtr = (
+                                trm_i + lmbda_c_eq_val 
+                                * (trm_ii+lmbda_c_eq_val*trm_iii)
+                            )
                             gamma_tilde_dnmntr = kappa_nu + 1.
                             gamma_tilde = gamma_tilde_nmrtr / gamma_tilde_dnmntr
                             
                             trm_i   = 2.
                             trm_ii  = 2. * kappa_nu
                             trm_iii = kappa_nu + 3.
-                            delta_tilde_nmrtr = (trm_i - lmbda_c_eq_val 
-                                                    * (trm_ii+lmbda_c_eq_val
-                                                    *(trm_iii+lmbda_c_eq_val)))
+                            delta_tilde_nmrtr = (
+                                trm_i - lmbda_c_eq_val * 
+                                (trm_ii+lmbda_c_eq_val*(trm_iii+lmbda_c_eq_val))
+                            )
                             delta_tilde_dnmntr = kappa_nu + 1.
                             delta_tilde = delta_tilde_nmrtr / delta_tilde_dnmntr
 
-                            pi_tilde_nmrtr  = (3. * alpha_tilde * gamma_tilde
-                                                - beta_tilde**2)
+                            pi_tilde_nmrtr  = (
+                                3. * alpha_tilde * gamma_tilde - beta_tilde**2
+                            )
                             pi_tilde_dnmntr = 3. * alpha_tilde**2
                             pi_tilde = pi_tilde_nmrtr / pi_tilde_dnmntr
 
-                            rho_tilde_nmrtr = (2. * beta_tilde**3
-                                                - 9. * alpha_tilde * beta_tilde
-                                                * gamma_tilde + 27. 
-                                                * alpha_tilde**2 * delta_tilde)
+                            rho_tilde_nmrtr = (
+                                2. * beta_tilde**3
+                                - 9. * alpha_tilde * beta_tilde * gamma_tilde
+                                + 27. * alpha_tilde**2 * delta_tilde
+                            )
                             rho_tilde_dnmntr = 27. * alpha_tilde**3
                             rho_tilde = rho_tilde_nmrtr / rho_tilde_dnmntr
 
-                            arccos_arg = (3. * rho_tilde / (2.*pi_tilde)
-                                            * np.sqrt(-3./pi_tilde))
+                            arccos_arg = (
+                                3. * rho_tilde / (2.*pi_tilde)
+                                * np.sqrt(-3./pi_tilde)
+                            )
                             
                             if arccos_arg >= 1. - 1.e-14:
                                 arccos_arg =  1. - 1.e-14
                             elif arccos_arg < -1. + 1.e-14:
                                 arccos_arg =  -1. + 1.e-14
                             
-                            cos_arg = (1. / 3. * np.arccos(arccos_arg)
-                                        - 2. * np.pi / 3.)
-                            lmbda_nu_val = (2. * np.sqrt(-pi_tilde/3.)
-                                            * np.cos(cos_arg)
-                                            - beta_tilde / (3.*alpha_tilde))
+                            cos_arg = (
+                                1. / 3. * np.arccos(arccos_arg)
+                                - 2. * np.pi / 3.
+                            )
+                            lmbda_nu_val = (
+                                2. * np.sqrt(-pi_tilde/3.) * np.cos(cos_arg)
+                                - beta_tilde / (3.*alpha_tilde)
+                            )
                         
                         # Bergstrom approximate
                         elif lmbda_c_eq_val <= lmbda_c_eq_crit:
-                            sqrt_arg = (lmbda_c_eq_val**2 - 2. * lmbda_c_eq_val
-                                        + 1. + 4. / kappa_nu)
-                            lmbda_nu_val = ((lmbda_c_eq_val+1.+np.sqrt(sqrt_arg))
-                                            / 2.)
+                            sqrt_arg = (
+                                lmbda_c_eq_val**2 - 2. * lmbda_c_eq_val + 1.
+                                + 4. / kappa_nu
+                            )
+                            lmbda_nu_val = (
+                                (lmbda_c_eq_val+1.+np.sqrt(sqrt_arg)) / 2.
+                            )
                         
                         # Bergstrom approximate
                         else:
                             alpha_tilde = 1.
                             beta_tilde  = -3.
                             gamma_tilde = 3. - zeta_nu_char**2 / kappa_nu
-                            delta_tilde = (zeta_nu_char**2 / kappa_nu 
-                                            * lmbda_c_eq_val - 1.)
+                            delta_tilde = (
+                                zeta_nu_char**2 / kappa_nu * lmbda_c_eq_val - 1.
+                            )
 
-                            pi_tilde_nmrtr = (3. * alpha_tilde * gamma_tilde 
-                                                - beta_tilde**2)
+                            pi_tilde_nmrtr = (
+                                3. * alpha_tilde * gamma_tilde - beta_tilde**2
+                            )
                             pi_tilde_dnmntr = 3. * alpha_tilde**2
                             pi_tilde = pi_tilde_nmrtr / pi_tilde_dnmntr
 
-                            rho_tilde_nmrtr = (2. * beta_tilde**3
-                                                - 9. * alpha_tilde * beta_tilde
-                                                * gamma_tilde + 27. 
-                                                * alpha_tilde**2 * delta_tilde)
+                            rho_tilde_nmrtr = (
+                                2. * beta_tilde**3
+                                - 9. * alpha_tilde * beta_tilde * gamma_tilde
+                                + 27. * alpha_tilde**2 * delta_tilde
+                            )
                             rho_tilde_dnmntr = 27. * alpha_tilde**3
                             rho_tilde = rho_tilde_nmrtr / rho_tilde_dnmntr
 
-                            arccos_arg = (3. * rho_tilde / (2.*pi_tilde)
-                                            * np.sqrt(-3./pi_tilde))
+                            arccos_arg = (
+                                3. * rho_tilde / (2.*pi_tilde)
+                                * np.sqrt(-3./pi_tilde)
+                            )
                             
                             if arccos_arg >= 1. - 1.e-14:
                                 arccos_arg =  1. - 1.e-14
                             elif arccos_arg < -1. + 1.e-14:
                                 arccos_arg =  -1. + 1.e-14
                             
-                            cos_arg = (1. / 3. * np.arccos(arccos_arg)
-                                        - 2. * np.pi / 3.)
-                            lmbda_nu_val = (2. * np.sqrt(-pi_tilde/3.)
-                                            * np.cos(cos_arg)
-                                            - beta_tilde / (3.*alpha_tilde))
+                            cos_arg = (
+                                1. / 3. * np.arccos(arccos_arg)
+                                - 2. * np.pi / 3.
+                            )
+                            lmbda_nu_val = (
+                                2. * np.sqrt(-pi_tilde/3.) * np.cos(cos_arg)
+                                - beta_tilde / (3.*alpha_tilde)
+                            )
                         
                         lmbda_nu.append(lmbda_nu_val)
                     
@@ -632,12 +683,12 @@ class AFMChainTensileTestCurveFitCharacterizer(
                         the result of the equilibrium chain stretch
                         minus the segment stretch plus one
                         """
-                        return (lmbda_comp_nu * (3.-1.00651*lmbda_comp_nu**2
-                                -0.962251*lmbda_comp_nu**4
-                                +1.47353*lmbda_comp_nu**6
-                                -0.48953*lmbda_comp_nu**8)
-                                / ((1.-lmbda_comp_nu)
-                                *(1.+1.01524*lmbda_comp_nu)))
+                        return (
+                            lmbda_comp_nu * (3.-1.00651*lmbda_comp_nu**2
+                            -0.962251*lmbda_comp_nu**4+1.47353*lmbda_comp_nu**6
+                            -0.48953*lmbda_comp_nu**8)
+                            / ((1.-lmbda_comp_nu)*(1.+1.01524*lmbda_comp_nu))
+                        )
                     
                     lmbda_comp_nu = lmbda_c_eq - lmbda_nu + 1.
                     
@@ -645,8 +696,9 @@ class AFMChainTensileTestCurveFitCharacterizer(
                 
                 nu_b = l_nu_eq / l_b_eq
                 zeta_nu_char = nu_b * zeta_b_char
-                lmbda_c_eq_pade2berg_crit = lmbda_c_eq_pade2berg_crit_func(
-                    kappa_nu)
+                lmbda_c_eq_pade2berg_crit = (
+                    lmbda_c_eq_pade2berg_crit_func(kappa_nu)
+                )
                 lmbda_c_eq_crit = lmbda_c_eq_crit_func(zeta_nu_char, kappa_nu)
                 lmbda_c_eq = r_nu / (nu*l_nu_eq) # nm/nm
                 lmbda_nu = lmbda_nu_func(lmbda_c_eq)
@@ -690,8 +742,10 @@ class AFMChainTensileTestCurveFitCharacterizer(
                     characteristic segment potential energy scale and
                     nondimensional segment stiffness
                     """
-                    return (1. + np.sqrt(zeta_nu_char/kappa_nu)
-                            - np.sqrt(1./(kappa_nu*zeta_nu_char)))
+                    return (
+                        1. + np.sqrt(zeta_nu_char/kappa_nu)
+                        - np.sqrt(1./(kappa_nu*zeta_nu_char))
+                    )
                 
                 def lmbda_nu_func(lmbda_c_eq):
                     """Segment stretch
@@ -721,87 +775,107 @@ class AFMChainTensileTestCurveFitCharacterizer(
                             trm_i   = 2. * kappa_nu
                             trm_ii  = 4. * kappa_nu + 6.
                             trm_iii = kappa_nu + 3.
-                            gamma_tilde_nmrtr = (trm_i + lmbda_c_eq_val 
-                                                    * (trm_ii
-                                                    +lmbda_c_eq_val*trm_iii))
+                            gamma_tilde_nmrtr = (
+                                trm_i + lmbda_c_eq_val 
+                                * (trm_ii+lmbda_c_eq_val*trm_iii)
+                            )
                             gamma_tilde_dnmntr = kappa_nu + 1.
                             gamma_tilde = gamma_tilde_nmrtr / gamma_tilde_dnmntr
                             
                             trm_i   = 2.
                             trm_ii  = 2. * kappa_nu
                             trm_iii = kappa_nu + 3.
-                            delta_tilde_nmrtr = (trm_i - lmbda_c_eq_val 
-                                                    * (trm_ii+lmbda_c_eq_val
-                                                    *(trm_iii+lmbda_c_eq_val)))
+                            delta_tilde_nmrtr = (
+                                trm_i - lmbda_c_eq_val * 
+                                (trm_ii+lmbda_c_eq_val*(trm_iii+lmbda_c_eq_val))
+                            )
                             delta_tilde_dnmntr = kappa_nu + 1.
                             delta_tilde = delta_tilde_nmrtr / delta_tilde_dnmntr
 
-                            pi_tilde_nmrtr  = (3. * alpha_tilde * gamma_tilde
-                                                - beta_tilde**2)
+                            pi_tilde_nmrtr  = (
+                                3. * alpha_tilde * gamma_tilde - beta_tilde**2
+                            )
                             pi_tilde_dnmntr = 3. * alpha_tilde**2
                             pi_tilde = pi_tilde_nmrtr / pi_tilde_dnmntr
 
-                            rho_tilde_nmrtr = (2. * beta_tilde**3
-                                                - 9. * alpha_tilde * beta_tilde
-                                                * gamma_tilde + 27. 
-                                                * alpha_tilde**2 * delta_tilde)
+                            rho_tilde_nmrtr = (
+                                2. * beta_tilde**3
+                                - 9. * alpha_tilde * beta_tilde * gamma_tilde
+                                + 27. * alpha_tilde**2 * delta_tilde
+                            )
                             rho_tilde_dnmntr = 27. * alpha_tilde**3
                             rho_tilde = rho_tilde_nmrtr / rho_tilde_dnmntr
 
-                            arccos_arg = (3. * rho_tilde / (2.*pi_tilde)
-                                            * np.sqrt(-3./pi_tilde))
+                            arccos_arg = (
+                                3. * rho_tilde / (2.*pi_tilde)
+                                * np.sqrt(-3./pi_tilde)
+                            )
                             
                             if arccos_arg >= 1. - 1.e-14:
                                 arccos_arg =  1. - 1.e-14
                             elif arccos_arg < -1. + 1.e-14:
                                 arccos_arg =  -1. + 1.e-14
                             
-                            cos_arg = (1. / 3. * np.arccos(arccos_arg)
-                                        - 2. * np.pi / 3.)
-                            lmbda_nu_val = (2. * np.sqrt(-pi_tilde/3.)
-                                            * np.cos(cos_arg)
-                                            - beta_tilde / (3.*alpha_tilde))
+                            cos_arg = (
+                                1. / 3. * np.arccos(arccos_arg)
+                                - 2. * np.pi / 3.
+                            )
+                            lmbda_nu_val = (
+                                2. * np.sqrt(-pi_tilde/3.) * np.cos(cos_arg)
+                                - beta_tilde / (3.*alpha_tilde)
+                            )
                         
                         # Bergstrom approximate
                         elif lmbda_c_eq_val <= lmbda_c_eq_crit:
-                            sqrt_arg = (lmbda_c_eq_val**2 - 2. * lmbda_c_eq_val
-                                        + 1. + 4. / kappa_nu)
-                            lmbda_nu_val = ((lmbda_c_eq_val+1.+np.sqrt(sqrt_arg))
-                                            / 2.)
+                            sqrt_arg = (
+                                lmbda_c_eq_val**2 - 2. * lmbda_c_eq_val + 1.
+                                + 4. / kappa_nu
+                            )
+                            lmbda_nu_val = (
+                                (lmbda_c_eq_val+1.+np.sqrt(sqrt_arg)) / 2.
+                            )
                         
                         # Bergstrom approximate
                         else:
                             alpha_tilde = 1.
                             beta_tilde  = -3.
                             gamma_tilde = 3. - zeta_nu_char**2 / kappa_nu
-                            delta_tilde = (zeta_nu_char**2 / kappa_nu 
-                                            * lmbda_c_eq_val - 1.)
+                            delta_tilde = (
+                                zeta_nu_char**2 / kappa_nu * lmbda_c_eq_val - 1.
+                            )
 
-                            pi_tilde_nmrtr = (3. * alpha_tilde * gamma_tilde
-                                                - beta_tilde**2)
+                            pi_tilde_nmrtr = (
+                                3. * alpha_tilde * gamma_tilde - beta_tilde**2
+                            )
                             pi_tilde_dnmntr = 3. * alpha_tilde**2
                             pi_tilde = pi_tilde_nmrtr / pi_tilde_dnmntr
 
-                            rho_tilde_nmrtr = (2. * beta_tilde**3
-                                                - 9. * alpha_tilde * beta_tilde
-                                                * gamma_tilde + 27. 
-                                                * alpha_tilde**2 * delta_tilde)
+                            rho_tilde_nmrtr = (
+                                2. * beta_tilde**3
+                                - 9. * alpha_tilde * beta_tilde * gamma_tilde
+                                + 27. * alpha_tilde**2 * delta_tilde
+                            )
                             rho_tilde_dnmntr = 27. * alpha_tilde**3
                             rho_tilde = rho_tilde_nmrtr / rho_tilde_dnmntr
 
-                            arccos_arg = (3. * rho_tilde / (2.*pi_tilde)
-                                            * np.sqrt(-3./pi_tilde))
+                            arccos_arg = (
+                                3. * rho_tilde / (2.*pi_tilde)
+                                * np.sqrt(-3./pi_tilde)
+                            )
                             
                             if arccos_arg >= 1. - 1.e-14:
                                 arccos_arg =  1. - 1.e-14
                             elif arccos_arg < -1. + 1.e-14:
                                 arccos_arg =  -1. + 1.e-14
                             
-                            cos_arg = (1. / 3. * np.arccos(arccos_arg)
-                                        - 2. * np.pi / 3.)
-                            lmbda_nu_val = (2. * np.sqrt(-pi_tilde/3.)
-                                            * np.cos(cos_arg)
-                                            - beta_tilde / (3.*alpha_tilde))
+                            cos_arg = (
+                                1. / 3. * np.arccos(arccos_arg)
+                                - 2. * np.pi / 3.
+                            )
+                            lmbda_nu_val = (
+                                2. * np.sqrt(-pi_tilde/3.) * np.cos(cos_arg)
+                                - beta_tilde / (3.*alpha_tilde)
+                            )
                         
                         lmbda_nu.append(lmbda_nu_val)
                     
@@ -822,12 +896,12 @@ class AFMChainTensileTestCurveFitCharacterizer(
                         the result of the equilibrium chain stretch
                         minus the segment stretch plus one
                         """
-                        return (lmbda_comp_nu * (3.-1.00651*lmbda_comp_nu**2
-                                -0.962251*lmbda_comp_nu**4
-                                +1.47353*lmbda_comp_nu**6
-                                -0.48953*lmbda_comp_nu**8)
-                                / ((1.-lmbda_comp_nu)
-                                *(1.+1.01524*lmbda_comp_nu)))
+                        return (
+                            lmbda_comp_nu * (3.-1.00651*lmbda_comp_nu**2
+                            -0.962251*lmbda_comp_nu**4+1.47353*lmbda_comp_nu**6
+                            -0.48953*lmbda_comp_nu**8)
+                            / ((1.-lmbda_comp_nu)*(1.+1.01524*lmbda_comp_nu))
+                        )
                     
                     lmbda_comp_nu = lmbda_c_eq - lmbda_nu + 1.
                     
@@ -835,8 +909,9 @@ class AFMChainTensileTestCurveFitCharacterizer(
                 
                 nu_b = l_nu_eq / l_b_eq
                 zeta_nu_char = nu_b * zeta_b_char
-                lmbda_c_eq_pade2berg_crit = lmbda_c_eq_pade2berg_crit_func(
-                    kappa_nu)
+                lmbda_c_eq_pade2berg_crit = (
+                    lmbda_c_eq_pade2berg_crit_func(kappa_nu)
+                )
                 lmbda_c_eq_crit = lmbda_c_eq_crit_func(zeta_nu_char, kappa_nu)
                 lmbda_c_eq = r_nu / (nu*l_nu_eq) # nm/nm
                 lmbda_nu = lmbda_nu_func(lmbda_c_eq)
@@ -847,19 +922,23 @@ class AFMChainTensileTestCurveFitCharacterizer(
             
             r_nu_fit_max = r_nu[-1]
             
-            r_nu_fit_num_steps = (int(
-                np.around(
+            r_nu_fit_num_steps = (
+                int(np.around(
                     (r_nu_fit_max-cp.r_nu_fit_min)/cp.r_nu_fit_inc))
-                + 1)
-            r_nu_fit = np.linspace(
-                cp.r_nu_fit_min, r_nu_fit_max, r_nu_fit_num_steps) # nm
+                + 1
+            )
+            r_nu_fit = (
+                np.linspace(cp.r_nu_fit_min, r_nu_fit_max, r_nu_fit_num_steps)
+             ) # nm
             
             l_nu_eq_min = l_b_eq # nm
             
-            popt, pcov = optimize.curve_fit(
-                f_c_func_l_nu_eq_nu_kappa_nu_fit, r_nu, f_c,
-                bounds=((l_nu_eq_min, cp.nu_min, cp.kappa_nu_min),
-                        (cp.l_nu_eq_max, cp.nu_max, cp.kappa_nu_max)))
+            popt, pcov = (
+                optimize.curve_fit(
+                    f_c_func_l_nu_eq_nu_kappa_nu_fit, r_nu, f_c,
+                    bounds=((l_nu_eq_min, cp.nu_min, cp.kappa_nu_min),
+                            (cp.l_nu_eq_max, cp.nu_max, cp.kappa_nu_max)))
+            )
             
             l_nu_eq  = popt[0]
             nu       = popt[1]
@@ -875,8 +954,10 @@ class AFMChainTensileTestCurveFitCharacterizer(
             print('nu = {}'.format(nu))
             print('kappa_nu = {}'.format(kappa_nu))
             
-            f_c_fit = f_c_func_l_nu_eq_nu_kappa_nu_fit(
-                r_nu_fit, l_nu_eq, nu, kappa_nu)
+            f_c_fit = (
+                f_c_func_l_nu_eq_nu_kappa_nu_fit(
+                    r_nu_fit, l_nu_eq, nu, kappa_nu)
+            )
             r_nu_fit_intgr_nu = np.copy(r_nu_fit)
             
             nu_b_floor = np.floor(nu_b)
@@ -886,26 +967,34 @@ class AFMChainTensileTestCurveFitCharacterizer(
             l_nu_eq_ceil  = nu_b_ceil*l_b_eq
             
             l_nu_eq    = l_nu_eq_floor
-            popt, pcov = optimize.curve_fit(
-                f_c_func_nu_kappa_nu_fit, r_nu, f_c,
-                bounds=((cp.nu_min, cp.kappa_nu_min),
-                        (cp.nu_max, cp.kappa_nu_max)))
+            popt, pcov = (
+                optimize.curve_fit(
+                    f_c_func_nu_kappa_nu_fit, r_nu, f_c,
+                    bounds=((cp.nu_min, cp.kappa_nu_min),
+                            (cp.nu_max, cp.kappa_nu_max)))
+            )
+
             nu_floor       = popt[0]
             kappa_nu_floor = popt[1]
-            residual_floor = np.linalg.norm(
-                f_c-f_c_func_l_nu_eq_nu_kappa_nu_fit(
+            residual_floor = (
+                np.linalg.norm(f_c-f_c_func_l_nu_eq_nu_kappa_nu_fit(
                     r_nu, l_nu_eq_floor, nu_floor, kappa_nu_floor))
+            )
             
             l_nu_eq    = l_nu_eq_ceil
-            popt, pcov = optimize.curve_fit(
-                f_c_func_nu_kappa_nu_fit, r_nu, f_c,
-                bounds=((cp.nu_min, cp.kappa_nu_min),
-                        (cp.nu_max, cp.kappa_nu_max)))
+            popt, pcov = (
+                optimize.curve_fit(
+                    f_c_func_nu_kappa_nu_fit, r_nu, f_c,
+                    bounds=((cp.nu_min, cp.kappa_nu_min),
+                            (cp.nu_max, cp.kappa_nu_max)))
+            )
+
             nu_ceil       = popt[0]
             kappa_nu_ceil = popt[1]
-            residual_ceil = np.linalg.norm(
-                f_c-f_c_func_l_nu_eq_nu_kappa_nu_fit(
+            residual_ceil = (
+                np.linalg.norm(f_c-f_c_func_l_nu_eq_nu_kappa_nu_fit(
                     r_nu, l_nu_eq_ceil, nu_ceil, kappa_nu_ceil))
+            )
             
             if residual_floor <= residual_ceil:
                 l_nu_eq = l_nu_eq_floor
@@ -921,24 +1010,32 @@ class AFMChainTensileTestCurveFitCharacterizer(
             nu_ceil  = np.ceil(nu)
             
             nu         = nu_floor
-            popt, pcov = optimize.curve_fit(
-                f_c_func_kappa_nu_fit, r_nu, f_c,
-                bounds=(cp.kappa_nu_min,
-                        cp.kappa_nu_max))
+            popt, pcov = (
+                optimize.curve_fit(
+                    f_c_func_kappa_nu_fit, r_nu, f_c,
+                    bounds=(cp.kappa_nu_min,
+                            cp.kappa_nu_max))
+            )
+
             kappa_nu_floor = popt[0]
-            residual_floor = np.linalg.norm(
-                f_c-f_c_func_l_nu_eq_nu_kappa_nu_fit(
+            residual_floor = (
+                np.linalg.norm(f_c-f_c_func_l_nu_eq_nu_kappa_nu_fit(
                     r_nu, l_nu_eq, nu_floor, kappa_nu_floor))
+            )
             
             nu         = nu_ceil
-            popt, pcov = optimize.curve_fit(
-                f_c_func_kappa_nu_fit, r_nu, f_c,
-                bounds=(cp.kappa_nu_min,
-                        cp.kappa_nu_max))
+            popt, pcov = (
+                optimize.curve_fit(
+                    f_c_func_kappa_nu_fit, r_nu, f_c,
+                    bounds=(cp.kappa_nu_min,
+                            cp.kappa_nu_max))
+            )
+
             kappa_nu_ceil = popt[0]
-            residual_ceil = np.linalg.norm(
-                f_c-f_c_func_l_nu_eq_nu_kappa_nu_fit(
+            residual_ceil = (
+                np.linalg.norm(f_c-f_c_func_l_nu_eq_nu_kappa_nu_fit(
                     r_nu, l_nu_eq, nu_ceil, kappa_nu_ceil))
+            )
             
             if residual_floor <= residual_ceil:
                 nu       = nu_floor
@@ -954,17 +1051,20 @@ class AFMChainTensileTestCurveFitCharacterizer(
             intgr_nu          = nu
             kappa_nu_intgr_nu = kappa_nu
             
-            f_c_fit_intgr_nu = f_c_func_l_nu_eq_nu_kappa_nu_fit(
-                r_nu_fit_intgr_nu, l_nu_eq_intgr_nu,
-                intgr_nu, kappa_nu_intgr_nu)
+            f_c_fit_intgr_nu = (
+                f_c_func_l_nu_eq_nu_kappa_nu_fit(
+                    r_nu_fit_intgr_nu, l_nu_eq_intgr_nu,
+                    intgr_nu, kappa_nu_intgr_nu)
+            )
             
             l_nu_eq  = l_nu_eq_init
             nu       = nu_init
             kappa_nu = kappa_nu_init
             
-            return (r_nu_fit, r_nu_fit_intgr_nu, f_c_fit, f_c_fit_intgr_nu,
-                    l_nu_eq, l_nu_eq_intgr_nu, nu, intgr_nu,
-                    kappa_nu, kappa_nu_intgr_nu)
+            return (
+                r_nu_fit, r_nu_fit_intgr_nu, f_c_fit, f_c_fit_intgr_nu, l_nu_eq,
+                l_nu_eq_intgr_nu, nu, intgr_nu, kappa_nu, kappa_nu_intgr_nu
+            )
 
         k_B     = constants.value(u'Boltzmann constant') # J/K
         h       = constants.value(u'Planck constant') # J/Hz
@@ -980,8 +1080,10 @@ class AFMChainTensileTestCurveFitCharacterizer(
         chain_backbone_bond_type = (
             cp.polymer_type_label2chain_backbone_bond_type_dict[polymer_type]
         )
-        self.data_file_prefix = (self.paper_authors+'-'+polymer_type+'-'
-                                    +chain_backbone_bond_type+'-'+self.chain)
+        self.data_file_prefix = (
+            self.paper_authors + '-' + polymer_type + '-'
+            + chain_backbone_bond_type + '-' + self.chain
+        )
 
         f_c_max = (
             cp.chain_backbone_bond_type2f_c_max_dict[chain_backbone_bond_type]
@@ -995,8 +1097,10 @@ class AFMChainTensileTestCurveFitCharacterizer(
 
         # Curve fit single chain AFM tensile test results;
         # nm, nN respectively
-        r_nu, f_c = chain_data_file_load_func(
-            self.data_file_prefix, cp.chain_data_directory)
+        r_nu, f_c = (
+            chain_data_file_load_func(
+                self.data_file_prefix, cp.chain_data_directory)
+        )
 
         # nm, nN, nm, unitless, unitless, respectively
         (r_nu_fit, r_nu_fit_intgr_nu,
@@ -1073,12 +1177,15 @@ class AFMChainTensileTestCurveFitCharacterizer(
         # Initialize a rate-dependent CompositeuFJC which matches the
         # chain used in the AFM tensile test where the bond and segment
         # numbers in the chain are strictly integer values
-        rate_dependent_single_chain = RateDependentScissionCompositeuFJC(
-            nu=intgr_nu, zeta_nu_char=zeta_nu_char_intgr_nu,
-            kappa_nu=kappa_nu_intgr_nu, omega_0=omega_0)
+        rate_dependent_single_chain = (
+            RateDependentScissionCompositeuFJC(
+                nu=intgr_nu, zeta_nu_char=zeta_nu_char_intgr_nu,
+                kappa_nu=kappa_nu_intgr_nu, omega_0=omega_0)
+        )
 
-        f_c_crit = (rate_dependent_single_chain.xi_c_crit
-                    / (beta*l_nu_eq_intgr_nu)) # (nN*nm)/nm = nN
+        f_c_crit = (
+            rate_dependent_single_chain.xi_c_crit / (beta*l_nu_eq_intgr_nu)
+        ) # (nN*nm)/nm = nN
 
         # Define the applied chain force values to calculate over
         f_c_steps = np.linspace(0, f_c_crit, cp.f_c_num_steps) # nN
@@ -1108,19 +1215,20 @@ class AFMChainTensileTestCurveFitCharacterizer(
             t_steps = f_c_steps / f_c_dot # nN/(nN/sec) = sec
 
             # Make arrays to allocate results
-            xi_c                    = []
-            lmbda_nu                = []
-            lmbda_c_eq              = []
-            p_nu_sci_hat            = []
-            p_nu_sci_hat_cum_intgrl = []
-            gamma_c                 = []
-            epsilon_cnu_diss_hat    = []
+            xi_c                      = []
+            lmbda_nu                  = []
+            lmbda_c_eq                = []
+            p_nu_sci_hat              = []
+            p_nu_sci_hat_cmltv_intgrl = []
+            gamma_c                   = []
+            epsilon_cnu_diss_hat      = []
 
             # Calculate results through applied chain force values
             for f_c_indx in range(cp.f_c_num_steps):
                 t_val = t_steps[f_c_indx]
-                xi_c_val = (f_c_steps[f_c_indx] * beta 
-                            * l_nu_eq_intgr_nu) # nN*nm/(nN*nm)
+                xi_c_val = (
+                    f_c_steps[f_c_indx] * beta * l_nu_eq_intgr_nu
+                ) # nN*nm/(nN*nm)
                 lmbda_nu_val = (
                     rate_dependent_single_chain.lmbda_nu_xi_c_hat_func(xi_c_val)
                 )
@@ -1130,27 +1238,31 @@ class AFMChainTensileTestCurveFitCharacterizer(
                 p_nu_sci_hat_val = (
                     rate_dependent_single_chain.p_nu_sci_hat_func(lmbda_nu_val)
                 )
+                epsilon_cnu_sci_hat_val = (
+                    rate_dependent_single_chain.epsilon_cnu_sci_hat_func(
+                        lmbda_nu_val)
+                )
 
                 # initialization
                 if f_c_indx == 0:
-                    p_nu_sci_hat_cum_intgrl_val = 0
-                    gamma_c_val                 = 0
-                    epsilon_cnu_diss_hat_val    = 0
+                    p_nu_sci_hat_cmltv_intgrl_val = 0
+                    gamma_c_val                   = 0
+                    epsilon_cnu_diss_hat_val      = 0
                 else:
-                    p_nu_sci_hat_cum_intgrl_val = (
-                        rate_dependent_single_chain.p_nu_sci_hat_cum_intgrl_func(
+                    p_nu_sci_hat_cmltv_intgrl_val = (
+                        rate_dependent_single_chain.p_nu_sci_hat_cmltv_intgrl_func(
                             p_nu_sci_hat_val, t_val, p_nu_sci_hat[f_c_indx-1],
                             t_steps[f_c_indx-1],
-                            p_nu_sci_hat_cum_intgrl[f_c_indx-1])
+                            p_nu_sci_hat_cmltv_intgrl[f_c_indx-1])
                     )
                     gamma_c_val = (
                         rate_dependent_single_chain.gamma_c_func(
-                            p_nu_sci_hat_cum_intgrl_val)
+                            p_nu_sci_hat_cmltv_intgrl_val)
                     )
                     epsilon_cnu_diss_hat_val = (
                         rate_dependent_single_chain.epsilon_cnu_diss_hat_func(
-                            p_nu_sci_hat_val, p_nu_sci_hat_cum_intgrl_val,
-                            t_val, lmbda_nu_val, t_steps[f_c_indx-1],
+                            p_nu_sci_hat_val, p_nu_sci_hat_cmltv_intgrl_val,
+                            epsilon_cnu_sci_hat_val, t_val, t_steps[f_c_indx-1],
                             epsilon_cnu_diss_hat[f_c_indx-1])
                     )
 
@@ -1158,7 +1270,7 @@ class AFMChainTensileTestCurveFitCharacterizer(
                 lmbda_nu.append(lmbda_nu_val)
                 lmbda_c_eq.append(lmbda_c_eq_val)
                 p_nu_sci_hat.append(p_nu_sci_hat_val)
-                p_nu_sci_hat_cum_intgrl.append(p_nu_sci_hat_cum_intgrl_val)
+                p_nu_sci_hat_cmltv_intgrl.append(p_nu_sci_hat_cmltv_intgrl_val)
                 gamma_c.append(gamma_c_val)
                 epsilon_cnu_diss_hat.append(epsilon_cnu_diss_hat_val)
             
@@ -1190,34 +1302,39 @@ class AFMChainTensileTestCurveFitCharacterizer(
         # Initialize a rate-independent CompositeuFJC which matches the
         # chain used in the AFM tensile test where the bond and segment
         # numbers in the chain are strictly integer values
-        rate_independent_single_chain = RateIndependentScissionCompositeuFJC(
-            nu=intgr_nu, zeta_nu_char=zeta_nu_char_intgr_nu,
-            kappa_nu=kappa_nu_intgr_nu)
+        rate_independent_single_chain = (
+            RateIndependentScissionCompositeuFJC(
+                nu=intgr_nu, zeta_nu_char=zeta_nu_char_intgr_nu,
+                kappa_nu=kappa_nu_intgr_nu)
+        )
 
-        f_c_crit = (rate_independent_single_chain.xi_c_crit
-                    / (beta*l_nu_eq_intgr_nu)) # (nN*nm)/nm = nN
+        f_c_crit = (
+            rate_independent_single_chain.xi_c_crit / (beta*l_nu_eq_intgr_nu)
+        ) # (nN*nm)/nm = nN
 
         # Define the applied chain force values to calculate over
         f_c_steps = np.linspace(0, f_c_crit, cp.f_c_num_steps) # nN
 
         xi_c                 = []
         lmbda_nu             = []
+        lmbda_nu_max         = []
         lmbda_c_eq           = []
         p_c_sci_hat          = []
         epsilon_cnu_sci_hat  = []
         epsilon_cnu_diss_hat = []
 
         # initialization
-        lmbda_nu_max = 0
+        lmbda_nu_max_val = 0
 
         # Calculate results through applied chain force values
         for f_c_indx in range(cp.f_c_num_steps):
-            xi_c_val = (f_c_steps[f_c_indx] * beta 
-                        * l_nu_eq_intgr_nu) # nN*nm/(nN*nm)
+            xi_c_val = (
+                f_c_steps[f_c_indx] * beta * l_nu_eq_intgr_nu
+            ) # nN*nm/(nN*nm)
             lmbda_nu_val = (
                 rate_independent_single_chain.lmbda_nu_xi_c_hat_func(xi_c_val)
             )
-            lmbda_nu_max = max([lmbda_nu_max, lmbda_nu_val])
+            lmbda_nu_max_val = max([lmbda_nu_max_val, lmbda_nu_val])
             lmbda_c_eq_val = (
                 rate_independent_single_chain.lmbda_c_eq_func(lmbda_nu_val)
             )
@@ -1234,12 +1351,14 @@ class AFMChainTensileTestCurveFitCharacterizer(
             else:
                 epsilon_cnu_diss_hat_val = (
                     rate_independent_single_chain.epsilon_cnu_diss_hat_func(
-                        lmbda_nu_max, lmbda_nu_val,
-                        lmbda_nu[f_c_indx-1], epsilon_cnu_diss_hat[f_c_indx-1])
+                        lmbda_nu_max_val, lmbda_nu_max[f_c_indx-1],
+                        lmbda_nu_val, lmbda_nu[f_c_indx-1],
+                        epsilon_cnu_diss_hat[f_c_indx-1])
                 )
             
             xi_c.append(xi_c_val)
             lmbda_nu.append(lmbda_nu_val)
+            lmbda_nu_max.append(lmbda_nu_max_val)
             lmbda_c_eq.append(lmbda_c_eq_val)
             p_c_sci_hat.append(p_c_sci_hat_val)
             epsilon_cnu_sci_hat.append(epsilon_cnu_sci_hat_val)

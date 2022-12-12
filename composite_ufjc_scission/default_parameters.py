@@ -1,5 +1,5 @@
 """
-The default parameters module for the composite uFJC scission model
+The default parameters module for the composite uFJC scission model.
 """
 
 # import necessary libraries

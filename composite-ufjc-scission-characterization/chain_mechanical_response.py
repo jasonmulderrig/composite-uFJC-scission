@@ -85,9 +85,11 @@ class ChainMechanicalResponseCharacterizer(CompositeuFJCScissionCharacterizer):
 
             # Define the values of the equilibrium chain stretch to
             # calculate over
-            lmbda_c_eq_steps = np.linspace(
-                cp.lmbda_c_eq_min, single_chain.lmbda_c_eq_crit,
-                cp.lmbda_c_eq_num_steps)
+            lmbda_c_eq_steps = (
+                np.linspace(
+                    cp.lmbda_c_eq_min, single_chain.lmbda_c_eq_crit,
+                    cp.lmbda_c_eq_num_steps)
+            )
 
             # Make arrays to allocate results
             lmbda_c_eq = []
@@ -161,9 +163,11 @@ class ChainMechanicalResponseCharacterizer(CompositeuFJCScissionCharacterizer):
 
             # Define the values of the equilibrium chain stretch to
             # calculate over
-            lmbda_c_eq_steps = np.linspace(
-                cp.lmbda_c_eq_min, single_chain.lmbda_c_eq_crit, 
-                cp.lmbda_c_eq_num_steps)
+            lmbda_c_eq_steps = (
+                np.linspace(
+                    cp.lmbda_c_eq_min, single_chain.lmbda_c_eq_crit,
+                    cp.lmbda_c_eq_num_steps)
+            )
 
             # Make arrays to allocate results
             lmbda_c_eq = []

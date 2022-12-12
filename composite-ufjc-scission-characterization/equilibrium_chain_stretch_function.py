@@ -121,39 +121,48 @@ class EquilibriumChainStretchFunctionCharacterizer(
             trm_iii = 2.
             trm_iv  = kappa_nu
             trm_v   = 1.
-            delta_tilde = (trm_i * (trm_ii*lmbda_nu**2-lmbda_nu**3)
-                            - trm_iii * (trm_iv*lmbda_nu+trm_v))
+            delta_tilde = (
+                trm_i * (trm_ii*lmbda_nu**2-lmbda_nu**3)
+                - trm_iii * (trm_iv*lmbda_nu+trm_v)
+            )
             
             pi_tilde_nmrtr  = 3. * alpha_tilde * gamma_tilde - beta_tilde**2
             pi_tilde_dnmntr = 3. * alpha_tilde**2
             pi_tilde = pi_tilde_nmrtr / pi_tilde_dnmntr
 
-            rho_tilde_nmrtr = (2. * beta_tilde**3 
-                                - 9. * alpha_tilde * beta_tilde * gamma_tilde 
-                                + 27. * alpha_tilde**2 * delta_tilde)
+            rho_tilde_nmrtr = (
+                2. * beta_tilde**3 - 9. * alpha_tilde * beta_tilde * gamma_tilde 
+                + 27. * alpha_tilde**2 * delta_tilde
+            )
             rho_tilde_dnmntr = 27. * alpha_tilde**3
             rho_tilde = rho_tilde_nmrtr / rho_tilde_dnmntr
 
             arccos_arg = 3. * rho_tilde / (2.*pi_tilde) * np.sqrt(-3./pi_tilde)
             cos_arg = 1. / 3. * np.arccos(arccos_arg) - 2. * np.pi / 3.
-            return (2. * np.sqrt(-pi_tilde/3.) * np.cos(cos_arg)
-                    - beta_tilde / (3.*alpha_tilde))
+            return (
+                2. * np.sqrt(-pi_tilde/3.) * np.cos(cos_arg)
+                - beta_tilde / (3.*alpha_tilde)
+            )
         
         cp = self.parameters.characterizer
 
         # nu=125, zeta_nu_char=100, and kappa_nu=1000
-        single_chain = RateIndependentScissionCompositeuFJC(
-            nu=cp.nu_single_chain_list[1],
-            zeta_nu_char=cp.zeta_nu_char_single_chain_list[2],
-            kappa_nu=cp.kappa_nu_single_chain_list[2])
+        single_chain = (
+            RateIndependentScissionCompositeuFJC(
+                nu=cp.nu_single_chain_list[1],
+                zeta_nu_char=cp.zeta_nu_char_single_chain_list[2],
+                kappa_nu=cp.kappa_nu_single_chain_list[2])
+        )
 
         # Define the segment stretch values to calculate over
-        lmbda_nu_num_steps = (int(
-            np.around(
+        lmbda_nu_num_steps = (
+            int(np.around(
                 (cp.lmbda_nu_max-cp.lmbda_nu_min)/cp.lmbda_nu_inc))
-            + 1)
-        lmbda_nu_steps = np.linspace(
-            cp.lmbda_nu_min, cp.lmbda_nu_max, lmbda_nu_num_steps)
+            + 1
+        )
+        lmbda_nu_steps = (
+            np.linspace(cp.lmbda_nu_min, cp.lmbda_nu_max, lmbda_nu_num_steps)
+        )
         
         # Make arrays to allocate results
         lmbda_nu                = []
@@ -173,33 +182,43 @@ class EquilibriumChainStretchFunctionCharacterizer(
             lmbda_comp_nu_val = lmbda_c_eq_val - lmbda_nu_val + 1.
             
             if lmbda_nu_val < single_chain.lmbda_nu_crit:
-                lmbda_c_eq_exact_val = optimize.brenth(
-                    subcrit_governing_lmbda_c_eq_func, -0.1, 2.0,
-                    args=(lmbda_nu_val, single_chain.kappa_nu))
+                lmbda_c_eq_exact_val = (
+                    optimize.brenth(
+                        subcrit_governing_lmbda_c_eq_func, -0.1, 2.0,
+                        args=(lmbda_nu_val, single_chain.kappa_nu))
+                )
             
             else:
-                lmbda_c_eq_exact_val = optimize.brenth(
-                    supercrit_governing_lmbda_c_eq_func, -0.1, 2.0,
-                    args=(lmbda_nu_val, single_chain.kappa_nu,
-                            single_chain.zeta_nu_char))
+                lmbda_c_eq_exact_val = (
+                    optimize.brenth(
+                        supercrit_governing_lmbda_c_eq_func, -0.1, 2.0,
+                        args=(lmbda_nu_val, single_chain.kappa_nu,
+                                single_chain.zeta_nu_char))
+                )
             
-            lmbda_c_eq_err_val = (np.abs(
-                (lmbda_c_eq_val-lmbda_c_eq_exact_val)/lmbda_c_eq_exact_val)
-                * 100)
+            lmbda_c_eq_err_val = (
+                np.abs(
+                    (lmbda_c_eq_val-lmbda_c_eq_exact_val)/lmbda_c_eq_exact_val)
+                * 100
+            )
             lmbda_c_eq_bergapprx_val = (
                 subcrit_lmbda_c_eq_berg_approx_func(
                     single_chain.kappa_nu, lmbda_nu_val)
             )
-            lmbda_c_eq_bergapprxerr_val = (np.abs(
-                (lmbda_c_eq_bergapprx_val-lmbda_c_eq_exact_val)/lmbda_c_eq_exact_val)
-                * 100)
+            lmbda_c_eq_bergapprxerr_val = (
+                np.abs(
+                    (lmbda_c_eq_bergapprx_val-lmbda_c_eq_exact_val)/lmbda_c_eq_exact_val)
+                * 100
+            )
             lmbda_c_eq_padeapprx_val = (
                 subcrit_lmbda_c_eq_pade_approx_func(
                     single_chain.kappa_nu, lmbda_nu_val)
             )
-            lmbda_c_eq_padeapprxerr_val = (np.abs(
-                (lmbda_c_eq_padeapprx_val-lmbda_c_eq_exact_val)/lmbda_c_eq_exact_val)
-                * 100)
+            lmbda_c_eq_padeapprxerr_val = (
+                np.abs(
+                    (lmbda_c_eq_padeapprx_val-lmbda_c_eq_exact_val)/lmbda_c_eq_exact_val)
+                * 100
+            )
             
             lmbda_nu.append(lmbda_nu_val)
             lmbda_c_eq.append(lmbda_c_eq_val)
@@ -232,10 +251,14 @@ class EquilibriumChainStretchFunctionCharacterizer(
         lmbda_c_eq_bergapprx_array = np.asarray(self.lmbda_c_eq_bergapprx)
         lmbda_c_eq_padeapprx_array = np.asarray(self.lmbda_c_eq_padeapprx)
         
-        bergapprx_cutoff_indx = np.argmin(
-            np.abs(lmbda_comp_nu_array-cp.bergapprx_lmbda_nu_cutoff))
-        pade2berg_crit_indx = np.argmin(
-            np.abs(lmbda_c_eq_padeapprx_array[0:bergapprx_cutoff_indx]-lmbda_c_eq_bergapprx_array[0:bergapprx_cutoff_indx]))
+        bergapprx_cutoff_indx = (
+            np.argmin(np.abs(lmbda_comp_nu_array-cp.bergapprx_lmbda_nu_cutoff))
+        )
+        pade2berg_crit_indx = (
+            np.argmin(
+                np.abs(
+                    lmbda_c_eq_padeapprx_array[0:bergapprx_cutoff_indx]-lmbda_c_eq_bergapprx_array[0:bergapprx_cutoff_indx]))
+        )
 
         # plot results
         latex_formatting_figure(pp)

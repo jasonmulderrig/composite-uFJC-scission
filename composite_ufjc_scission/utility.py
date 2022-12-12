@@ -1,4 +1,4 @@
-"""The utilities module for the composite uFJC scission model"""
+"""The utilities module for the composite uFJC scission model."""
 
 # import necessary libraries
 from __future__ import division
@@ -75,7 +75,7 @@ def latex_formatting_figure(post_processing_parameters):
 
 def save_current_figure(
         savedir, xlabel, xlabelfontsize, ylabel, ylabelfontsize, name):
-    """Save matplotlib plot figure with labels
+    """Save matplotlib plot figure with labels.
     
     This function saves the current matplotlib plot figure with
     specified axis labels and axis label fontsize.
@@ -88,7 +88,7 @@ def save_current_figure(
     plt.close()
 
 def save_current_figure_no_labels(savedir, name):
-    """Save matplotlib plot figure without labels
+    """Save matplotlib plot figure without labels.
     
     This function saves the current matplotlib plot figure without
     specified axis labels.

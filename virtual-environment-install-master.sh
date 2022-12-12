@@ -1,10 +1,15 @@
 #!/bin/bash
 
+# Make sure the VENV_PATH variable is correctly set based upon the computer system being used, as follows
+
 # For the workstation AnalyticalEngine
 VENV_PATH="/home/jason_mulderrig/research/projects/composite-uFJC-scission"
 
 # # For the laptop WSL2 running Ubuntu 20.04
 # VENV_PATH="/home/jasonmulderrig/research/projects/temp"
+
+# # For the Macbook Air
+# VENV_PATH="/Users/jasonmulderrig/research/projects/composite-uFJC-scission"
 
 # Set up Python virtual environment and associated Python packages
 

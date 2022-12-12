@@ -78,19 +78,24 @@ class SegmentStretchFunctionCharacterizer(CompositeuFJCScissionCharacterizer):
         cp = self.parameters.characterizer
 
         # nu=125, zeta_nu_char=100, and kappa_nu=1000
-        single_chain = RateIndependentScissionCompositeuFJC(
-            nu=cp.nu_single_chain_list[1],
-            zeta_nu_char=cp.zeta_nu_char_single_chain_list[2],
-            kappa_nu=cp.kappa_nu_single_chain_list[2])
+        single_chain = (
+            RateIndependentScissionCompositeuFJC(
+                nu=cp.nu_single_chain_list[1],
+                zeta_nu_char=cp.zeta_nu_char_single_chain_list[2],
+                kappa_nu=cp.kappa_nu_single_chain_list[2])
+        )
 
         # Define the values of the equilibrium chain stretch to
         # calculate over
-        lmbda_c_eq_num_steps = (int(
-            np.around(
+        lmbda_c_eq_num_steps = (
+            int(np.around(
                 (cp.lmbda_c_eq_max-cp.lmbda_c_eq_min)/cp.lmbda_c_eq_inc))
-            + 1)
-        lmbda_c_eq_steps = np.linspace(
-            cp.lmbda_c_eq_min, cp.lmbda_c_eq_max, lmbda_c_eq_num_steps)
+            + 1
+        )
+        lmbda_c_eq_steps = (
+            np.linspace(
+                cp.lmbda_c_eq_min, cp.lmbda_c_eq_max, lmbda_c_eq_num_steps)
+        )
         
         # Make arrays to allocate results
         lmbda_c_eq            = []
@@ -111,31 +116,40 @@ class SegmentStretchFunctionCharacterizer(CompositeuFJCScissionCharacterizer):
             lmbda_comp_nu_val = lmbda_c_eq_val - lmbda_nu_val + 1.
             
             if lmbda_c_eq_val < single_chain.lmbda_c_eq_crit:
-                lmbda_nu_exact_val = optimize.brenth(
-                    subcrit_governing_lmbda_nu_func, 0.8, 2.0,
-                    args=(lmbda_c_eq_val, single_chain.kappa_nu))
+                lmbda_nu_exact_val = (
+                    optimize.brenth(
+                        subcrit_governing_lmbda_nu_func, 0.8, 2.0,
+                        args=(lmbda_c_eq_val, single_chain.kappa_nu))
+                )
             
             else:
-                lmbda_nu_exact_val = optimize.brenth(
-                    supercrit_governing_lmbda_nu_func, 0.8, 2.0,
-                    args=(lmbda_c_eq_val, single_chain.zeta_nu_char,
-                            single_chain.kappa_nu))
+                lmbda_nu_exact_val = (
+                    optimize.brenth(
+                        supercrit_governing_lmbda_nu_func, 0.8, 2.0,
+                        args=(lmbda_c_eq_val, single_chain.zeta_nu_char,
+                                single_chain.kappa_nu))
+                )
             
-            lmbda_nu_err_val = (np.abs(
-                (lmbda_nu_val-lmbda_nu_exact_val)/lmbda_nu_exact_val)
-                * 100)
+            lmbda_nu_err_val = (
+                np.abs((lmbda_nu_val-lmbda_nu_exact_val)/lmbda_nu_exact_val)
+                * 100
+            )
             lmbda_nu_bergapprx_val = (
                 single_chain.subcrit_lmbda_nu_berg_approx_func(lmbda_c_eq_val)
             )
-            lmbda_nu_bergapprxerr_val = (np.abs(
-                (lmbda_nu_bergapprx_val-lmbda_nu_exact_val)/lmbda_nu_exact_val)
-                * 100)
+            lmbda_nu_bergapprxerr_val = (
+                np.abs(
+                    (lmbda_nu_bergapprx_val-lmbda_nu_exact_val)/lmbda_nu_exact_val)
+                * 100
+            )
             lmbda_nu_padeapprx_val = (
                 single_chain.subcrit_lmbda_nu_pade_approx_func(lmbda_c_eq_val)
             )
-            lmbda_nu_padeapprxerr_val = (np.abs(
-                (lmbda_nu_padeapprx_val-lmbda_nu_exact_val)/lmbda_nu_exact_val)
-                * 100)
+            lmbda_nu_padeapprxerr_val = (
+                np.abs(
+                    (lmbda_nu_padeapprx_val-lmbda_nu_exact_val)/lmbda_nu_exact_val)
+                * 100
+            )
             
             lmbda_c_eq.append(lmbda_c_eq_val)
             lmbda_nu.append(lmbda_nu_val)
@@ -171,8 +185,9 @@ class SegmentStretchFunctionCharacterizer(CompositeuFJCScissionCharacterizer):
         ppp = self.parameters.post_processing
 
         lmbda_comp_nu_array   = np.asarray(self.lmbda_comp_nu)
-        bergapprx_cutoff_indx = np.argmin(
-            np.abs(lmbda_comp_nu_array-cp.bergapprx_lmbda_nu_cutoff))
+        bergapprx_cutoff_indx = (
+            np.argmin(np.abs(lmbda_comp_nu_array-cp.bergapprx_lmbda_nu_cutoff))
+        )
 
         # plot results
         latex_formatting_figure(ppp)

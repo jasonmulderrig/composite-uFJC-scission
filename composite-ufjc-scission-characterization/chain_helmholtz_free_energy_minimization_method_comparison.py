@@ -76,19 +76,19 @@ class ChainHelmholtzFreeEnergyMinimizationMethodComparisonCharacterizer(
                 equilibrium chain stretch minus the segment stretch plus
                 one
                 """
-                return (0.0602726941412868 * lmbda_comp_nu**8
-                        + 0.00103401966455583 * lmbda_comp_nu**7
-                        - 0.162726405850159 * lmbda_comp_nu**6
-                        - 0.00150537112388157 * lmbda_comp_nu**5
-                        - 0.00350216312906114 * lmbda_comp_nu**4
-                        - 0.00254138511870934 * lmbda_comp_nu**3
-                        + 0.488744117329956 * lmbda_comp_nu**2
-                        + 0.0071635921950366 * lmbda_comp_nu
-                        - 0.999999503781195 *
-                        np.log(1.00000000002049-lmbda_comp_nu)
-                        - 0.992044340231098 *
-                        np.log(lmbda_comp_nu+0.98498877114821)
-                        - 0.0150047080499398)
+                return (
+                    0.0602726941412868 * lmbda_comp_nu**8
+                    + 0.00103401966455583 * lmbda_comp_nu**7
+                    - 0.162726405850159 * lmbda_comp_nu**6
+                    - 0.00150537112388157 * lmbda_comp_nu**5
+                    - 0.00350216312906114 * lmbda_comp_nu**4
+                    - 0.00254138511870934 * lmbda_comp_nu**3
+                    + 0.488744117329956 * lmbda_comp_nu**2
+                    + 0.0071635921950366 * lmbda_comp_nu
+                    - 0.999999503781195 * np.log(1.00000000002049-lmbda_comp_nu)
+                    - 0.992044340231098 * np.log(lmbda_comp_nu+0.98498877114821)
+                    - 0.0150047080499398
+                )
             
             def u_nu_func(lmbda_nu, zeta_nu_char, kappa_nu):
                 """Nondimensional sub-critical chain state segment
@@ -104,8 +104,10 @@ class ChainHelmholtzFreeEnergyMinimizationMethodComparisonCharacterizer(
 
             lmbda_comp_nu = lmbda_c_eq - lmbda_nu + 1.
 
-            return (u_nu_func(lmbda_nu, zeta_nu_char, kappa_nu) 
-                    + s_cnu_func(lmbda_comp_nu))
+            return (
+                u_nu_func(lmbda_nu, zeta_nu_char, kappa_nu)
+                + s_cnu_func(lmbda_comp_nu)
+            )
         
         def supercrit_psi_cnu_func(
                 lmbda_nu, lmbda_c_eq, zeta_nu_char, kappa_nu):
@@ -130,19 +132,19 @@ class ChainHelmholtzFreeEnergyMinimizationMethodComparisonCharacterizer(
                 equilibrium chain stretch minus the segment stretch plus
                 one
                 """
-                return (0.0602726941412868 * lmbda_comp_nu**8
-                        + 0.00103401966455583 * lmbda_comp_nu**7
-                        - 0.162726405850159 * lmbda_comp_nu**6
-                        - 0.00150537112388157 * lmbda_comp_nu**5
-                        - 0.00350216312906114 * lmbda_comp_nu**4
-                        - 0.00254138511870934 * lmbda_comp_nu**3
-                        + 0.488744117329956 * lmbda_comp_nu**2
-                        + 0.0071635921950366 * lmbda_comp_nu
-                        - 0.999999503781195 *
-                        np.log(1.00000000002049-lmbda_comp_nu)
-                        - 0.992044340231098 *
-                        np.log(lmbda_comp_nu+0.98498877114821)
-                        - 0.0150047080499398)
+                return (
+                    0.0602726941412868 * lmbda_comp_nu**8
+                    + 0.00103401966455583 * lmbda_comp_nu**7
+                    - 0.162726405850159 * lmbda_comp_nu**6
+                    - 0.00150537112388157 * lmbda_comp_nu**5
+                    - 0.00350216312906114 * lmbda_comp_nu**4
+                    - 0.00254138511870934 * lmbda_comp_nu**3
+                    + 0.488744117329956 * lmbda_comp_nu**2
+                    + 0.0071635921950366 * lmbda_comp_nu
+                    - 0.999999503781195 * np.log(1.00000000002049-lmbda_comp_nu)
+                    - 0.992044340231098 * np.log(lmbda_comp_nu+0.98498877114821)
+                    - 0.0150047080499398
+                )
             
             def u_nu_func(lmbda_nu, zeta_nu_char, kappa_nu):
                 """Nondimensional super-critical chain state segment
@@ -158,8 +160,10 @@ class ChainHelmholtzFreeEnergyMinimizationMethodComparisonCharacterizer(
 
             lmbda_comp_nu = lmbda_c_eq - lmbda_nu + 1.
 
-            return (u_nu_func(lmbda_nu, zeta_nu_char, kappa_nu) 
-                    + s_cnu_func(lmbda_comp_nu))
+            return (
+                u_nu_func(lmbda_nu, zeta_nu_char, kappa_nu) 
+                + s_cnu_func(lmbda_comp_nu)
+            )
         
         cp = self.parameters.characterizer
 
@@ -196,17 +200,22 @@ class ChainHelmholtzFreeEnergyMinimizationMethodComparisonCharacterizer(
                 psi_minimization_zeta_nu_char_single_chain_list[single_chain_indx]
             )
 
-            lmbda_c_eq_max = (cp.zeta_nu_char_lmbda_c_eq_crit_factor
-                                * single_chain.lmbda_c_eq_crit)
+            lmbda_c_eq_max = (
+                cp.zeta_nu_char_lmbda_c_eq_crit_factor
+                * single_chain.lmbda_c_eq_crit
+            )
 
             # Define the values of the equilibrium chain stretch to
             # calculate over
-            lmbda_c_eq_num_steps = (int(
-                np.around(
+            lmbda_c_eq_num_steps = (
+                int(np.around(
                     (lmbda_c_eq_max-cp.lmbda_c_eq_min)/cp.lmbda_c_eq_inc))
-                + 1)
-            lmbda_c_eq_steps = np.linspace(
-                cp.lmbda_c_eq_min, lmbda_c_eq_max, lmbda_c_eq_num_steps)
+                + 1
+            )
+            lmbda_c_eq_steps = (
+                np.linspace(
+                    cp.lmbda_c_eq_min, lmbda_c_eq_max, lmbda_c_eq_num_steps)
+            )
 
             # Make arrays to allocate results
             lmbda_c_eq       = []
@@ -221,26 +230,34 @@ class ChainHelmholtzFreeEnergyMinimizationMethodComparisonCharacterizer(
                 lmbda_nu_val   = single_chain.lmbda_nu_func(lmbda_c_eq_val)
                 
                 if lmbda_c_eq_val < 1.0:
-                    result = optimize.minimize(
-                        subcrit_psi_cnu_func, 1.0,
-                        args=(lmbda_c_eq_val, single_chain.zeta_nu_char,
-                                single_chain.kappa_nu))
+                    result = (
+                        optimize.minimize(
+                            subcrit_psi_cnu_func, 1.0,
+                            args=(lmbda_c_eq_val, single_chain.zeta_nu_char,
+                                    single_chain.kappa_nu))
+                    )
                 
                 elif lmbda_c_eq_val < single_chain.lmbda_c_eq_crit:
-                    result = optimize.minimize(
-                        subcrit_psi_cnu_func, lmbda_c_eq_val,
-                        args=(lmbda_c_eq_val, single_chain.zeta_nu_char,
-                                single_chain.kappa_nu))
+                    result = (
+                        optimize.minimize(
+                            subcrit_psi_cnu_func, lmbda_c_eq_val,
+                            args=(lmbda_c_eq_val, single_chain.zeta_nu_char,
+                                    single_chain.kappa_nu))
+                    )
                 
                 else:
-                    result = optimize.minimize(
-                        supercrit_psi_cnu_func, lmbda_c_eq_val,
-                        args=(lmbda_c_eq_val, single_chain.zeta_nu_char,
-                                single_chain.kappa_nu))
+                    result = (
+                        optimize.minimize(
+                            supercrit_psi_cnu_func, lmbda_c_eq_val,
+                            args=(lmbda_c_eq_val, single_chain.zeta_nu_char,
+                                    single_chain.kappa_nu))
+                    )
                 
                 lmbda_nu_psimin_val  = result.x
-                lmbda_nu_mthderr_val = np.abs(
-                    (lmbda_nu_psimin_val-lmbda_nu_val)/lmbda_nu_val)*100
+                lmbda_nu_mthderr_val = (
+                    np.abs((lmbda_nu_psimin_val-lmbda_nu_val)/lmbda_nu_val)
+                    * 100
+                )
                 
                 lmbda_c_eq.append(lmbda_c_eq_val)
                 lmbda_nu.append(lmbda_nu_val)
@@ -311,17 +328,22 @@ class ChainHelmholtzFreeEnergyMinimizationMethodComparisonCharacterizer(
                 psi_minimization_kappa_nu_single_chain_list[single_chain_indx]
             )
 
-            lmbda_c_eq_max = (cp.kappa_nu_lmbda_c_eq_crit_factor
-                                * single_chain.lmbda_c_eq_crit)
+            lmbda_c_eq_max = (
+                cp.kappa_nu_lmbda_c_eq_crit_factor
+                * single_chain.lmbda_c_eq_crit
+            )
 
             # Define the values of the equilibrium chain stretch to
             # calculate over
-            lmbda_c_eq_num_steps = (int(
-                np.around(
+            lmbda_c_eq_num_steps = (
+                int(np.around(
                     (lmbda_c_eq_max-cp.lmbda_c_eq_min)/cp.lmbda_c_eq_inc))
-                + 1)
-            lmbda_c_eq_steps = np.linspace(
-                cp.lmbda_c_eq_min, lmbda_c_eq_max, lmbda_c_eq_num_steps)
+                + 1
+            )
+            lmbda_c_eq_steps = (
+                np.linspace(
+                    cp.lmbda_c_eq_min, lmbda_c_eq_max, lmbda_c_eq_num_steps)
+            )
 
             # Make arrays to allocate results
             lmbda_c_eq       = []
@@ -336,26 +358,34 @@ class ChainHelmholtzFreeEnergyMinimizationMethodComparisonCharacterizer(
                 lmbda_nu_val   = single_chain.lmbda_nu_func(lmbda_c_eq_val)
                 
                 if lmbda_c_eq_val < 1.0:
-                    result = optimize.minimize(
-                        subcrit_psi_cnu_func, 1.0,
-                        args=(lmbda_c_eq_val, single_chain.zeta_nu_char,
-                                single_chain.kappa_nu))
+                    result = (
+                        optimize.minimize(
+                            subcrit_psi_cnu_func, 1.0,
+                            args=(lmbda_c_eq_val, single_chain.zeta_nu_char,
+                                    single_chain.kappa_nu))
+                    )
                 
                 elif lmbda_c_eq_val < single_chain.lmbda_c_eq_crit:
-                    result = optimize.minimize(
-                        subcrit_psi_cnu_func, lmbda_c_eq_val,
-                        args=(lmbda_c_eq_val, single_chain.zeta_nu_char,
-                                single_chain.kappa_nu))
+                    result = (
+                        optimize.minimize(
+                            subcrit_psi_cnu_func, lmbda_c_eq_val,
+                            args=(lmbda_c_eq_val, single_chain.zeta_nu_char,
+                                    single_chain.kappa_nu))
+                    )
                 
                 else:
-                    result = optimize.minimize(
-                        supercrit_psi_cnu_func, lmbda_c_eq_val,
-                        args=(lmbda_c_eq_val, single_chain.zeta_nu_char,
-                                single_chain.kappa_nu))
+                    result = (
+                        optimize.minimize(
+                            supercrit_psi_cnu_func, lmbda_c_eq_val,
+                            args=(lmbda_c_eq_val, single_chain.zeta_nu_char,
+                                    single_chain.kappa_nu))
+                    )
                 
                 lmbda_nu_psimin_val  = result.x
-                lmbda_nu_mthderr_val = np.abs(
-                    (lmbda_nu_psimin_val-lmbda_nu_val)/lmbda_nu_val)*100
+                lmbda_nu_mthderr_val = (
+                    np.abs((lmbda_nu_psimin_val-lmbda_nu_val)/lmbda_nu_val)
+                    * 100
+                )
                 
                 lmbda_c_eq.append(lmbda_c_eq_val)
                 lmbda_nu.append(lmbda_nu_val)

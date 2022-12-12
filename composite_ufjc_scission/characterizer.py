@@ -1,4 +1,4 @@
-"""The characterizer module for the composite uFJC scission model"""
+"""The characterizer module for the composite uFJC scission model."""
 
 # import necessary libraries
 from __future__ import division
@@ -7,7 +7,7 @@ from .utility import generate_savedir
 
 
 class CompositeuFJCScissionCharacterizer(object):
-    """Characterizer class for composite uFJCs with scission"""
+    """Characterizer class for composite uFJCs with scission."""
 
     def __init__(self):
         """Initializes the ``CompositeuFJCScissionCharacterizer`` class,

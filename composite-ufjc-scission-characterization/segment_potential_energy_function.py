@@ -65,8 +65,10 @@ class SegmentPotentialEnergyFunctionCharacterizer(
             stretch, nondimensional characteristic segment potential
             energy scale, and nondimensional segment stiffness.
             """
-            return (ln_squared_kappa_nu * (np.log(lmbda_nu))**2
-                    - ln_squared_zeta_nu_char)
+            return (
+                ln_squared_kappa_nu * (np.log(lmbda_nu))**2
+                - ln_squared_zeta_nu_char
+            )
         
         def u_nu_lj_func(lj_zeta_nu_char, lmbda_nu):
             """Nondimensional 12-6 Lennard-Jones segment potential
@@ -82,18 +84,22 @@ class SegmentPotentialEnergyFunctionCharacterizer(
         cp = self.parameters.characterizer
 
         # nu=125, zeta_nu_char=100, and kappa_nu=1000
-        single_chain = RateIndependentScissionCompositeuFJC(
-            nu=cp.nu_single_chain_list[1],
-            zeta_nu_char=cp.zeta_nu_char_single_chain_list[2],
-            kappa_nu=cp.kappa_nu_single_chain_list[2])
+        single_chain = (
+            RateIndependentScissionCompositeuFJC(
+                nu=cp.nu_single_chain_list[1],
+                zeta_nu_char=cp.zeta_nu_char_single_chain_list[2],
+                kappa_nu=cp.kappa_nu_single_chain_list[2])
+        )
 
         # Define the segment stretch values to calculate over
-        lmbda_nu_num_steps = (int(
-            np.around(
+        lmbda_nu_num_steps = (
+            int(np.around(
                 (cp.lmbda_nu_max-cp.lmbda_nu_min)/cp.lmbda_nu_inc))
-            + 1)
-        lmbda_nu_steps = np.linspace(
-            cp.lmbda_nu_min, cp.lmbda_nu_max, lmbda_nu_num_steps)
+            + 1
+        )
+        lmbda_nu_steps = (
+            np.linspace(cp.lmbda_nu_min, cp.lmbda_nu_max, lmbda_nu_num_steps)
+        )
         
         # Make arrays to allocate results
         lmbda_nu        = []
@@ -108,10 +114,16 @@ class SegmentPotentialEnergyFunctionCharacterizer(
         # Calculate results through specified segment stretch values
         for lmbda_nu_indx in range(lmbda_nu_num_steps):
             lmbda_nu_val = lmbda_nu_steps[lmbda_nu_indx]
-            u_nu_morse_val = u_nu_morse_func(
-                single_chain.zeta_nu_char, single_chain.kappa_nu, lmbda_nu_val)
-            u_nu_ln_squared_val = u_nu_ln_squared_func(
-                single_chain.zeta_nu_char, single_chain.kappa_nu, lmbda_nu_val)
+            u_nu_morse_val = (
+                u_nu_morse_func(
+                    single_chain.zeta_nu_char, single_chain.kappa_nu,
+                    lmbda_nu_val)
+            )
+            u_nu_ln_squared_val = (
+                u_nu_ln_squared_func(
+                    single_chain.zeta_nu_char, single_chain.kappa_nu,
+                    lmbda_nu_val)
+            )
             u_nu_lj_val = u_nu_lj_func(single_chain.zeta_nu_char, lmbda_nu_val)
             u_nu_har_val = single_chain.u_nu_har_func(lmbda_nu_val)
             u_nu_val = single_chain.u_nu_func(lmbda_nu_val)

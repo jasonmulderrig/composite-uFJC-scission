@@ -71,9 +71,11 @@ class Pade2BergstromCriticalPointCharacterizer(
             for single_chain in single_chain_list
         ]
 
-        popt, pcov = optimize.curve_fit(
-            lmbda_c_eq_pade2berg_func_kappa_nu_fit, 
-            cp.kappa_nu_pade2berg_crit_list, lmbda_c_eq_pade2berg_crit)
+        popt, pcov = (
+            optimize.curve_fit(
+                lmbda_c_eq_pade2berg_func_kappa_nu_fit,
+                cp.kappa_nu_pade2berg_crit_list, lmbda_c_eq_pade2berg_crit)
+        )
         n = popt[0]
         b = popt[1]
         print("n = {}".format(n))
@@ -99,12 +101,16 @@ class Pade2BergstromCriticalPointCharacterizer(
         """Define finalization analysis"""
         ppp = self.parameters.post_processing
 
-        kappa_nu_pade2berg_crit = load_pickle_object(
-            self.savedir, "kappa_nu_pade2berg_crit")
-        lmbda_c_eq_pade2berg_crit = load_pickle_object(
-            self.savedir, "lmbda_c_eq_pade2berg_crit")
-        lmbda_c_eq_pade2berg_crit_curve_fit = load_pickle_object(
-            self.savedir, "lmbda_c_eq_pade2berg_crit_curve_fit")
+        kappa_nu_pade2berg_crit = (
+            load_pickle_object(self.savedir, "kappa_nu_pade2berg_crit")
+        )
+        lmbda_c_eq_pade2berg_crit = (
+            load_pickle_object(self.savedir, "lmbda_c_eq_pade2berg_crit")
+        )
+        lmbda_c_eq_pade2berg_crit_curve_fit = (
+            load_pickle_object(
+                self.savedir, "lmbda_c_eq_pade2berg_crit_curve_fit")
+        )
 
         # plot results
         latex_formatting_figure(ppp)

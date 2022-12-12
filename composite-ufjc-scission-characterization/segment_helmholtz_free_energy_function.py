@@ -49,18 +49,23 @@ class SegmentHelmholtzFreeEnergyFunctionCharacterizer(
         cp = self.parameters.characterizer
 
         # nu=125, zeta_nu_char=100, and kappa_nu=1000
-        single_chain = RateIndependentScissionCompositeuFJC(
-            nu=cp.nu_single_chain_list[1],
-            zeta_nu_char=cp.zeta_nu_char_single_chain_list[2],
-            kappa_nu=cp.kappa_nu_single_chain_list[2])
+        single_chain = (
+            RateIndependentScissionCompositeuFJC(
+                nu=cp.nu_single_chain_list[1],
+                zeta_nu_char=cp.zeta_nu_char_single_chain_list[2],
+                kappa_nu=cp.kappa_nu_single_chain_list[2])
+        )
 
         # Define the equilibrium stretch values to calculate over
-        lmbda_c_eq_num_steps = (int(
-            np.around(
+        lmbda_c_eq_num_steps = (
+            int(np.around(
                 (cp.lmbda_c_eq_max-cp.lmbda_c_eq_min)/cp.lmbda_c_eq_inc))
-            + 1)
-        lmbda_c_eq_steps = np.linspace(
-            cp.lmbda_c_eq_min, cp.lmbda_c_eq_max, lmbda_c_eq_num_steps)
+            + 1
+        )
+        lmbda_c_eq_steps = (
+            np.linspace(
+                cp.lmbda_c_eq_min, cp.lmbda_c_eq_max, lmbda_c_eq_num_steps)
+        )
         
         # Make arrays to allocate results
         lmbda_c_eq = []
