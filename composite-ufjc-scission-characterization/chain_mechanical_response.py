@@ -138,8 +138,7 @@ class ChainMechanicalResponseCharacterizer(CompositeuFJCScissionCharacterizer):
                 nu=cp.nu_single_chain_list[1],
                 zeta_nu_char=cp.zeta_nu_char_single_chain_list[2],
                 kappa_nu=cp.kappa_nu_single_chain_list[single_chain_indx])
-            for single_chain_indx in range(
-                len(cp.kappa_nu_single_chain_list))
+            for single_chain_indx in range(len(cp.kappa_nu_single_chain_list))
         ]
 
         chain_mech_resp_kappa_nu_lmbda_c_eq___single_chain_chunk = [

@@ -36,50 +36,12 @@ class RateIndependentScission(object):
         stretch, and the current and prior values of the maximum applied
         segment stretch.
         """
-        # dissipated energy cannot be destroyed
-        if lmbda_nu_hat_val <= lmbda_nu_hat_val_prior:
-            return epsilon_nu_diss_hat_val_prior
-        elif lmbda_nu_hat_val < lmbda_nu_hat_max_val:
-            return epsilon_nu_diss_hat_val_prior
-        # dissipated energy from fully broken segments remains fixed
-        elif lmbda_nu_hat_max_val_prior > self.lmbda_nu_crit:
-            return epsilon_nu_diss_hat_val_prior
-        else:
-            # no dissipated energy at equilibrium
-            if (lmbda_nu_hat_val-1.) <= self.lmbda_nu_hat_inc:
-                epsilon_nu_diss_hat_prime_val = 0.
-            else:
-                # dissipated energy is created with respect to the prior
-                # value of maximum applied segment stretch
-                if lmbda_nu_hat_val_prior < lmbda_nu_hat_max_val_prior:
-                    lmbda_nu_hat_val_prior = lmbda_nu_hat_max_val_prior
-                # dissipated energy plateaus at the critical segment
-                # stretch
-                if (lmbda_nu_hat_max_val_prior < self.lmbda_nu_crit and 
-                    lmbda_nu_hat_val > self.lmbda_nu_crit):
-                    lmbda_nu_hat_val = self.lmbda_nu_crit
-                
-                p_nu_sci_hat_val_prior = (
-                    self.p_nu_sci_hat_func(lmbda_nu_hat_val_prior)
-                )
-                p_nu_sci_hat_val = (
-                    self.p_nu_sci_hat_func(lmbda_nu_hat_val)
-                )
-                p_nu_sci_hat_prime_val = (
-                    (p_nu_sci_hat_val-p_nu_sci_hat_val_prior)
-                    / (lmbda_nu_hat_val-lmbda_nu_hat_val_prior)
-                )
-                epsilon_nu_sci_hat_val = (
-                    self.epsilon_nu_sci_hat_func(lmbda_nu_hat_val)
-                )
-                epsilon_nu_diss_hat_prime_val = (
-                    p_nu_sci_hat_prime_val * epsilon_nu_sci_hat_val 
-                )
-            
-            return (
-                epsilon_nu_diss_hat_val_prior + epsilon_nu_diss_hat_prime_val
-                * (lmbda_nu_hat_val-lmbda_nu_hat_val_prior)
-            )
+        return (
+            self.epsilon_nu_diss_hat_rate_independent_scission_func(
+                lmbda_nu_hat_max_val, lmbda_nu_hat_max_val_prior,
+                lmbda_nu_hat_val, lmbda_nu_hat_val_prior,
+                epsilon_nu_diss_hat_val_prior)
+        )
     
     def epsilon_cnu_diss_hat_func(
             self, lmbda_nu_hat_max_val, lmbda_nu_hat_max_val_prior,
@@ -94,50 +56,12 @@ class RateIndependentScission(object):
         segment stretch, and the current and prior values of the maximum
         applied segment stretch.
         """
-        # dissipated energy cannot be destroyed
-        if lmbda_nu_hat_val <= lmbda_nu_hat_val_prior:
-            return epsilon_cnu_diss_hat_val_prior
-        elif lmbda_nu_hat_val < lmbda_nu_hat_max_val:
-            return epsilon_cnu_diss_hat_val_prior
-        # dissipated energy from fully broken chains remains fixed
-        elif lmbda_nu_hat_max_val_prior > self.lmbda_nu_crit:
-            return epsilon_cnu_diss_hat_val_prior
-        else:
-            # no dissipated energy at equilibrium
-            if (lmbda_nu_hat_val-1.) <= self.lmbda_nu_hat_inc:
-                epsilon_cnu_diss_hat_prime_val = 0.
-            else:
-                # dissipated energy is created with respect to the prior
-                # value of maximum applied segment stretch
-                if lmbda_nu_hat_val_prior < lmbda_nu_hat_max_val_prior:
-                    lmbda_nu_hat_val_prior = lmbda_nu_hat_max_val_prior
-                # dissipated energy plateaus at the critical segment
-                # stretch
-                if (lmbda_nu_hat_max_val_prior < self.lmbda_nu_crit and 
-                    lmbda_nu_hat_val > self.lmbda_nu_crit):
-                    lmbda_nu_hat_val = self.lmbda_nu_crit
-                
-                p_c_sci_hat_val_prior = (
-                    self.p_c_sci_hat_func(lmbda_nu_hat_val_prior)
-                )
-                p_c_sci_hat_val = (
-                    self.p_c_sci_hat_func(lmbda_nu_hat_val)
-                )
-                p_c_sci_hat_prime_val = (
-                    (p_c_sci_hat_val-p_c_sci_hat_val_prior)
-                    / (lmbda_nu_hat_val-lmbda_nu_hat_val_prior)
-                )
-                epsilon_cnu_sci_hat_val = (
-                    self.epsilon_cnu_sci_hat_func(lmbda_nu_hat_val)
-                )
-                epsilon_cnu_diss_hat_prime_val = (
-                    p_c_sci_hat_prime_val * epsilon_cnu_sci_hat_val 
-                )
-            
-            return (
-                epsilon_cnu_diss_hat_val_prior + epsilon_cnu_diss_hat_prime_val
-                * (lmbda_nu_hat_val-lmbda_nu_hat_val_prior)
-            )
+        return (
+            self.epsilon_cnu_diss_hat_rate_independent_scission_func(
+                lmbda_nu_hat_max_val, lmbda_nu_hat_max_val_prior,
+                lmbda_nu_hat_val, lmbda_nu_hat_val_prior,
+                epsilon_cnu_diss_hat_val_prior)
+        )
     
 
 class RateDependentScission(object):

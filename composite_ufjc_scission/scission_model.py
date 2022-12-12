@@ -210,7 +210,7 @@ class AnalyticalScissionCompositeuFJC(CompositeuFJC):
         activation energy barrier as a function of the applied segment
         stretch.
         """
-        if lmbda_nu_hat <= 1.:
+        if lmbda_nu_hat <= 1. + self.cond_val:
             return self.zeta_nu_char
         elif lmbda_nu_hat <= self.lmbda_nu_crit:
             cbrt_arg = (
@@ -233,7 +233,7 @@ class AnalyticalScissionCompositeuFJC(CompositeuFJC):
         the applied segment stretch as a function of applied segment
         stretch.
         """
-        if lmbda_nu_hat <= 1.:
+        if lmbda_nu_hat <= 1. + self.cond_val:
             return -np.inf
         elif lmbda_nu_hat <= self.lmbda_nu_crit:
             cbrt_arg = self.zeta_nu_char**2 * self.kappa_nu / (lmbda_nu_hat-1.)
@@ -287,7 +287,7 @@ class AnalyticalScissionCompositeuFJC(CompositeuFJC):
         applied segment stretch as a function of applied segment
         stretch.
         """
-        if lmbda_nu_hat <= 1.:
+        if lmbda_nu_hat <= 1. + self.cond_val:
             return 0.
         else:
             return (
@@ -305,7 +305,7 @@ class AnalyticalScissionCompositeuFJC(CompositeuFJC):
         applied segment stretch as a function of applied segment
         stretch.
         """
-        if lmbda_nu_hat <= 1.:
+        if lmbda_nu_hat <= 1. + self.cond_val:
             return 0.
         else:
             return -self.p_nu_sci_hat_prime_analytical_func(lmbda_nu_hat)
@@ -319,7 +319,7 @@ class AnalyticalScissionCompositeuFJC(CompositeuFJC):
         probability of chain survival taken with respect to the applied
         segment stretch as a function of applied segment stretch.
         """
-        if lmbda_nu_hat <= 1.:
+        if lmbda_nu_hat <= 1. + self.cond_val:
             return 0.
         else:
             return (
@@ -337,7 +337,7 @@ class AnalyticalScissionCompositeuFJC(CompositeuFJC):
         probability of chain scission taken with respect to the applied
         segment stretch as a function of applied segment stretch.
         """
-        if lmbda_nu_hat <= 1.:
+        if lmbda_nu_hat <= 1. + self.cond_val:
             return 0.
         else:
             return -self.p_c_sur_hat_prime_analytical_func(lmbda_nu_hat)
@@ -403,10 +403,67 @@ class AnalyticalScissionCompositeuFJC(CompositeuFJC):
                 * (lmbda_nu_hat_val-lmbda_nu_hat_val_prior)
             )
     
+    def epsilon_nu_diss_hat_rate_independent_scission_func(
+            self, lmbda_nu_hat_max_val, lmbda_nu_hat_max_val_prior,
+            lmbda_nu_hat_val, lmbda_nu_hat_val_prior,
+            epsilon_nu_diss_hat_val_prior):
+        """Nondimensional rate-independent dissipated segment scission
+        energy.
+        
+        This function computes the nondimensional rate-independent
+        dissipated segment scission energy as a function of its prior
+        value, the current and prior values of the applied segment
+        stretch, and the current and prior values of the maximum applied
+        segment stretch.
+        """
+        # dissipated energy cannot be destroyed
+        if lmbda_nu_hat_val <= lmbda_nu_hat_val_prior:
+            return epsilon_nu_diss_hat_val_prior
+        elif lmbda_nu_hat_val < lmbda_nu_hat_max_val:
+            return epsilon_nu_diss_hat_val_prior
+        # dissipated energy from fully broken segments remains fixed
+        elif lmbda_nu_hat_max_val_prior > self.lmbda_nu_crit:
+            return epsilon_nu_diss_hat_val_prior
+        else:
+            # no dissipated energy at equilibrium
+            if (lmbda_nu_hat_val-1.) <= self.lmbda_nu_hat_inc:
+                epsilon_nu_diss_hat_prime_val = 0.
+            else:
+                # dissipated energy is created with respect to the prior
+                # value of maximum applied segment stretch
+                if lmbda_nu_hat_val_prior < lmbda_nu_hat_max_val_prior:
+                    lmbda_nu_hat_val_prior = lmbda_nu_hat_max_val_prior
+                # dissipated energy plateaus at the critical segment
+                # stretch
+                if (lmbda_nu_hat_max_val_prior < self.lmbda_nu_crit and 
+                    lmbda_nu_hat_val > self.lmbda_nu_crit):
+                    lmbda_nu_hat_val = self.lmbda_nu_crit
+                
+                p_nu_sci_hat_val_prior = (
+                    self.p_nu_sci_hat_func(lmbda_nu_hat_val_prior)
+                )
+                p_nu_sci_hat_val = (
+                    self.p_nu_sci_hat_func(lmbda_nu_hat_val)
+                )
+                p_nu_sci_hat_prime_val = (
+                    (p_nu_sci_hat_val-p_nu_sci_hat_val_prior)
+                    / (lmbda_nu_hat_val-lmbda_nu_hat_val_prior)
+                )
+                epsilon_nu_sci_hat_val = (
+                    self.epsilon_nu_sci_hat_func(lmbda_nu_hat_val)
+                )
+                epsilon_nu_diss_hat_prime_val = (
+                    p_nu_sci_hat_prime_val * epsilon_nu_sci_hat_val 
+                )
+            
+            return (
+                epsilon_nu_diss_hat_val_prior + epsilon_nu_diss_hat_prime_val
+                * (lmbda_nu_hat_val-lmbda_nu_hat_val_prior)
+            )
+    
     def epsilon_nu_diss_hat_crit_func(self):
-        """Analytically calculated nondimensional rate-independent
-        dissipated segment scission energy for a chain at the critical
-        state.
+        """Nondimensional rate-independent dissipated segment scission
+        energy for a chain at the critical state.
         
         This function computes the nondimensional rate-independent
         dissipated segment scission energy for a chain at the critical
@@ -425,10 +482,10 @@ class AnalyticalScissionCompositeuFJC(CompositeuFJC):
         )
 
         # initialization
-        lmbda_nu_hat_max_val_prior = 0
-        lmbda_nu_hat_max_val       = 0
-        epsilon_nu_diss_hat_crit_val_prior = 0
-        epsilon_nu_diss_hat_crit_val       = 0
+        lmbda_nu_hat_max_val_prior = 0.
+        lmbda_nu_hat_max_val       = 0.
+        epsilon_nu_diss_hat_crit_val_prior = 0.
+        epsilon_nu_diss_hat_crit_val       = 0.
 
         for lmbda_nu_hat_indx in range(lmbda_nu_hat_num_steps):
             lmbda_nu_hat_val = lmbda_nu_hat_steps[lmbda_nu_hat_indx]
@@ -438,7 +495,7 @@ class AnalyticalScissionCompositeuFJC(CompositeuFJC):
                 pass
             else:
                 epsilon_nu_diss_hat_crit_val = (
-                    self.epsilon_nu_diss_hat_analytical_func(
+                    self.epsilon_nu_diss_hat_rate_independent_scission_func(
                         lmbda_nu_hat_max_val, lmbda_nu_hat_max_val_prior,
                         lmbda_nu_hat_val,
                         lmbda_nu_hat_steps[lmbda_nu_hat_indx-1],
@@ -512,10 +569,67 @@ class AnalyticalScissionCompositeuFJC(CompositeuFJC):
                 * (lmbda_nu_hat_val-lmbda_nu_hat_val_prior)
             )
     
+    def epsilon_cnu_diss_hat_rate_independent_scission_func(
+            self, lmbda_nu_hat_max_val, lmbda_nu_hat_max_val_prior,
+            lmbda_nu_hat_val, lmbda_nu_hat_val_prior,
+            epsilon_cnu_diss_hat_val_prior):
+        """Nondimensional rate-independent dissipated chain scission
+        energy per segment.
+        
+        This function computes the nondimensional rate-independent
+        dissipated chain scission energy per segment as a function of
+        its prior value, the current and prior values of the applied
+        segment stretch, and the current and prior values of the maximum
+        applied segment stretch.
+        """
+        # dissipated energy cannot be destroyed
+        if lmbda_nu_hat_val <= lmbda_nu_hat_val_prior:
+            return epsilon_cnu_diss_hat_val_prior
+        elif lmbda_nu_hat_val < lmbda_nu_hat_max_val:
+            return epsilon_cnu_diss_hat_val_prior
+        # dissipated energy from fully broken chains remains fixed
+        elif lmbda_nu_hat_max_val_prior > self.lmbda_nu_crit:
+            return epsilon_cnu_diss_hat_val_prior
+        else:
+            # no dissipated energy at equilibrium
+            if (lmbda_nu_hat_val-1.) <= self.lmbda_nu_hat_inc:
+                epsilon_cnu_diss_hat_prime_val = 0.
+            else:
+                # dissipated energy is created with respect to the prior
+                # value of maximum applied segment stretch
+                if lmbda_nu_hat_val_prior < lmbda_nu_hat_max_val_prior:
+                    lmbda_nu_hat_val_prior = lmbda_nu_hat_max_val_prior
+                # dissipated energy plateaus at the critical segment
+                # stretch
+                if (lmbda_nu_hat_max_val_prior < self.lmbda_nu_crit and 
+                    lmbda_nu_hat_val > self.lmbda_nu_crit):
+                    lmbda_nu_hat_val = self.lmbda_nu_crit
+                
+                p_c_sci_hat_val_prior = (
+                    self.p_c_sci_hat_func(lmbda_nu_hat_val_prior)
+                )
+                p_c_sci_hat_val = (
+                    self.p_c_sci_hat_func(lmbda_nu_hat_val)
+                )
+                p_c_sci_hat_prime_val = (
+                    (p_c_sci_hat_val-p_c_sci_hat_val_prior)
+                    / (lmbda_nu_hat_val-lmbda_nu_hat_val_prior)
+                )
+                epsilon_cnu_sci_hat_val = (
+                    self.epsilon_cnu_sci_hat_func(lmbda_nu_hat_val)
+                )
+                epsilon_cnu_diss_hat_prime_val = (
+                    p_c_sci_hat_prime_val * epsilon_cnu_sci_hat_val 
+                )
+            
+            return (
+                epsilon_cnu_diss_hat_val_prior + epsilon_cnu_diss_hat_prime_val
+                * (lmbda_nu_hat_val-lmbda_nu_hat_val_prior)
+            )
+    
     def epsilon_cnu_diss_hat_crit_func(self):
-        """Analytically calculated nondimensional rate-independent
-        dissipated chain scission energy per segment for a chain at the
-        critical state.
+        """Nondimensional rate-independent dissipated chain scission
+        energy per segment for a chain at the critical state.
         
         This function computes the nondimensional rate-independent
         dissipated chain scission energy per segment for a chain at the
@@ -534,10 +648,10 @@ class AnalyticalScissionCompositeuFJC(CompositeuFJC):
         )
 
         # initialization
-        lmbda_nu_hat_max_val_prior = 0
-        lmbda_nu_hat_max_val       = 0
-        epsilon_cnu_diss_hat_crit_val_prior = 0
-        epsilon_cnu_diss_hat_crit_val       = 0
+        lmbda_nu_hat_max_val_prior = 0.
+        lmbda_nu_hat_max_val       = 0.
+        epsilon_cnu_diss_hat_crit_val_prior = 0.
+        epsilon_cnu_diss_hat_crit_val       = 0.
 
         for lmbda_nu_hat_indx in range(lmbda_nu_hat_num_steps):
             lmbda_nu_hat_val = lmbda_nu_hat_steps[lmbda_nu_hat_indx]
@@ -547,7 +661,7 @@ class AnalyticalScissionCompositeuFJC(CompositeuFJC):
                 pass
             else:
                 epsilon_cnu_diss_hat_crit_val = (
-                    self.epsilon_cnu_diss_hat_analytical_func(
+                    self.epsilon_cnu_diss_hat_rate_independent_scission_func(
                         lmbda_nu_hat_max_val, lmbda_nu_hat_max_val_prior,
                         lmbda_nu_hat_val,
                         lmbda_nu_hat_steps[lmbda_nu_hat_indx-1],

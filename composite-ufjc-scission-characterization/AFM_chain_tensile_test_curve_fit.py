@@ -1223,6 +1223,11 @@ class AFMChainTensileTestCurveFitCharacterizer(
             gamma_c                   = []
             epsilon_cnu_diss_hat      = []
 
+            # initialization
+            p_nu_sci_hat_cmltv_intgrl_val = 0.
+            gamma_c_val                   = 0.
+            epsilon_cnu_diss_hat_val      = 0.
+
             # Calculate results through applied chain force values
             for f_c_indx in range(cp.f_c_num_steps):
                 t_val = t_steps[f_c_indx]
@@ -1243,11 +1248,8 @@ class AFMChainTensileTestCurveFitCharacterizer(
                         lmbda_nu_val)
                 )
 
-                # initialization
                 if f_c_indx == 0:
-                    p_nu_sci_hat_cmltv_intgrl_val = 0
-                    gamma_c_val                   = 0
-                    epsilon_cnu_diss_hat_val      = 0
+                    pass
                 else:
                     p_nu_sci_hat_cmltv_intgrl_val = (
                         rate_dependent_single_chain.p_nu_sci_hat_cmltv_intgrl_func(
@@ -1324,7 +1326,8 @@ class AFMChainTensileTestCurveFitCharacterizer(
         epsilon_cnu_diss_hat = []
 
         # initialization
-        lmbda_nu_max_val = 0
+        lmbda_nu_max_val         = 0.
+        epsilon_cnu_diss_hat_val = 0.
 
         # Calculate results through applied chain force values
         for f_c_indx in range(cp.f_c_num_steps):
@@ -1346,8 +1349,8 @@ class AFMChainTensileTestCurveFitCharacterizer(
                     lmbda_nu_val)
             )
 
-            if f_c_indx == 0: # initialization
-                epsilon_cnu_diss_hat_val = 0
+            if f_c_indx == 0:
+                pass
             else:
                 epsilon_cnu_diss_hat_val = (
                     rate_independent_single_chain.epsilon_cnu_diss_hat_func(

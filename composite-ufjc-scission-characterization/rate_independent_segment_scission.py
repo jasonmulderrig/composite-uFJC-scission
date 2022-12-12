@@ -61,20 +61,27 @@ class RateIndependentSegmentScissionCharacterizer(
         # Make arrays to allocate results
         lmbda_nu_hat     = []
         lmbda_nu_hat_max = []
-        e_nu_sci_hat     = []
-        e_nu_sci_hat_err = []
-        epsilon_nu_sci_hat     = []
-        epsilon_nu_sci_hat_err = []
-        p_nu_sci_hat     = []
-        p_nu_sci_hat_err = []
-        p_nu_sur_hat     = []
-        p_nu_sur_hat_err = []
+        e_nu_sci_hat            = []
+        e_nu_sci_hat_analytical = []
+        e_nu_sci_hat_err        = []
+        epsilon_nu_sci_hat            = []
+        epsilon_nu_sci_hat_analytical = []
+        epsilon_nu_sci_hat_err        = []
+        p_nu_sci_hat            = []
+        p_nu_sci_hat_analytical = []
+        p_nu_sci_hat_err        = []
+        p_nu_sur_hat            = []
+        p_nu_sur_hat_analytical = []
+        p_nu_sur_hat_err        = []
         epsilon_nu_diss_hat            = []
         epsilon_nu_diss_hat_analytical = []
         epsilon_nu_diss_hat_err        = []
 
         # initialization
-        lmbda_nu_hat_max_val = 0
+        lmbda_nu_hat_max_val = 0.
+        epsilon_nu_diss_hat_val            = 0.
+        epsilon_nu_diss_hat_analytical_val = 0.
+        epsilon_nu_diss_hat_err_val        = 0.
         
         # Calculate results through specified applied segment
         # stretch values
@@ -87,20 +94,41 @@ class RateIndependentSegmentScissionCharacterizer(
             )
             e_nu_sci_hat_err_val = (
                 np.abs(
-                    (e_nu_sci_hat_val-e_nu_sci_hat_analytical_val)/e_nu_sci_hat_analytical_val)
+                    (e_nu_sci_hat_analytical_val-e_nu_sci_hat_val)/(e_nu_sci_hat_val+single_chain.cond_val))
                 * 100
             )
             epsilon_nu_sci_hat_val = (
                 single_chain.epsilon_nu_sci_hat_func(lmbda_nu_hat_val)
             )
+            epsilon_nu_sci_hat_analytical_val = (
+                single_chain.epsilon_nu_sci_hat_analytical_func(lmbda_nu_hat_val)
+            )
+            epsilon_nu_sci_hat_err_val = (
+                np.abs(
+                    (epsilon_nu_sci_hat_analytical_val-epsilon_nu_sci_hat_val)/(epsilon_nu_sci_hat_val+single_chain.cond_val))
+                * 100
+            )
             p_nu_sci_hat_val = single_chain.p_nu_sci_hat_func(lmbda_nu_hat_val)
+            p_nu_sci_hat_analytical_val = (
+                single_chain.p_nu_sci_hat_analytical_func(lmbda_nu_hat_val)
+            )
+            p_nu_sci_hat_err_val = (
+                np.abs(
+                    (p_nu_sci_hat_analytical_val-p_nu_sci_hat_val)/(p_nu_sci_hat_val+single_chain.cond_val))
+                * 100
+            )
             p_nu_sur_hat_val = single_chain.p_nu_sur_hat_func(lmbda_nu_hat_val)
+            p_nu_sur_hat_analytical_val = (
+                single_chain.p_nu_sur_hat_analytical_func(lmbda_nu_hat_val)
+            )
+            p_nu_sur_hat_err_val = (
+                np.abs(
+                    (p_nu_sur_hat_analytical_val-p_nu_sur_hat_val)/(p_nu_sur_hat_val+single_chain.cond_val))
+                * 100
+            )
             
-            # initialization
             if lmbda_nu_hat_indx == 0:
-                epsilon_nu_diss_hat_val = 0
-                epsilon_nu_diss_hat_analytical_val = 0
-                epsilon_nu_diss_hat_analytical_err_val = 0
+                pass
             else:
                 epsilon_nu_diss_hat_val = (
                     single_chain.epsilon_nu_diss_hat_func(
@@ -111,7 +139,7 @@ class RateIndependentSegmentScissionCharacterizer(
                         epsilon_nu_diss_hat[lmbda_nu_hat_indx-1])
                 )
                 epsilon_nu_diss_hat_analytical_val = (
-                    single_chain.epsilon_nu_diss_hat_rate_independent_analytical_func(
+                    single_chain.epsilon_nu_diss_hat_analytical_func(
                         lmbda_nu_hat_max_val, 
                         lmbda_nu_hat_max[lmbda_nu_hat_indx-1],
                         lmbda_nu_hat_val,
@@ -120,17 +148,24 @@ class RateIndependentSegmentScissionCharacterizer(
                 )
                 epsilon_nu_diss_hat_err_val = (
                     np.abs(
-                        (epsilon_nu_diss_hat_val-epsilon_nu_diss_hat_analytical_val)/epsilon_nu_diss_hat_analytical_val)
+                        (epsilon_nu_diss_hat_analytical_val-epsilon_nu_diss_hat_val)/(epsilon_nu_diss_hat_val+single_chain.cond_val))
                     * 100
                 )
             
             lmbda_nu_hat.append(lmbda_nu_hat_val)
             lmbda_nu_hat_max.append(lmbda_nu_hat_max_val)
             e_nu_sci_hat.append(e_nu_sci_hat_val)
+            e_nu_sci_hat_analytical.append(e_nu_sci_hat_analytical_val)
             e_nu_sci_hat_err.append(e_nu_sci_hat_err_val)
             epsilon_nu_sci_hat.append(epsilon_nu_sci_hat_val)
+            epsilon_nu_sci_hat_analytical.append(epsilon_nu_sci_hat_analytical_val)
+            epsilon_nu_sci_hat_err.append(epsilon_nu_sci_hat_err_val)
             p_nu_sci_hat.append(p_nu_sci_hat_val)
+            p_nu_sci_hat_analytical.append(p_nu_sci_hat_analytical_val)
+            p_nu_sci_hat_err.append(p_nu_sci_hat_err_val)
             p_nu_sur_hat.append(p_nu_sur_hat_val)
+            p_nu_sur_hat_analytical.append(p_nu_sur_hat_analytical_val)
+            p_nu_sur_hat_err.append(p_nu_sur_hat_err_val)
             epsilon_nu_diss_hat.append(epsilon_nu_diss_hat_val)
             epsilon_nu_diss_hat_analytical.append(epsilon_nu_diss_hat_analytical_val)
             epsilon_nu_diss_hat_err.append(epsilon_nu_diss_hat_err_val)
@@ -139,25 +174,55 @@ class RateIndependentSegmentScissionCharacterizer(
             e_nu_sci_hat_val/single_chain.zeta_nu_char
             for e_nu_sci_hat_val in e_nu_sci_hat
         ]
+        overline_e_nu_sci_hat_analytical = [
+            e_nu_sci_hat_analytical_val/single_chain.zeta_nu_char
+            for e_nu_sci_hat_analytical_val in e_nu_sci_hat_analytical
+        ]
         overline_epsilon_nu_sci_hat = [
             epsilon_nu_sci_hat_val/single_chain.zeta_nu_char
             for epsilon_nu_sci_hat_val in epsilon_nu_sci_hat
+        ]
+        overline_epsilon_nu_sci_hat_analytical = [
+            epsilon_nu_sci_hat_analytical_val/single_chain.zeta_nu_char
+            for epsilon_nu_sci_hat_analytical_val
+            in epsilon_nu_sci_hat_analytical
         ]
         overline_epsilon_nu_diss_hat = [
             epsilon_nu_diss_hat_val/single_chain.zeta_nu_char
             for epsilon_nu_diss_hat_val in epsilon_nu_diss_hat
         ]
+        overline_epsilon_nu_diss_hat_analytical = [
+            epsilon_nu_diss_hat_analytical_val/single_chain.zeta_nu_char
+            for epsilon_nu_diss_hat_analytical_val
+            in epsilon_nu_diss_hat_analytical
+        ]
         
         self.single_chain = single_chain
         
-        self.lmbda_nu_hat                 = lmbda_nu_hat
-        self.overline_e_nu_sci_hat        = overline_e_nu_sci_hat
-        self.e_nu_sci_hat_err             = e_nu_sci_hat_err
-        self.overline_epsilon_nu_sci_hat  = overline_epsilon_nu_sci_hat
-        self.p_nu_sci_hat                 = p_nu_sci_hat
-        self.p_nu_sur_hat                 = p_nu_sur_hat
-        self.overline_epsilon_nu_diss_hat = overline_epsilon_nu_diss_hat
-        self.epsilon_nu_diss_hat_err      = epsilon_nu_diss_hat_err
+        self.lmbda_nu_hat = lmbda_nu_hat
+        self.overline_e_nu_sci_hat            = overline_e_nu_sci_hat
+        self.overline_e_nu_sci_hat_analytical = overline_e_nu_sci_hat_analytical
+        self.e_nu_sci_hat_err                 = e_nu_sci_hat_err
+        self.overline_epsilon_nu_sci_hat            = (
+            overline_epsilon_nu_sci_hat
+        )
+        self.overline_epsilon_nu_sci_hat_analytical = (
+            overline_epsilon_nu_sci_hat_analytical
+        )
+        self.epsilon_nu_sci_hat_err                 = epsilon_nu_sci_hat_err
+        self.p_nu_sci_hat            = p_nu_sci_hat
+        self.p_nu_sci_hat_analytical = p_nu_sci_hat_analytical
+        self.p_nu_sci_hat_err        = p_nu_sci_hat_err
+        self.p_nu_sur_hat            = p_nu_sur_hat
+        self.p_nu_sur_hat_analytical = p_nu_sur_hat_analytical
+        self.p_nu_sur_hat_err        = p_nu_sur_hat_err
+        self.overline_epsilon_nu_diss_hat            = (
+            overline_epsilon_nu_diss_hat
+        )
+        self.overline_epsilon_nu_diss_hat_analytical = (
+            overline_epsilon_nu_diss_hat_analytical
+        )
+        self.epsilon_nu_diss_hat_err                 = epsilon_nu_diss_hat_err
 
     def finalization(self):
         """Define finalization analysis"""
@@ -207,6 +272,85 @@ class RateIndependentSegmentScissionCharacterizer(
         save_current_figure_no_labels(
             self.savedir,
             "rate-independent-segment-scission-indicators-vs-lmbda_nu_hat")
+        
+        fig, (ax1, ax2) = plt.subplots(
+            2, 1, gridspec_kw={'height_ratios': [2, 1]}, sharex=True)
+        ax1.plot(
+            self.lmbda_nu_hat, self.overline_e_nu_sci_hat_analytical, linestyle=':',
+            color='blue', alpha=1, linewidth=2.5,
+            label=r'$\overline{\hat{e}_{\nu}^{sci}}$')
+        ax1.plot(
+            self.lmbda_nu_hat, self.overline_epsilon_nu_sci_hat_analytical, linestyle='-',
+            color='blue', alpha=1, linewidth=2.5,
+            label=r'$\overline{\hat{\varepsilon}_{\nu}^{sci}}$')
+        ax1.plot(
+            self.lmbda_nu_hat, self.overline_epsilon_nu_diss_hat_analytical,
+            linestyle=(0, (3, 1, 1, 1)), color='blue', alpha=1, linewidth=2.5,
+            label=r'$\overline{\hat{\varepsilon}_{\nu}^{diss}}$')
+        ax2.plot(
+            self.lmbda_nu_hat, self.p_nu_sci_hat_analytical, linestyle='-', color='blue',
+            alpha=1, linewidth=2.5, label=r'$\hat{p}_{\nu}^{sci}$')
+        ax2.plot(
+            self.lmbda_nu_hat, self.p_nu_sur_hat_analytical, linestyle=':', color='blue',
+            alpha=1, linewidth=2.5, label=r'$\hat{p}_{\nu}^{sur}$')
+
+        ax1.legend(loc='best', fontsize=14, handlelength=3)
+        ax1.set_ylim([-0.05, 1.05])
+        ax1.tick_params(axis='y', labelsize=16)
+        ax1.set_ylabel(
+            r'$\overline{\hat{e}_{\nu}^{sci}},~\overline{\hat{\varepsilon}_{\nu}^{sci}},~\overline{\hat{\varepsilon}_{\nu}^{diss}}$',
+            fontsize=20)
+        ax1.grid(True, alpha=0.25)
+        ax2.legend(loc='best', fontsize=14)
+        ax2.set_ylim([-0.05, 1.05])
+        ax2.tick_params(axis='y', labelsize=16)
+        ax2.set_ylabel(
+            r'$\hat{p}_{\nu}^{sci},~\hat{p}_{\nu}^{sur}$', fontsize=20)
+        ax2.grid(True, alpha=0.25)
+        
+        plt.xlim([self.lmbda_nu_hat[0], self.lmbda_nu_hat[-1]])
+        plt.xticks(fontsize=16)
+        plt.xlabel(r'$\hat{\lambda}_{\nu}$', fontsize=20)
+        save_current_figure_no_labels(
+            self.savedir,
+            "analytical-rate-independent-segment-scission-indicators-vs-lmbda_nu_hat")
+        
+        fig, (ax1, ax2) = plt.subplots(
+            2, 1, gridspec_kw={'height_ratios': [1, 1]}, sharex=True)
+        ax1.plot(
+            self.lmbda_nu_hat, self.e_nu_sci_hat_err, linestyle=':',
+            color='blue', alpha=1, linewidth=2.5,
+            label=r'$\overline{\hat{e}_{\nu}^{sci}}$')
+        ax1.plot(
+            self.lmbda_nu_hat, self.epsilon_nu_sci_hat_err, linestyle='-',
+            color='blue', alpha=1, linewidth=2.5,
+            label=r'$\overline{\hat{\varepsilon}_{\nu}^{sci}}$')
+        ax1.plot(
+            self.lmbda_nu_hat, self.epsilon_nu_diss_hat_err,
+            linestyle=(0, (3, 1, 1, 1)), color='blue', alpha=1, linewidth=2.5,
+            label=r'$\overline{\hat{\varepsilon}_{\nu}^{diss}}$')
+        ax2.plot(
+            self.lmbda_nu_hat, self.p_nu_sci_hat_err, linestyle='-', color='blue',
+            alpha=1, linewidth=2.5, label=r'$\hat{p}_{\nu}^{sci}$')
+        ax2.plot(
+            self.lmbda_nu_hat, self.p_nu_sur_hat_err, linestyle=':', color='blue',
+            alpha=1, linewidth=2.5, label=r'$\hat{p}_{\nu}^{sur}$')
+
+        ax1.legend(loc='best', fontsize=14, handlelength=3)
+        ax1.tick_params(axis='y', labelsize=16)
+        ax1.set_ylabel(r'$\%~\textrm{error}$', fontsize=20)
+        ax1.grid(True, alpha=0.25)
+        ax2.legend(loc='best', fontsize=14)
+        ax2.tick_params(axis='y', labelsize=16)
+        ax2.set_ylabel(r'$\%~\textrm{error}$', fontsize=20)
+        ax2.grid(True, alpha=0.25)
+        
+        plt.xlim([self.lmbda_nu_hat[0], self.lmbda_nu_hat[-1]])
+        plt.xticks(fontsize=16)
+        plt.xlabel(r'$\hat{\lambda}_{\nu}$', fontsize=20)
+        save_current_figure_no_labels(
+            self.savedir,
+            "rate-independent-segment-scission-indicators-percent-error-vs-lmbda_nu_hat")
 
 if __name__ == '__main__':
 

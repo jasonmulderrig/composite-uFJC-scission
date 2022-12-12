@@ -22,7 +22,7 @@ class CompositeuFJC(object):
         min_exponent = np.log(sys.float_info.min) / np.log(10)
         max_exponent = np.log(sys.float_info.max) / np.log(10)
         eps_val      = np.finfo(float).eps
-        cond_val     = eps_val * 5e12
+        cond_val     = eps_val * 5e10
 
         self.min_exponent = min_exponent
         self.max_exponent = max_exponent
@@ -489,13 +489,16 @@ class CompositeuFJC(object):
                 - beta_tilde / (3.*alpha_tilde)
             )
     
-    def L_func(x):
+    def L_func(self, x):
         """Langevin function.
 
         This function computes the Langevin function of a scalar
         argument.
         """
-        return 1. / np.tanh(x) - 1. / x
+        if x <= self.cond_val:
+            return 0.
+        else:
+            return 1. / np.tanh(x) - 1. / x
 
     def inv_L_func(self, lmbda_comp_nu):
         """Jedynak R[9,2] inverse Langevin approximant.
@@ -544,7 +547,7 @@ class CompositeuFJC(object):
         free energy contribution per segment as a function of the
         applied segment stretch.
         """
-        if lmbda_nu_hat <= 1.:
+        if lmbda_nu_hat <= 1. + self.cond_val:
             return 0.
         else:
             xi_c_hat = self.xi_c_analytical_func(lmbda_nu_hat)
