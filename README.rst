@@ -43,7 +43,7 @@ Citation
 ..
     Badges ========================================================================
 
-.. |build| image:: https://img.shields.io/github/workflow/status/jasonmulderrig/composite-uFJC-scission/main?label=GitHub&logo=github
+.. |build| image:: https://img.shields.io/github/checks-status/jasonmulderrig/composite-uFJC-scission/main?label=GitHub&logo=github
     :target: https://github.com/jasonmulderrig/composite-uFJC-scission
 
 .. |pyversions| image:: https://img.shields.io/pypi/pyversions/composite-ufjc-scission.svg?logo=python&logoColor=FBE072&color=4B8BBE&label=Python
