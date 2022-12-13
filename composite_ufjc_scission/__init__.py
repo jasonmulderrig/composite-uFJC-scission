@@ -7,4 +7,4 @@ from .scission_model import *
 from .core import *
 from .utility import *
 
-__version__ = "1.2.0"
+__version__ = "1.3.0"
