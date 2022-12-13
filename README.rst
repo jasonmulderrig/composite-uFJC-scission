@@ -55,5 +55,5 @@ Citation
 .. |license| image:: https://img.shields.io/github/license/jasonmulderrig/composite-uFJC-scission?label=License
     :target: https://github.com/jasonmulderrig/composite-uFJC-scission/LICENSE
 
-.. |zenodo| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.7335565.svg
-   :target: https://doi.org/10.5281/zenodo.7335565
+.. |zenodo| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.7434682.svg
+   :target: https://doi.org/10.5281/zenodo.7434682
