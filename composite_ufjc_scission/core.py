@@ -294,33 +294,20 @@ class CompositeuFJC(object):
         This function numerically calculates the Pade-to-Bergstrom (P2B)
         critical segment stretch and critical equilibrium chain stretch.
         """
-        lmbda_c_eq_min   = 0.
-        lmbda_c_eq_max   = 1.
-        lmbda_c_eq_steps = (
-            np.linspace(lmbda_c_eq_min, lmbda_c_eq_max, int(1e4)+1)
-        )
-        
-        # Make arrays to allocate results
-        lmbda_c_eq         = []
-        lmbda_nu_bergapprx = []
-        lmbda_nu_padeapprx = []
-        
-        for lmbda_c_eq_indx in range(len(lmbda_c_eq_steps)):
-            lmbda_c_eq_val = lmbda_c_eq_steps[lmbda_c_eq_indx]
-            lmbda_nu_bergapprx_val = (
-                self.subcrit_lmbda_nu_berg_approx_func(lmbda_c_eq_val)
-            )
-            lmbda_nu_padeapprx_val = (
-                self.subcrit_lmbda_nu_pade_approx_func(lmbda_c_eq_val)
-            )
-            
-            lmbda_c_eq = np.append(lmbda_c_eq, lmbda_c_eq_val)
-            lmbda_nu_bergapprx = (
-                np.append(lmbda_nu_bergapprx, lmbda_nu_bergapprx_val)
-            )
-            lmbda_nu_padeapprx = (
-                np.append(lmbda_nu_padeapprx, lmbda_nu_padeapprx_val)
-            )
+        lmbda_c_eq_min = 0.
+        lmbda_c_eq_max = 1.
+        lmbda_c_eq = np.linspace(lmbda_c_eq_min, lmbda_c_eq_max, int(1e4)+1)
+
+        lmbda_nu_bergapprx = [
+            self.subcrit_lmbda_nu_berg_approx_func(lmbda_c_eq_val)
+            for lmbda_c_eq_val in lmbda_c_eq
+        ]
+        lmbda_nu_padeapprx = [
+            self.subcrit_lmbda_nu_pade_approx_func(lmbda_c_eq_val)
+            for lmbda_c_eq_val in lmbda_c_eq
+        ]
+        lmbda_nu_bergapprx = np.asarray(lmbda_nu_bergapprx)
+        lmbda_nu_padeapprx = np.asarray(lmbda_nu_padeapprx)
         
         pade2berg_crit_indx = (
             np.argmin(np.abs(lmbda_nu_padeapprx-lmbda_nu_bergapprx))
