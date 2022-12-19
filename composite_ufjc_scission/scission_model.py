@@ -7,6 +7,7 @@ from __future__ import division
 import sys
 import numpy as np
 from scipy import integrate
+import quadpy as qp
 
 # Import internal modules
 from .core import CompositeuFJC
@@ -34,6 +35,8 @@ class AnalyticalScissionCompositeuFJC(CompositeuFJC):
 
         # Parameters needed for numerical calculations
         self.lmbda_nu_hat_inc  = 0.0005
+        self.num_quad_points   = 1001
+        
         p_nu_sci_hat_0    = 0.001
         p_nu_sci_hat_half = 0.5
         p_nu_sci_hat_1    = 0.999
@@ -737,49 +740,93 @@ class AnalyticalScissionCompositeuFJC(CompositeuFJC):
         
         return epsilon_cnu_diss_hat_crit_val
     
-    def I_intgrnd_func(self, lmbda_c_eq, n):
+    def Z_intact_func(self, lmbda_c_eq):
         """Integrand involved in the intact equilibrium chain
-        configuration partition function integration.
+        configuration partition function integration
         
         This function computes the integrand involved in the intact 
         equilibrium chain configuration partition function integration
-        as a function of the equilibrium chain stretch and integer n.
+        as a function of the equilibrium chain stretch, integer n, and
+        segment number nu
         """
         lmbda_nu = self.lmbda_nu_func(lmbda_c_eq)
         psi_cnu  = self.psi_cnu_func(lmbda_nu, lmbda_c_eq)
         
-        return np.exp(-self.nu*(psi_cnu+self.zeta_nu_char)) * lmbda_c_eq**(n+2)
-    
-    def I_func(self, n):
-        """Intact equilibrium chain configuration partition function
-        integration through all admissible end-to-end chain distances up
-        to the critical point.
-        
-        This function numerically computes the intact equilibrium chain
-        configuration partition function through all admissible
-        end-to-end chain distances up to the critical point as a 
-        function of integer n.
-        """
-        return (
-            integrate.quad(
-                self.I_intgrnd_func, self.lmbda_c_eq_ref, self.lmbda_c_eq_crit,
-                args=(n,), epsabs=1.0e-12, epsrel=1.0e-12)[0]
-        )
+        return np.exp(-self.nu*(psi_cnu+self.zeta_nu_char))
     
     def A_nu_func(self):
         """Reference equilibrium chain stretch.
         
-        This function numerically computes the reference equilibrium
-        chain stretch.
+        This function computes the reference equilibrium chain stretch
+        via numerical quadrature.
         """
-        # second moment of the intact chain configuration pdf
-        I_2 = self.I_func(2)
-        # zeroth moment of the intact chain configuration pdf
-        I_0 = self.I_func(0)
-        sqrt_arg = (
-            I_2 / I_0 / (1.+self.nu*np.exp(-self.epsilon_nu_diss_hat_crit))
+        def J_func(lmbda_c_eq_ref, lmbda_c_eq_crit):
+            """Jacobian for the master space-equilibrium chain
+            configuration space transformation.
+            
+            This function computes the Jacobian for the master space
+            equilibrium chain configuration space transformation.
+            """
+            return (lmbda_c_eq_crit-lmbda_c_eq_ref)/2.
+        def lmbda_c_eq_point_func(point):
+            """Equilibrium chain stretch as a function of master space
+            coordinate point.
+
+            This function computes the equilibrium chain stretch as a
+            function of master space coordinate point.
+            """
+            J = J_func(self.lmbda_c_eq_ref, self.lmbda_c_eq_crit)
+            return J*(1+point) + self.lmbda_c_eq_ref
+        
+        # Numerical quadrature scheme for integration in the master
+        # space, which corresponds to the initial intact equilibrium
+        # chain configuration
+        scheme = qp.c1.gauss_legendre(self.num_quad_points)
+        
+        # sort points in ascending order
+        indx_ascd_order = np.argsort(scheme.points)
+        points = scheme.points[indx_ascd_order]
+        weights = scheme.weights[indx_ascd_order]
+        
+        # Jacobian for the master space-equilibrium chain configuration
+        # space transformation
+        J = J_func(self.lmbda_c_eq_ref, self.lmbda_c_eq_crit)
+        
+        # Equilibrium chain stretches corresponding to the master space
+        # points for the initial intact chain configuration
+        lmbda_c_eq_0_points = lmbda_c_eq_point_func(points)
+        
+        # Integrand of the zeroth moment of the initial intact chain
+        # configuration equilibrium probability density distribution without
+        # without normalization
+        I_0_intrgrnd = np.asarray(
+            [self.Z_intact_func(lmbda_c_eq_0_point) * lmbda_c_eq_0_point**2
+            for lmbda_c_eq_0_point in lmbda_c_eq_0_points]
         )
-        return np.sqrt(sqrt_arg)
+        
+        # Zeroth moment of the initial intact chain configuration
+        # equilibrium probability density distribution without
+        # normalization
+        I_0 = np.sum(np.multiply(weights, I_0_intrgrnd))*J
+
+        # Total configuration equilibrium partition function
+        Z_eq_tot = (1.+self.nu*np.exp(-self.epsilon_nu_diss_hat_crit)) * I_0
+
+        # Integrand of the second moment of the initial intact chain
+        # configuration equilibrium probability density distribution without
+        # without normalization
+        I_2_intrgrnd = np.asarray(
+            [self.Z_intact_func(lmbda_c_eq_0_point) * lmbda_c_eq_0_point**4
+            for lmbda_c_eq_0_point in lmbda_c_eq_0_points]
+        )
+        
+        # Second moment of the initial intact chain configuration
+        # equilibrium probability density distribution without
+        # normalization
+        I_2 = np.sum(np.multiply(weights, I_2_intrgrnd))*J
+        
+        # Reference equilibrium chain stretch
+        return np.sqrt(I_2/Z_eq_tot)
 
 
 class SmoothstepScissionCompositeuFJC(CompositeuFJC):
@@ -839,6 +886,7 @@ class SmoothstepScissionCompositeuFJC(CompositeuFJC):
 
         # Parameters needed for numerical calculations
         self.lmbda_nu_hat_inc  = 0.0005
+        self.num_quad_points   = 1001
 
         # Calculate and retain numerically calculated parameters
         self.epsilon_nu_diss_hat_crit  = self.epsilon_nu_diss_hat_crit_func()
@@ -1402,49 +1450,93 @@ class SmoothstepScissionCompositeuFJC(CompositeuFJC):
         
         return epsilon_cnu_diss_hat_crit_val
     
-    def I_intgrnd_func(self, lmbda_c_eq, n):
+    def Z_intact_func(self, lmbda_c_eq):
         """Integrand involved in the intact equilibrium chain
-        configuration partition function integration.
+        configuration partition function integration
         
         This function computes the integrand involved in the intact 
         equilibrium chain configuration partition function integration
-        as a function of the equilibrium chain stretch and integer n.
+        as a function of the equilibrium chain stretch, integer n, and
+        segment number nu
         """
         lmbda_nu = self.lmbda_nu_func(lmbda_c_eq)
         psi_cnu  = self.psi_cnu_func(lmbda_nu, lmbda_c_eq)
         
-        return np.exp(-self.nu*(psi_cnu+self.zeta_nu_char)) * lmbda_c_eq**(n+2)
-    
-    def I_func(self, n):
-        """Intact equilibrium chain configuration partition function
-        integration through all admissible end-to-end chain distances up
-        to the critical point.
-        
-        This function numerically computes the intact equilibrium chain
-        configuration partition function through all admissible
-        end-to-end chain distances up to the critical point as a 
-        function of integer n.
-        """
-        return (
-            integrate.quad(
-                self.I_intgrnd_func, self.lmbda_c_eq_ref, self.lmbda_c_eq_crit,
-                args=(n,), epsabs=1.0e-12, epsrel=1.0e-12)[0]
-        )
+        return np.exp(-self.nu*(psi_cnu+self.zeta_nu_char))
     
     def A_nu_func(self):
         """Reference equilibrium chain stretch.
         
-        This function numerically computes the reference equilibrium
-        chain stretch.
+        This function computes the reference equilibrium chain stretch
+        via numerical quadrature.
         """
-        # second moment of the intact chain configuration pdf
-        I_2 = self.I_func(2)
-        # zeroth moment of the intact chain configuration pdf
-        I_0 = self.I_func(0)
-        sqrt_arg = (
-            I_2 / I_0 / (1.+self.nu*np.exp(-self.epsilon_nu_diss_hat_crit))
+        def J_func(lmbda_c_eq_ref, lmbda_c_eq_crit):
+            """Jacobian for the master space-equilibrium chain
+            configuration space transformation.
+            
+            This function computes the Jacobian for the master space
+            equilibrium chain configuration space transformation.
+            """
+            return (lmbda_c_eq_crit-lmbda_c_eq_ref)/2.
+        def lmbda_c_eq_point_func(point):
+            """Equilibrium chain stretch as a function of master space
+            coordinate point.
+
+            This function computes the equilibrium chain stretch as a
+            function of master space coordinate point.
+            """
+            J = J_func(self.lmbda_c_eq_ref, self.lmbda_c_eq_crit)
+            return J*(1+point) + self.lmbda_c_eq_ref
+        
+        # Numerical quadrature scheme for integration in the master
+        # space, which corresponds to the initial intact equilibrium
+        # chain configuration
+        scheme = qp.c1.gauss_legendre(self.num_quad_points)
+        
+        # sort points in ascending order
+        indx_ascd_order = np.argsort(scheme.points)
+        points = scheme.points[indx_ascd_order]
+        weights = scheme.weights[indx_ascd_order]
+        
+        # Jacobian for the master space-equilibrium chain configuration
+        # space transformation
+        J = J_func(self.lmbda_c_eq_ref, self.lmbda_c_eq_crit)
+        
+        # Equilibrium chain stretches corresponding to the master space
+        # points for the initial intact chain configuration
+        lmbda_c_eq_0_points = lmbda_c_eq_point_func(points)
+        
+        # Integrand of the zeroth moment of the initial intact chain
+        # configuration equilibrium probability density distribution without
+        # without normalization
+        I_0_intrgrnd = np.asarray(
+            [self.Z_intact_func(lmbda_c_eq_0_point) * lmbda_c_eq_0_point**2
+            for lmbda_c_eq_0_point in lmbda_c_eq_0_points]
         )
-        return np.sqrt(sqrt_arg)
+        
+        # Zeroth moment of the initial intact chain configuration
+        # equilibrium probability density distribution without
+        # normalization
+        I_0 = np.sum(np.multiply(weights, I_0_intrgrnd))*J
+
+        # Total configuration equilibrium partition function
+        Z_eq_tot = (1.+self.nu*np.exp(-self.epsilon_nu_diss_hat_crit)) * I_0
+
+        # Integrand of the second moment of the initial intact chain
+        # configuration equilibrium probability density distribution without
+        # without normalization
+        I_2_intrgrnd = np.asarray(
+            [self.Z_intact_func(lmbda_c_eq_0_point) * lmbda_c_eq_0_point**4
+            for lmbda_c_eq_0_point in lmbda_c_eq_0_points]
+        )
+        
+        # Second moment of the initial intact chain configuration
+        # equilibrium probability density distribution without
+        # normalization
+        I_2 = np.sum(np.multiply(weights, I_2_intrgrnd))*J
+        
+        # Reference equilibrium chain stretch
+        return np.sqrt(I_2/Z_eq_tot)
 
 
 class SigmoidScissionCompositeuFJC(CompositeuFJC):
@@ -1490,6 +1582,7 @@ class SigmoidScissionCompositeuFJC(CompositeuFJC):
 
         # Parameters needed for numerical calculations
         self.lmbda_nu_hat_inc  = 0.0005
+        self.num_quad_points   = 1001
 
         # Calculate and retain numerically calculated parameters
         self.epsilon_nu_diss_hat_crit  = self.epsilon_nu_diss_hat_crit_func()
@@ -2039,46 +2132,90 @@ class SigmoidScissionCompositeuFJC(CompositeuFJC):
         
         return epsilon_cnu_diss_hat_crit_val
     
-    def I_intgrnd_func(self, lmbda_c_eq, n):
+    def Z_intact_func(self, lmbda_c_eq):
         """Integrand involved in the intact equilibrium chain
-        configuration partition function integration.
+        configuration partition function integration
         
         This function computes the integrand involved in the intact 
         equilibrium chain configuration partition function integration
-        as a function of the equilibrium chain stretch and integer n.
+        as a function of the equilibrium chain stretch, integer n, and
+        segment number nu
         """
         lmbda_nu = self.lmbda_nu_func(lmbda_c_eq)
         psi_cnu  = self.psi_cnu_func(lmbda_nu, lmbda_c_eq)
         
-        return np.exp(-self.nu*(psi_cnu+self.zeta_nu_char)) * lmbda_c_eq**(n+2)
-    
-    def I_func(self, n):
-        """Intact equilibrium chain configuration partition function
-        integration through all admissible end-to-end chain distances up
-        to the critical point.
-        
-        This function numerically computes the intact equilibrium chain
-        configuration partition function through all admissible
-        end-to-end chain distances up to the critical point as a 
-        function of integer n.
-        """
-        return (
-            integrate.quad(
-                self.I_intgrnd_func, self.lmbda_c_eq_ref, self.lmbda_c_eq_crit,
-                args=(n,), epsabs=1.0e-12, epsrel=1.0e-12)[0]
-        )
+        return np.exp(-self.nu*(psi_cnu+self.zeta_nu_char))
     
     def A_nu_func(self):
         """Reference equilibrium chain stretch.
         
-        This function numerically computes the reference equilibrium
-        chain stretch.
+        This function computes the reference equilibrium chain stretch
+        via numerical quadrature.
         """
-        # second moment of the intact chain configuration pdf
-        I_2 = self.I_func(2)
-        # zeroth moment of the intact chain configuration pdf
-        I_0 = self.I_func(0)
-        sqrt_arg = (
-            I_2 / I_0 / (1.+self.nu*np.exp(-self.epsilon_nu_diss_hat_crit))
+        def J_func(lmbda_c_eq_ref, lmbda_c_eq_crit):
+            """Jacobian for the master space-equilibrium chain
+            configuration space transformation.
+            
+            This function computes the Jacobian for the master space
+            equilibrium chain configuration space transformation.
+            """
+            return (lmbda_c_eq_crit-lmbda_c_eq_ref)/2.
+        def lmbda_c_eq_point_func(point):
+            """Equilibrium chain stretch as a function of master space
+            coordinate point.
+
+            This function computes the equilibrium chain stretch as a
+            function of master space coordinate point.
+            """
+            J = J_func(self.lmbda_c_eq_ref, self.lmbda_c_eq_crit)
+            return J*(1+point) + self.lmbda_c_eq_ref
+        
+        # Numerical quadrature scheme for integration in the master
+        # space, which corresponds to the initial intact equilibrium
+        # chain configuration
+        scheme = qp.c1.gauss_legendre(self.num_quad_points)
+        
+        # sort points in ascending order
+        indx_ascd_order = np.argsort(scheme.points)
+        points = scheme.points[indx_ascd_order]
+        weights = scheme.weights[indx_ascd_order]
+        
+        # Jacobian for the master space-equilibrium chain configuration
+        # space transformation
+        J = J_func(self.lmbda_c_eq_ref, self.lmbda_c_eq_crit)
+        
+        # Equilibrium chain stretches corresponding to the master space
+        # points for the initial intact chain configuration
+        lmbda_c_eq_0_points = lmbda_c_eq_point_func(points)
+        
+        # Integrand of the zeroth moment of the initial intact chain
+        # configuration equilibrium probability density distribution without
+        # without normalization
+        I_0_intrgrnd = np.asarray(
+            [self.Z_intact_func(lmbda_c_eq_0_point) * lmbda_c_eq_0_point**2
+            for lmbda_c_eq_0_point in lmbda_c_eq_0_points]
         )
-        return np.sqrt(sqrt_arg)
+        
+        # Zeroth moment of the initial intact chain configuration
+        # equilibrium probability density distribution without
+        # normalization
+        I_0 = np.sum(np.multiply(weights, I_0_intrgrnd))*J
+
+        # Total configuration equilibrium partition function
+        Z_eq_tot = (1.+self.nu*np.exp(-self.epsilon_nu_diss_hat_crit)) * I_0
+
+        # Integrand of the second moment of the initial intact chain
+        # configuration equilibrium probability density distribution without
+        # without normalization
+        I_2_intrgrnd = np.asarray(
+            [self.Z_intact_func(lmbda_c_eq_0_point) * lmbda_c_eq_0_point**4
+            for lmbda_c_eq_0_point in lmbda_c_eq_0_points]
+        )
+        
+        # Second moment of the initial intact chain configuration
+        # equilibrium probability density distribution without
+        # normalization
+        I_2 = np.sum(np.multiply(weights, I_2_intrgrnd))*J
+        
+        # Reference equilibrium chain stretch
+        return np.sqrt(I_2/Z_eq_tot)
