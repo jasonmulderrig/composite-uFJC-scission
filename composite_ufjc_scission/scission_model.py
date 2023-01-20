@@ -6,6 +6,7 @@ fundamental analytical scission model.
 from __future__ import division
 import sys
 import numpy as np
+import numquad as nq
 
 # Import internal modules
 from .core import CompositeuFJC
@@ -776,15 +777,15 @@ class AnalyticalScissionCompositeuFJC(CompositeuFJC):
             J = J_func(self.lmbda_c_eq_ref, self.lmbda_c_eq_crit)
             return J*(1+point) + self.lmbda_c_eq_ref
         
-        # Gauss-Legendre numerical quadrature scheme for integration in
-        # the master space, which corresponds to the initial intact
-        # equilibrium chain configuration
-        points, weights = np.polynomial.legendre.leggauss(self.num_quad_points)
+        # Numerical quadrature scheme for integration in the master
+        # space, which corresponds to the initial intact equilibrium
+        # chain configuration
+        scheme = nq.c1.gauss_legendre(self.num_quad_points)
         
         # sort points in ascending order
-        indx_ascd_order = np.argsort(points)
-        points = points[indx_ascd_order]
-        weights = weights[indx_ascd_order]
+        indx_ascd_order = np.argsort(scheme.points)
+        points = scheme.points[indx_ascd_order]
+        weights = scheme.weights[indx_ascd_order]
         
         # Jacobian for the master space-equilibrium chain configuration
         # space transformation
@@ -1486,15 +1487,15 @@ class SmoothstepScissionCompositeuFJC(CompositeuFJC):
             J = J_func(self.lmbda_c_eq_ref, self.lmbda_c_eq_crit)
             return J*(1+point) + self.lmbda_c_eq_ref
         
-        # Gauss-Legendre numerical quadrature scheme for integration in
-        # the master space, which corresponds to the initial intact
-        # equilibrium chain configuration
-        points, weights = np.polynomial.legendre.leggauss(self.num_quad_points)
+        # Numerical quadrature scheme for integration in the master
+        # space, which corresponds to the initial intact equilibrium
+        # chain configuration
+        scheme = nq.c1.gauss_legendre(self.num_quad_points)
         
         # sort points in ascending order
-        indx_ascd_order = np.argsort(points)
-        points = points[indx_ascd_order]
-        weights = weights[indx_ascd_order]
+        indx_ascd_order = np.argsort(scheme.points)
+        points = scheme.points[indx_ascd_order]
+        weights = scheme.weights[indx_ascd_order]
         
         # Jacobian for the master space-equilibrium chain configuration
         # space transformation
@@ -2168,15 +2169,15 @@ class SigmoidScissionCompositeuFJC(CompositeuFJC):
             J = J_func(self.lmbda_c_eq_ref, self.lmbda_c_eq_crit)
             return J*(1+point) + self.lmbda_c_eq_ref
         
-        # Gauss-Legendre numerical quadrature scheme for integration in
-        # the master space, which corresponds to the initial intact
-        # equilibrium chain configuration
-        points, weights = np.polynomial.legendre.leggauss(self.num_quad_points)
+        # Numerical quadrature scheme for integration in the master
+        # space, which corresponds to the initial intact equilibrium
+        # chain configuration
+        scheme = nq.c1.gauss_legendre(self.num_quad_points)
         
         # sort points in ascending order
-        indx_ascd_order = np.argsort(points)
-        points = points[indx_ascd_order]
-        weights = weights[indx_ascd_order]
+        indx_ascd_order = np.argsort(scheme.points)
+        points = scheme.points[indx_ascd_order]
+        weights = scheme.weights[indx_ascd_order]
         
         # Jacobian for the master space-equilibrium chain configuration
         # space transformation
