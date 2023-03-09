@@ -71,6 +71,9 @@ class RateIndependentChainScissionCharacterizer(
         p_c_sur_hat_err___single_chain_chunk = [
             0. for single_chain_indx in range(len(single_chain_list))
         ]
+        p_c_sur_hat_abs_diff___single_chain_chunk = [
+            0. for single_chain_indx in range(len(single_chain_list))
+        ]
         p_c_sci_hat___single_chain_chunk = [
             0. for single_chain_indx in range(len(single_chain_list))
         ]
@@ -78,6 +81,9 @@ class RateIndependentChainScissionCharacterizer(
             0. for single_chain_indx in range(len(single_chain_list))
         ]
         p_c_sci_hat_err___single_chain_chunk = [
+            0. for single_chain_indx in range(len(single_chain_list))
+        ]
+        p_c_sci_hat_abs_diff___single_chain_chunk = [
             0. for single_chain_indx in range(len(single_chain_list))
         ]
         epsilon_cnu_sci_hat___single_chain_chunk = [
@@ -98,16 +104,34 @@ class RateIndependentChainScissionCharacterizer(
         epsilon_cnu_diss_hat_err___single_chain_chunk = [
             0. for single_chain_indx in range(len(single_chain_list))
         ]
+        epsilon_cnu_diss_hat_equiv___single_chain_chunk = [
+            0. for single_chain_indx in range(len(single_chain_list))
+        ]
+        epsilon_cnu_diss_hat_equiv_err___single_chain_chunk = [
+            0. for single_chain_indx in range(len(single_chain_list))
+        ]
         overline_epsilon_cnu_sci_hat___single_chain_chunk = [
             0. for single_chain_indx in range(len(single_chain_list))
         ]
         overline_epsilon_cnu_sci_hat_analytical___single_chain_chunk = [
             0. for single_chain_indx in range(len(single_chain_list))
         ]
+        overline_epsilon_cnu_sci_hat_abs_diff___single_chain_chunk = [
+            0. for single_chain_indx in range(len(single_chain_list))
+        ]
         overline_epsilon_cnu_diss_hat___single_chain_chunk = [
             0. for single_chain_indx in range(len(single_chain_list))
         ]
         overline_epsilon_cnu_diss_hat_analytical___single_chain_chunk = [
+            0. for single_chain_indx in range(len(single_chain_list))
+        ]
+        overline_epsilon_cnu_diss_hat_abs_diff___single_chain_chunk = [
+            0. for single_chain_indx in range(len(single_chain_list))
+        ]
+        overline_epsilon_cnu_diss_hat_equiv___single_chain_chunk = [
+            0. for single_chain_indx in range(len(single_chain_list))
+        ]
+        overline_epsilon_cnu_diss_hat_equiv_abs_diff___single_chain_chunk = [
             0. for single_chain_indx in range(len(single_chain_list))
         ]
         nu___single_chain_chunk = [
@@ -137,21 +161,32 @@ class RateIndependentChainScissionCharacterizer(
             p_c_sur_hat            = []
             p_c_sur_hat_analytical = []
             p_c_sur_hat_err        = []
+            p_c_sur_hat_abs_diff   = []
             p_c_sci_hat            = []
             p_c_sci_hat_analytical = []
             p_c_sci_hat_err        = []
+            p_c_sci_hat_abs_diff   = []
             epsilon_cnu_sci_hat            = []
             epsilon_cnu_sci_hat_analytical = []
             epsilon_cnu_sci_hat_err        = []
+            epsilon_cnu_sci_hat_abs_diff   = []
             epsilon_cnu_diss_hat            = []
             epsilon_cnu_diss_hat_analytical = []
             epsilon_cnu_diss_hat_err        = []
+            epsilon_cnu_diss_hat_abs_diff   = []
+            epsilon_cnu_diss_hat_equiv      = []
+            epsilon_cnu_diss_hat_equiv_err  = []
+            epsilon_cnu_diss_hat_equiv_abs_diff = []
 
             # initialization
             lmbda_nu_hat_max_val = 0.
             epsilon_cnu_diss_hat_val            = 0.
             epsilon_cnu_diss_hat_analytical_val = 0.
             epsilon_cnu_diss_hat_err_val        = 0.
+            epsilon_cnu_diss_hat_abs_diff_val   = 0.
+            epsilon_cnu_diss_hat_equiv_val      = 0.
+            epsilon_cnu_diss_hat_equiv_err_val  = 0.
+            epsilon_cnu_diss_hat_equiv_abs_diff_val = 0.
             
             # Calculate results through specified applied segment
             # stretch values
@@ -171,6 +206,9 @@ class RateIndependentChainScissionCharacterizer(
                         (p_c_sur_hat_analytical_val-p_c_sur_hat_val)/(p_c_sur_hat_val+single_chain.cond_val))
                     * 100
                 )
+                p_c_sur_hat_abs_diff_val = (
+                    np.abs(p_c_sur_hat_analytical_val-p_c_sur_hat_val)
+                )
                 p_c_sci_hat_val = (
                     single_chain.p_c_sci_hat_func(lmbda_nu_hat_val)
                 )
@@ -182,6 +220,9 @@ class RateIndependentChainScissionCharacterizer(
                         (p_c_sci_hat_analytical_val-p_c_sci_hat_val)/(p_c_sci_hat_val+single_chain.cond_val))
                     * 100
                 )
+                p_c_sci_hat_abs_diff_val = (
+                    np.abs(p_c_sci_hat_analytical_val-p_c_sci_hat_val)
+                )
                 epsilon_cnu_sci_hat_val = (
                     single_chain.epsilon_cnu_sci_hat_func(lmbda_nu_hat_val)
                 )
@@ -192,6 +233,9 @@ class RateIndependentChainScissionCharacterizer(
                     np.abs(
                         (epsilon_cnu_sci_hat_analytical_val-epsilon_cnu_sci_hat_val)/(epsilon_cnu_sci_hat_val+single_chain.cond_val))
                     * 100
+                )
+                epsilon_cnu_sci_hat_abs_diff_val = (
+                    np.abs(epsilon_cnu_sci_hat_analytical_val-epsilon_cnu_sci_hat_val)
                 )
 
                 # initialization
@@ -219,21 +263,42 @@ class RateIndependentChainScissionCharacterizer(
                             (epsilon_cnu_diss_hat_analytical_val-epsilon_cnu_diss_hat_val)/(epsilon_cnu_diss_hat_val+single_chain.cond_val))
                         * 100
                     )
+                    epsilon_cnu_diss_hat_abs_diff_val = (
+                        np.abs(epsilon_cnu_diss_hat_analytical_val-epsilon_cnu_diss_hat_val)
+                    )
+                    epsilon_cnu_diss_hat_equiv_val = (
+                        single_chain.epsilon_cnu_diss_hat_equiv_func(lmbda_nu_hat_val)
+                    )
+                    epsilon_cnu_diss_hat_equiv_err_val = (
+                        np.abs(
+                            (epsilon_cnu_diss_hat_equiv_val-epsilon_cnu_diss_hat_val)/(epsilon_cnu_diss_hat_val+single_chain.cond_val))
+                        * 100
+                    )
+                    epsilon_cnu_diss_hat_equiv_abs_diff_val = (
+                        np.abs(epsilon_cnu_diss_hat_equiv_val-epsilon_cnu_diss_hat_val)
+                    )
                 
                 lmbda_nu_hat.append(lmbda_nu_hat_val)
                 lmbda_nu_hat_max.append(lmbda_nu_hat_max_val)
                 p_c_sur_hat.append(p_c_sur_hat_val)
                 p_c_sur_hat_analytical.append(p_c_sur_hat_analytical_val)
                 p_c_sur_hat_err.append(p_c_sur_hat_err_val)
+                p_c_sur_hat_abs_diff.append(p_c_sur_hat_abs_diff_val)
                 p_c_sci_hat.append(p_c_sci_hat_val)
                 p_c_sci_hat_analytical.append(p_c_sci_hat_analytical_val)
                 p_c_sci_hat_err.append(p_c_sci_hat_err_val)
+                p_c_sci_hat_abs_diff.append(p_c_sci_hat_abs_diff_val)
                 epsilon_cnu_sci_hat.append(epsilon_cnu_sci_hat_val)
                 epsilon_cnu_sci_hat_analytical.append(epsilon_cnu_sci_hat_analytical_val)
                 epsilon_cnu_sci_hat_err.append(epsilon_cnu_sci_hat_err_val)
+                epsilon_cnu_sci_hat_abs_diff.append(epsilon_cnu_sci_hat_abs_diff_val)
                 epsilon_cnu_diss_hat.append(epsilon_cnu_diss_hat_val)
                 epsilon_cnu_diss_hat_analytical.append(epsilon_cnu_diss_hat_analytical_val)
                 epsilon_cnu_diss_hat_err.append(epsilon_cnu_diss_hat_err_val)
+                epsilon_cnu_diss_hat_abs_diff.append(epsilon_cnu_diss_hat_abs_diff_val)
+                epsilon_cnu_diss_hat_equiv.append(epsilon_cnu_diss_hat_equiv_val)
+                epsilon_cnu_diss_hat_equiv_err.append(epsilon_cnu_diss_hat_equiv_err_val)
+                epsilon_cnu_diss_hat_equiv_abs_diff.append(epsilon_cnu_diss_hat_equiv_abs_diff_val)
             
             overline_epsilon_cnu_sci_hat = [
                 epsilon_cnu_sci_hat_val/single_chain.zeta_nu_char
@@ -244,6 +309,11 @@ class RateIndependentChainScissionCharacterizer(
                 for epsilon_cnu_sci_hat_analytical_val
                 in epsilon_cnu_sci_hat_analytical
             ]
+            overline_epsilon_cnu_sci_hat_abs_diff = [
+                epsilon_cnu_sci_hat_abs_diff_val/single_chain.zeta_nu_char
+                for epsilon_cnu_sci_hat_abs_diff_val
+                in epsilon_cnu_sci_hat_abs_diff
+            ]
             overline_epsilon_cnu_diss_hat = [
                 epsilon_cnu_diss_hat_val/single_chain.zeta_nu_char
                 for epsilon_cnu_diss_hat_val in epsilon_cnu_diss_hat
@@ -252,6 +322,20 @@ class RateIndependentChainScissionCharacterizer(
                 epsilon_cnu_diss_hat_analytical_val/single_chain.zeta_nu_char
                 for epsilon_cnu_diss_hat_analytical_val
                 in epsilon_cnu_diss_hat_analytical
+            ]
+            overline_epsilon_cnu_diss_hat_abs_diff = [
+                epsilon_cnu_diss_hat_abs_diff_val/single_chain.zeta_nu_char
+                for epsilon_cnu_diss_hat_abs_diff_val
+                in epsilon_cnu_diss_hat_abs_diff
+            ]
+            overline_epsilon_cnu_diss_hat_equiv = [
+                epsilon_cnu_diss_hat_equiv_val/single_chain.zeta_nu_char
+                for epsilon_cnu_diss_hat_equiv_val in epsilon_cnu_diss_hat_equiv
+            ]
+            overline_epsilon_cnu_diss_hat_equiv_abs_diff = [
+                epsilon_cnu_diss_hat_equiv_abs_diff_val/single_chain.zeta_nu_char
+                for epsilon_cnu_diss_hat_equiv_abs_diff_val
+                in epsilon_cnu_diss_hat_equiv_abs_diff
             ]
             
             lmbda_nu_hat___single_chain_chunk[single_chain_indx] = lmbda_nu_hat
@@ -262,12 +346,18 @@ class RateIndependentChainScissionCharacterizer(
             p_c_sur_hat_err___single_chain_chunk[single_chain_indx] = (
                 p_c_sur_hat_err
             )
+            p_c_sur_hat_abs_diff___single_chain_chunk[single_chain_indx] = (
+                p_c_sur_hat_abs_diff
+            )
             p_c_sci_hat___single_chain_chunk[single_chain_indx] = p_c_sci_hat
             p_c_sci_hat_analytical___single_chain_chunk[single_chain_indx] = (
                 p_c_sci_hat_analytical
             )
             p_c_sci_hat_err___single_chain_chunk[single_chain_indx] = (
                 p_c_sci_hat_err
+            )
+            p_c_sci_hat_abs_diff___single_chain_chunk[single_chain_indx] = (
+                p_c_sci_hat_abs_diff
             )
             epsilon_cnu_sci_hat___single_chain_chunk[single_chain_indx] = (
                 epsilon_cnu_sci_hat
@@ -287,17 +377,35 @@ class RateIndependentChainScissionCharacterizer(
             epsilon_cnu_diss_hat_err___single_chain_chunk[single_chain_indx] = (
                 epsilon_cnu_diss_hat_err
             )
+            epsilon_cnu_diss_hat_equiv___single_chain_chunk[single_chain_indx] = (
+                epsilon_cnu_diss_hat_equiv
+            )
+            epsilon_cnu_diss_hat_equiv_err___single_chain_chunk[single_chain_indx] = (
+                epsilon_cnu_diss_hat_equiv_err
+            )
             overline_epsilon_cnu_sci_hat___single_chain_chunk[single_chain_indx] = (
                 overline_epsilon_cnu_sci_hat
             )
             overline_epsilon_cnu_sci_hat_analytical___single_chain_chunk[single_chain_indx] = (
                 overline_epsilon_cnu_sci_hat_analytical
             )
+            overline_epsilon_cnu_sci_hat_abs_diff___single_chain_chunk[single_chain_indx] = (
+                overline_epsilon_cnu_sci_hat_abs_diff
+            )
             overline_epsilon_cnu_diss_hat___single_chain_chunk[single_chain_indx] = (
                 overline_epsilon_cnu_diss_hat
             )
             overline_epsilon_cnu_diss_hat_analytical___single_chain_chunk[single_chain_indx] = (
                 overline_epsilon_cnu_diss_hat_analytical
+            )
+            overline_epsilon_cnu_diss_hat_abs_diff___single_chain_chunk[single_chain_indx] = (
+                overline_epsilon_cnu_diss_hat_abs_diff
+            )
+            overline_epsilon_cnu_diss_hat_equiv___single_chain_chunk[single_chain_indx] = (
+                overline_epsilon_cnu_diss_hat_equiv
+            )
+            overline_epsilon_cnu_diss_hat_equiv_abs_diff___single_chain_chunk[single_chain_indx] = (
+                overline_epsilon_cnu_diss_hat_equiv_abs_diff
             )
             nu___single_chain_chunk[single_chain_indx] = nu
         
@@ -315,6 +423,9 @@ class RateIndependentChainScissionCharacterizer(
         self.p_c_sur_hat_err___single_chain_chunk = (
             p_c_sur_hat_err___single_chain_chunk
         )
+        self.p_c_sur_hat_abs_diff___single_chain_chunk = (
+            p_c_sur_hat_abs_diff___single_chain_chunk
+        )
         self.p_c_sci_hat___single_chain_chunk = (
             p_c_sci_hat___single_chain_chunk
         )
@@ -323,6 +434,9 @@ class RateIndependentChainScissionCharacterizer(
         )
         self.p_c_sci_hat_err___single_chain_chunk = (
             p_c_sci_hat_err___single_chain_chunk
+        )
+        self.p_c_sci_hat_abs_diff___single_chain_chunk = (
+            p_c_sci_hat_abs_diff___single_chain_chunk
         )
         self.epsilon_cnu_sci_hat___single_chain_chunk = (
             epsilon_cnu_sci_hat___single_chain_chunk
@@ -333,6 +447,9 @@ class RateIndependentChainScissionCharacterizer(
         self.epsilon_cnu_sci_hat_err___single_chain_chunk = (
             epsilon_cnu_sci_hat_err___single_chain_chunk
         )
+        self.epsilon_cnu_diss_hat_equiv___single_chain_chunk = (
+            epsilon_cnu_diss_hat_equiv___single_chain_chunk
+        )
         self.epsilon_cnu_diss_hat___single_chain_chunk = (
             epsilon_cnu_diss_hat___single_chain_chunk
         )
@@ -342,17 +459,32 @@ class RateIndependentChainScissionCharacterizer(
         self.epsilon_cnu_diss_hat_err___single_chain_chunk = (
             epsilon_cnu_diss_hat_err___single_chain_chunk
         )
+        self.epsilon_cnu_diss_hat_equiv_err___single_chain_chunk = (
+            epsilon_cnu_diss_hat_equiv_err___single_chain_chunk
+        )
         self.overline_epsilon_cnu_sci_hat___single_chain_chunk = (
             overline_epsilon_cnu_sci_hat___single_chain_chunk
         )
         self.overline_epsilon_cnu_sci_hat_analytical___single_chain_chunk = (
             overline_epsilon_cnu_sci_hat_analytical___single_chain_chunk
         )
+        self.overline_epsilon_cnu_sci_hat_abs_diff___single_chain_chunk = (
+            overline_epsilon_cnu_sci_hat_abs_diff___single_chain_chunk
+        )
         self.overline_epsilon_cnu_diss_hat___single_chain_chunk = (
             overline_epsilon_cnu_diss_hat___single_chain_chunk
         )
         self.overline_epsilon_cnu_diss_hat_analytical___single_chain_chunk = (
             overline_epsilon_cnu_diss_hat_analytical___single_chain_chunk
+        )
+        self.overline_epsilon_cnu_diss_hat_abs_diff___single_chain_chunk = (
+            overline_epsilon_cnu_diss_hat_abs_diff___single_chain_chunk
+        )
+        self.overline_epsilon_cnu_diss_hat_equiv___single_chain_chunk = (
+            overline_epsilon_cnu_diss_hat_equiv___single_chain_chunk
+        )
+        self.overline_epsilon_cnu_diss_hat_equiv_abs_diff___single_chain_chunk = (
+            overline_epsilon_cnu_diss_hat_equiv_abs_diff___single_chain_chunk
         )
         self.nu___single_chain_chunk = nu___single_chain_chunk
 
@@ -548,6 +680,64 @@ class RateIndependentChainScissionCharacterizer(
             self.savedir,
             "rate-independent-chain-scission-indicators-percent-error-vs-lmbda_nu_hat")
         
+        fig, (ax1, ax2) = plt.subplots(
+            2, 1, gridspec_kw={'height_ratios': [1, 1]}, sharex=True)
+        for single_chain_indx in range(len(self.single_chain_list)):
+            lmbda_nu_hat = (
+                self.lmbda_nu_hat___single_chain_chunk[single_chain_indx]
+            )
+            overline_epsilon_cnu_sci_hat_abs_diff = (
+                self.overline_epsilon_cnu_sci_hat_abs_diff___single_chain_chunk[single_chain_indx]
+            )
+            overline_epsilon_cnu_diss_hat_abs_diff = (
+                self.overline_epsilon_cnu_diss_hat_abs_diff___single_chain_chunk[single_chain_indx]
+            )
+            ax1.plot(
+                lmbda_nu_hat, overline_epsilon_cnu_sci_hat_abs_diff, linestyle='-',
+                color=cp.color_list[single_chain_indx], alpha=1, linewidth=2.5,
+                label=cp.nu_label_single_chain_list[single_chain_indx])
+            ax1.plot(
+                lmbda_nu_hat, overline_epsilon_cnu_diss_hat_abs_diff,
+                linestyle=(0, (3, 1, 1, 1)),
+                color=cp.color_list[single_chain_indx], alpha=1, linewidth=2.5)
+        for single_chain_indx in range(len(self.single_chain_list)):
+            lmbda_nu_hat = (
+                self.lmbda_nu_hat___single_chain_chunk[single_chain_indx]
+            )
+            p_c_sur_hat_abs_diff  = (
+                self.p_c_sur_hat_abs_diff___single_chain_chunk[single_chain_indx]
+            )
+            p_c_sci_hat_abs_diff  = (
+                self.p_c_sci_hat_abs_diff___single_chain_chunk[single_chain_indx]
+            )
+            ax2.plot(
+                lmbda_nu_hat, p_c_sci_hat_abs_diff, linestyle='-',
+                color=cp.color_list[single_chain_indx], alpha=1, linewidth=2.5)
+            ax2.plot(
+                lmbda_nu_hat, p_c_sur_hat_abs_diff, linestyle=':',
+                color=cp.color_list[single_chain_indx], alpha=1, linewidth=2.5)
+        ax2.plot(
+            [], [], linestyle='-', color='black', label=r'$\hat{p}_c^{sci}$')
+        ax2.plot(
+            [], [], linestyle=':', color='black', label=r'$\hat{p}_c^{sur}$')
+
+        ax1.legend(loc='best', fontsize=18)
+        # ax1.set_ylim([-0.05, 0.7])
+        ax1.tick_params(axis='y', labelsize=20)
+        ax1.set_ylabel(r'$|\textrm{diff}|$', fontsize=21)
+        ax1.grid(True, alpha=0.25)
+        ax2.legend(loc='best', fontsize=18)
+        # ax2.set_ylim([-0.05, 1.05])
+        ax2.tick_params(axis='y', labelsize=20)
+        ax2.set_ylabel(r'$|\textrm{diff}|$', fontsize=21)
+        ax2.grid(True, alpha=0.25)
+        plt.xlim([lmbda_nu_hat[0], lmbda_nu_hat[-1]])
+        plt.xticks(fontsize=20)
+        plt.xlabel(r'$\hat{\lambda}_{\nu}$', fontsize=30)
+        save_current_figure_no_labels(
+            self.savedir,
+            "rate-independent-chain-scission-indicators-absolute-difference-vs-lmbda_nu_hat")
+        
         fig = plt.figure()
         for single_chain_indx in range(len(self.single_chain_list)):
             lmbda_nu_hat = (
@@ -584,6 +774,148 @@ class RateIndependentChainScissionCharacterizer(
             self.savedir, r'$\hat{\lambda}_{\nu}$', 30,
             r'$\overline{\hat{\varepsilon}_c^{sci}}~(-),~\overline{\hat{\varepsilon}_c^{diss}}~(-~\cdot)$',
             30, "rate-independent-chain-scission-energy-vs-lmbda_nu_hat")
+        
+        fig, (ax1, ax2) = plt.subplots(
+            2, 1, gridspec_kw={'height_ratios': [2, 1]}, sharex=True)
+        for single_chain_indx in range(len(self.single_chain_list)):
+            lmbda_nu_hat = (
+                self.lmbda_nu_hat___single_chain_chunk[single_chain_indx]
+            )
+            overline_epsilon_cnu_sci_hat = (
+                self.overline_epsilon_cnu_sci_hat___single_chain_chunk[single_chain_indx]
+            )
+            overline_epsilon_cnu_diss_hat_equiv = (
+                self.overline_epsilon_cnu_diss_hat_equiv___single_chain_chunk[single_chain_indx]
+            )
+            ax1.plot(
+                lmbda_nu_hat, overline_epsilon_cnu_sci_hat, linestyle='-',
+                color=cp.color_list[single_chain_indx], alpha=1, linewidth=2.5,
+                label=cp.nu_label_single_chain_list[single_chain_indx])
+            ax1.plot(
+                lmbda_nu_hat, overline_epsilon_cnu_diss_hat_equiv,
+                linestyle=(0, (3, 1, 1, 1)),
+                color=cp.color_list[single_chain_indx], alpha=1, linewidth=2.5)
+        ax1.plot(
+            lmbda_nu_hat, overline_epsilon_cnu_sci_hat, linestyle='-',
+            color='black', alpha=1, linewidth=2.5)
+        for single_chain_indx in range(len(self.single_chain_list)):
+            lmbda_nu_hat = (
+                self.lmbda_nu_hat___single_chain_chunk[single_chain_indx]
+            )
+            p_c_sur_hat  = (
+                self.p_c_sur_hat___single_chain_chunk[single_chain_indx]
+            )
+            p_c_sci_hat  = (
+                self.p_c_sci_hat___single_chain_chunk[single_chain_indx]
+            )
+            ax2.plot(
+                lmbda_nu_hat, p_c_sci_hat, linestyle='-',
+                color=cp.color_list[single_chain_indx], alpha=1, linewidth=2.5)
+            ax2.plot(
+                lmbda_nu_hat, p_c_sur_hat, linestyle=':',
+                color=cp.color_list[single_chain_indx], alpha=1, linewidth=2.5)
+        ax2.plot(
+            [], [], linestyle='-', color='black', label=r'$\hat{p}_c^{sci}$')
+        ax2.plot(
+            [], [], linestyle=':', color='black', label=r'$\hat{p}_c^{sur}$')
+
+        ax1.legend(loc='best', fontsize=18)
+        ax1.set_ylim([-0.05, 0.7])
+        ax1.tick_params(axis='y', labelsize=20)
+        ax1.set_ylabel(
+            r'$\overline{\hat{\varepsilon}_{c\nu}^{sci}}~(-),~\overline{\hat{\varepsilon}_{c\nu}^{diss}}~(-~\cdot)$',
+            fontsize=21)
+        ax1.grid(True, alpha=0.25)
+        ax2.legend(loc='best', fontsize=18)
+        ax2.set_ylim([-0.05, 1.05])
+        ax2.tick_params(axis='y', labelsize=20)
+        ax2.set_ylabel(r'$\hat{p}_c^{sur},~\hat{p}_c^{sci}$', fontsize=21)
+        ax2.grid(True, alpha=0.25)
+        plt.xlim([lmbda_nu_hat[0], lmbda_nu_hat[-1]])
+        plt.xticks(fontsize=20)
+        plt.xlabel(r'$\hat{\lambda}_{\nu}$', fontsize=30)
+        save_current_figure_no_labels(
+            self.savedir,
+            "rate-independent-chain-scission-indicators-equivalent-dissipated-chain-scission-vs-lmbda_nu_hat")
+        
+        fig = plt.figure()
+        for single_chain_indx in range(len(self.single_chain_list)):
+            lmbda_nu_hat = (
+                self.lmbda_nu_hat___single_chain_chunk[single_chain_indx]
+            )
+            overline_epsilon_cnu_sci_hat = (
+                self.overline_epsilon_cnu_sci_hat___single_chain_chunk[single_chain_indx]
+            )
+            overline_epsilon_cnu_diss_hat_equiv = (
+                self.overline_epsilon_cnu_diss_hat_equiv___single_chain_chunk[single_chain_indx]
+            )
+            nu = self.nu___single_chain_chunk[single_chain_indx]
+            overline_epsilon_c_sci_hat = [
+                x*nu for x in overline_epsilon_cnu_sci_hat
+            ]
+            overline_epsilon_c_diss_hat_equiv = [
+                x*nu for x in overline_epsilon_cnu_diss_hat_equiv
+            ]
+            plt.semilogy(
+                lmbda_nu_hat, overline_epsilon_c_sci_hat, linestyle='-',
+                color=cp.color_list[single_chain_indx], alpha=1, linewidth=2.5,
+                label=cp.nu_label_single_chain_list[single_chain_indx])
+            plt.semilogy(
+                lmbda_nu_hat, overline_epsilon_c_diss_hat_equiv,
+                linestyle=(0, (3, 1, 1, 1)),
+                color=cp.color_list[single_chain_indx], alpha=1, linewidth=2.5)
+        plt.legend(loc='best', fontsize=18)
+        plt.xlim([lmbda_nu_hat[0], lmbda_nu_hat[-1]])
+        plt.xticks(fontsize=20)
+        plt.ylim([1e-5, 1e4])
+        plt.yticks(fontsize=20)
+        plt.grid(True, alpha=0.25)
+        save_current_figure(
+            self.savedir, r'$\hat{\lambda}_{\nu}$', 30,
+            r'$\overline{\hat{\varepsilon}_c^{sci}}~(-),~\overline{\hat{\varepsilon}_c^{diss}}~(-~\cdot)$',
+            30, "rate-independent-chain-scission-energy-equivalent-dissipated-chain-scission-vs-lmbda_nu_hat")
+        
+        fig = plt.figure()
+        for single_chain_indx in range(len(self.single_chain_list)):
+            lmbda_nu_hat = (
+                self.lmbda_nu_hat___single_chain_chunk[single_chain_indx]
+            )
+            epsilon_cnu_diss_hat_equiv_err = (
+                self.epsilon_cnu_diss_hat_equiv_err___single_chain_chunk[single_chain_indx]
+            )
+            plt.plot(lmbda_nu_hat, epsilon_cnu_diss_hat_equiv_err,
+                 linestyle='-', color=cp.color_list[single_chain_indx],
+                 alpha=1, linewidth=2.5,
+                 label=cp.nu_label_single_chain_list[single_chain_indx])
+        plt.legend(loc='best', fontsize=14, handlelength=3)
+        plt.xlim([lmbda_nu_hat[0], lmbda_nu_hat[-1]])
+        plt.xticks(fontsize=16)
+        plt.yticks(fontsize=16)
+        plt.grid(True, alpha=0.25)
+        save_current_figure(
+            self.savedir, r'$\hat{\lambda}_{\nu}$', 30, r'$\%~\textrm{error}$', 30,
+            "equivalent-rate-independent-dissipated-chain-scission-percent-error-vs-lmbda_nu_hat")
+
+        fig = plt.figure()
+        for single_chain_indx in range(len(self.single_chain_list)):
+            lmbda_nu_hat = (
+                self.lmbda_nu_hat___single_chain_chunk[single_chain_indx]
+            )
+            overline_epsilon_cnu_diss_hat_equiv_abs_diff = (
+                self.overline_epsilon_cnu_diss_hat_equiv_abs_diff___single_chain_chunk[single_chain_indx]
+            )
+            plt.plot(lmbda_nu_hat, overline_epsilon_cnu_diss_hat_equiv_abs_diff,
+                 linestyle='-', color=cp.color_list[single_chain_indx],
+                 alpha=1, linewidth=2.5,
+                 label=cp.nu_label_single_chain_list[single_chain_indx])
+        plt.legend(loc='best', fontsize=14, handlelength=3)
+        plt.xlim([lmbda_nu_hat[0], lmbda_nu_hat[-1]])
+        plt.xticks(fontsize=16)
+        plt.yticks(fontsize=16)
+        plt.grid(True, alpha=0.25)
+        save_current_figure(
+            self.savedir, r'$\hat{\lambda}_{\nu}$', 30, r'$|\textrm{diff}|$', 30,
+            "equivalent-rate-independent-dissipated-chain-scission-absolute-difference-vs-lmbda_nu_hat")
 
 if __name__ == '__main__':
 

@@ -23,6 +23,19 @@ class RateIndependentScission(object):
     def __init__(self):
         pass
 
+    def epsilon_nu_diss_hat_equiv_func(self, lmbda_nu_hat_val):
+        """Nondimensional rate-independent dissipated segment scission
+        energy.
+        
+        This function computes the nondimensional rate-independent
+        dissipated segment scission energy as a function of the applied
+        segment stretch via a highly accurate approximation.
+        """
+        return (
+            self.p_nu_sci_hat_func(lmbda_nu_hat_val)
+            * self.epsilon_nu_diss_hat_crit
+        )
+
     def epsilon_nu_diss_hat_func(
             self, lmbda_nu_hat_max_val, lmbda_nu_hat_max_val_prior,
             lmbda_nu_hat_val, lmbda_nu_hat_val_prior,
@@ -41,6 +54,19 @@ class RateIndependentScission(object):
                 lmbda_nu_hat_max_val, lmbda_nu_hat_max_val_prior,
                 lmbda_nu_hat_val, lmbda_nu_hat_val_prior,
                 epsilon_nu_diss_hat_val_prior)
+        )
+    
+    def epsilon_cnu_diss_hat_equiv_func(self, lmbda_nu_hat_val):
+        """Nondimensional rate-independent dissipated chain scission
+        energy.
+        
+        This function computes the nondimensional rate-independent
+        dissipated chain scission energy as a function of the applied
+        segment stretch via a highly accurate approximation.
+        """
+        return (
+            self.p_c_sci_hat_func(lmbda_nu_hat_val)
+            * self.epsilon_cnu_diss_hat_crit
         )
     
     def epsilon_cnu_diss_hat_func(
