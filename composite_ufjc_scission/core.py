@@ -317,6 +317,9 @@ class CompositeuFJC(object):
                 lmbda_nu_padeapprx[pade2berg_crit_indx]])
         )
         lmbda_c_eq_pade2berg_crit = lmbda_c_eq[pade2berg_crit_indx]
+
+        del lmbda_c_eq, lmbda_nu_bergapprx, lmbda_nu_padeapprx
+
         return lmbda_nu_pade2berg_crit, lmbda_c_eq_pade2berg_crit
     
     def lmbda_c_eq_pade2berg_crit_func(self):

@@ -32,7 +32,7 @@ class AnalyticalScissionCompositeuFJC(CompositeuFJC):
         CompositeuFJC.__init__(self, **kwargs)
 
         # Parameters needed for numerical calculations
-        self.lmbda_nu_hat_inc  = 0.0005
+        self.lmbda_nu_hat_inc  = 0.0001
         self.num_quad_points   = 1001
         
         p_nu_sci_hat_0    = 0.001
@@ -43,9 +43,22 @@ class AnalyticalScissionCompositeuFJC(CompositeuFJC):
         p_c_sci_hat_1     = 0.999
 
         # Calculate and retain numerically calculated parameters
-        self.epsilon_nu_diss_hat_crit  = self.epsilon_nu_diss_hat_crit_func()
-        self.epsilon_cnu_diss_hat_crit = self.epsilon_cnu_diss_hat_crit_func()
-        self.A_nu          = self.A_nu_func()
+        (self.epsilon_nu_diss_hat_crit, self.epsilon_cnu_diss_hat_crit,
+         self.u_nu_hat_p_nu_sur_hat_max, self.lmbda_nu_hat_u_nu_hat_p_nu_sur_hat_max,
+         self.s_cnu_hat_p_nu_sur_hat_max, self.lmbda_nu_hat_s_cnu_hat_p_nu_sur_hat_max,
+         self.psi_cnu_hat_p_nu_sur_hat_max, self.lmbda_nu_hat_psi_cnu_hat_p_nu_sur_hat_max,
+         self.xi_c_hat_p_nu_sur_hat_max, self.lmbda_nu_hat_xi_c_hat_p_nu_sur_hat_max,
+         self.u_nu_hat_p_c_sur_hat_max, self.lmbda_nu_hat_u_nu_hat_p_c_sur_hat_max,
+         self.s_cnu_hat_p_c_sur_hat_max, self.lmbda_nu_hat_s_cnu_hat_p_c_sur_hat_max,
+         self.psi_cnu_hat_p_c_sur_hat_max, self.lmbda_nu_hat_psi_cnu_hat_p_c_sur_hat_max,
+         self.xi_c_hat_p_c_sur_hat_max, self.lmbda_nu_hat_xi_c_hat_p_c_sur_hat_max,
+         self.lmbda_nu_hat_p_nu_sci_hat_rms, self.lmbda_nu_hat_p_nu_sci_hat_mean,
+         self.epsilon_nu_diss_hat_p_nu_sci_hat_rms, self.epsilon_nu_diss_hat_p_nu_sci_hat_mean,
+         self.lmbda_nu_hat_p_c_sci_hat_rms, self.lmbda_nu_hat_p_c_sci_hat_mean,
+         self.epsilon_cnu_diss_hat_p_c_sci_hat_rms, self.epsilon_cnu_diss_hat_p_c_sci_hat_mean
+        ) = self.scission_parameters_func()
+
+        self.A_nu = self.A_nu_func()
         self.Lambda_nu_ref = self.lmbda_nu_func(self.A_nu)
 
         self.g_c_crit = (
@@ -525,53 +538,6 @@ class AnalyticalScissionCompositeuFJC(CompositeuFJC):
                 * (lmbda_nu_hat_val-lmbda_nu_hat_val_prior)
             )
     
-    def epsilon_nu_diss_hat_crit_func(self):
-        """Nondimensional rate-independent dissipated segment scission
-        energy for a chain at the critical state.
-        
-        This function computes the nondimensional rate-independent
-        dissipated segment scission energy for a chain at the critical
-        state.
-        """
-        # Define the values of the applied segment stretch to 
-        # calculate over
-        lmbda_nu_hat_num_steps = (
-            int(np.around(
-                (self.lmbda_nu_crit-self.lmbda_nu_ref)/self.lmbda_nu_hat_inc))
-            + 1
-        )
-        lmbda_nu_hat_steps = (
-            np.linspace(
-                self.lmbda_nu_ref, self.lmbda_nu_crit, lmbda_nu_hat_num_steps)
-        )
-
-        # initialization
-        lmbda_nu_hat_max_val_prior = 0.
-        lmbda_nu_hat_max_val       = 0.
-        epsilon_nu_diss_hat_crit_val_prior = 0.
-        epsilon_nu_diss_hat_crit_val       = 0.
-
-        for lmbda_nu_hat_indx in range(lmbda_nu_hat_num_steps):
-            lmbda_nu_hat_val = lmbda_nu_hat_steps[lmbda_nu_hat_indx]
-            lmbda_nu_hat_max_val = max([lmbda_nu_hat_max_val, lmbda_nu_hat_val])
-            
-            if lmbda_nu_hat_indx == 0:
-                pass
-            else:
-                epsilon_nu_diss_hat_crit_val = (
-                    self.epsilon_nu_diss_hat_rate_independent_scission_func(
-                        lmbda_nu_hat_max_val, lmbda_nu_hat_max_val_prior,
-                        lmbda_nu_hat_val,
-                        lmbda_nu_hat_steps[lmbda_nu_hat_indx-1],
-                        epsilon_nu_diss_hat_crit_val_prior)
-                )
-            
-            # update values
-            lmbda_nu_hat_max_val_prior = lmbda_nu_hat_max_val
-            epsilon_nu_diss_hat_crit_val_prior = epsilon_nu_diss_hat_crit_val
-        
-        return epsilon_nu_diss_hat_crit_val
-    
     def epsilon_cnu_diss_hat_prime_analytical_func(self, lmbda_nu_hat):
         """Analytical form of the derivative of the nondimensional
         rate-independent dissipated chain scission energy per segment
@@ -691,13 +657,58 @@ class AnalyticalScissionCompositeuFJC(CompositeuFJC):
                 * (lmbda_nu_hat_val-lmbda_nu_hat_val_prior)
             )
     
-    def epsilon_cnu_diss_hat_crit_func(self):
-        """Nondimensional rate-independent dissipated chain scission
-        energy per segment for a chain at the critical state.
+    def scission_parameters_func(self):
+        """Segment-level and chain-level scission parameters.
         
-        This function computes the nondimensional rate-independent
-        dissipated chain scission energy per segment for a chain at the
-        critical state.
+        This function computes the following segment-level scission
+        parameters:
+        -> Nondimensional rate-independent dissipated segment scission
+        energy for a segment at the critical state
+        -> Maximum value of the product of the nondimensional segment
+        potential energy with the probability of segment survival, and
+        the corresponding segment stretch
+        -> Maximum value of the product of the nondimensional
+        segment-level entropic free energy with the probability of
+        segment survival, and the corresponding segment stretch
+        -> Maximum value of the product of the nondimensional
+        segment-level Helmholtz free energy with the probability of
+        segment survival, and the corresponding segment stretch
+        -> Maximum value of the product of the nondimensional chain
+        force with the probability of segment survival, and the
+        corresponding segment stretch
+        -> Root-mean-square segment stretch of the probability density
+        function corresponding to the probability of segment scission,
+        along with the corresponding value of the nondimensional
+        rate-independent dissipated segment scission energy
+        -> Mean segment stretch of the probability density function
+        corresponding to the probability of segment scission, along with
+        the corresponding value of the nondimensional rate-independent
+        dissipated segment scission energy
+        
+        This function also computes the following chain-level scission
+        parameters:
+        -> Nondimensional per segment rate-independent dissipated chain
+        scission energy for a chain at the critical state
+        -> Maximum value of the product of the nondimensional segment
+        potential energy with the probability of chain survival, and
+        the corresponding segment stretch
+        -> Maximum value of the product of the nondimensional
+        segment-level entropic free energy with the probability of
+        chain survival, and the corresponding segment stretch
+        -> Maximum value of the product of the nondimensional per
+        segment chain-level Helmholtz free energy with the probability
+        of chain survival, and the corresponding segment stretch
+        -> Maximum value of the product of the nondimensional chain
+        force with the probability of chain survival, and the
+        corresponding segment stretch
+        -> Root-mean-square segment stretch of the probability density
+        function corresponding to the probability of chain scission,
+        along with the corresponding value of the nondimensional per
+        segment rate-independent dissipated chain scission energy
+        -> Mean segment stretch of the probability density function
+        corresponding to the probability of chain scission, along with
+        the corresponding value of the nondimensional per segment
+        rate-independent dissipated chain scission energy
         """
         # Define the values of the applied segment stretch to 
         # calculate over
@@ -710,33 +721,377 @@ class AnalyticalScissionCompositeuFJC(CompositeuFJC):
             np.linspace(
                 self.lmbda_nu_ref, self.lmbda_nu_crit, lmbda_nu_hat_num_steps)
         )
-
-        # initialization
-        lmbda_nu_hat_max_val_prior = 0.
-        lmbda_nu_hat_max_val       = 0.
-        epsilon_cnu_diss_hat_crit_val_prior = 0.
-        epsilon_cnu_diss_hat_crit_val       = 0.
-
+        
+        # Make arrays to allocate results
+        lmbda_nu_hat     = []
+        lmbda_nu_hat_max = []
+        p_nu_sci_hat     = []
+        epsilon_nu_diss_hat = []
+        u_nu_hat_p_nu_sur_hat    = []
+        s_cnu_hat_p_nu_sur_hat   = []
+        psi_cnu_hat_p_nu_sur_hat = []
+        xi_c_hat_p_nu_sur_hat    = []
+        p_c_sci_hat     = []
+        epsilon_cnu_diss_hat = []
+        u_nu_hat_p_c_sur_hat    = []
+        s_cnu_hat_p_c_sur_hat   = []
+        psi_cnu_hat_p_c_sur_hat = []
+        xi_c_hat_p_c_sur_hat    = []
+        
+        # Initialization
+        lmbda_nu_hat_max_val = 0.
+        epsilon_nu_diss_hat_val      = 0.
+        u_nu_hat_p_nu_sur_hat_val    = 0.
+        s_cnu_hat_p_nu_sur_hat_val   = 0.
+        psi_cnu_hat_p_nu_sur_hat_val = 0.
+        xi_c_hat_p_nu_sur_hat_val    = 0.
+        epsilon_cnu_diss_hat_val      = 0.
+        u_nu_hat_p_c_sur_hat_val    = 0.
+        s_cnu_hat_p_c_sur_hat_val   = 0.
+        psi_cnu_hat_p_c_sur_hat_val = 0.
+        xi_c_hat_p_c_sur_hat_val    = 0.
+        
+        # Calculate results through specified applied segment
+        # stretch values
         for lmbda_nu_hat_indx in range(lmbda_nu_hat_num_steps):
             lmbda_nu_hat_val = lmbda_nu_hat_steps[lmbda_nu_hat_indx]
             lmbda_nu_hat_max_val = max([lmbda_nu_hat_max_val, lmbda_nu_hat_val])
+            lmbda_c_eq_hat_val = self.lmbda_c_eq_func(lmbda_nu_hat_val)
+            lmbda_comp_nu_hat_val = lmbda_c_eq_hat_val - lmbda_nu_hat_val + 1.
+            u_nu_hat_val = self.u_nu_func(lmbda_nu_hat_val)
+            s_cnu_hat_val = self.s_cnu_func(lmbda_comp_nu_hat_val)
+            psi_cnu_hat_val = (
+                self.psi_cnu_func(lmbda_nu_hat_val, lmbda_c_eq_hat_val)
+            )
+            xi_c_hat_val = (
+                self.xi_c_func(lmbda_nu_hat_val, lmbda_c_eq_hat_val)
+            )
+            p_nu_sci_hat_val = self.p_nu_sci_hat_func(lmbda_nu_hat_val)
+            p_nu_sur_hat_val = self.p_nu_sur_hat_func(lmbda_nu_hat_val)
+            p_c_sur_hat_val = self.p_c_sur_hat_func(lmbda_nu_hat_val)
+            p_c_sci_hat_val = self.p_c_sci_hat_func(lmbda_nu_hat_val)
             
+            # Initialization
             if lmbda_nu_hat_indx == 0:
-                pass
+                u_nu_hat_init_val = u_nu_hat_val
+                s_cnu_hat_init_val = s_cnu_hat_val
+                psi_cnu_hat_init_val = psi_cnu_hat_val
+                xi_c_hat_init_val = xi_c_hat_val
             else:
-                epsilon_cnu_diss_hat_crit_val = (
-                    self.epsilon_cnu_diss_hat_rate_independent_scission_func(
-                        lmbda_nu_hat_max_val, lmbda_nu_hat_max_val_prior,
+                epsilon_nu_diss_hat_val = (
+                    self.epsilon_nu_diss_hat_rate_independent_scission_func(
+                        lmbda_nu_hat_max_val,
+                        lmbda_nu_hat_max[lmbda_nu_hat_indx-1],
                         lmbda_nu_hat_val,
-                        lmbda_nu_hat_steps[lmbda_nu_hat_indx-1],
-                        epsilon_cnu_diss_hat_crit_val_prior)
+                        lmbda_nu_hat[lmbda_nu_hat_indx-1],
+                        epsilon_nu_diss_hat[lmbda_nu_hat_indx-1])
+                )
+                u_nu_hat_p_nu_sur_hat_val = (
+                    p_nu_sur_hat_val * (u_nu_hat_val-u_nu_hat_init_val)
+                )
+                s_cnu_hat_p_nu_sur_hat_val = (
+                    p_nu_sur_hat_val * (s_cnu_hat_val-s_cnu_hat_init_val)
+                )
+                psi_cnu_hat_p_nu_sur_hat_val = (
+                    p_nu_sur_hat_val * (psi_cnu_hat_val-psi_cnu_hat_init_val)
+                )
+                xi_c_hat_p_nu_sur_hat_val = (
+                    p_nu_sur_hat_val * (xi_c_hat_val-xi_c_hat_init_val)
+                )
+                epsilon_cnu_diss_hat_val = (
+                    self.epsilon_cnu_diss_hat_rate_independent_scission_func(
+                        lmbda_nu_hat_max_val,
+                        lmbda_nu_hat_max[lmbda_nu_hat_indx-1],
+                        lmbda_nu_hat_val,
+                        lmbda_nu_hat[lmbda_nu_hat_indx-1],
+                        epsilon_cnu_diss_hat[lmbda_nu_hat_indx-1])
+                )
+                u_nu_hat_p_c_sur_hat_val = (
+                    p_c_sur_hat_val * (u_nu_hat_val-u_nu_hat_init_val)
+                )
+                s_cnu_hat_p_c_sur_hat_val = (
+                    p_c_sur_hat_val * (s_cnu_hat_val-s_cnu_hat_init_val)
+                )
+                psi_cnu_hat_p_c_sur_hat_val = (
+                    p_c_sur_hat_val * (psi_cnu_hat_val-psi_cnu_hat_init_val)
+                )
+                xi_c_hat_p_c_sur_hat_val = (
+                    p_c_sur_hat_val * (xi_c_hat_val-xi_c_hat_init_val)
                 )
             
-            # update values
-            lmbda_nu_hat_max_val_prior = lmbda_nu_hat_max_val
-            epsilon_cnu_diss_hat_crit_val_prior = epsilon_cnu_diss_hat_crit_val
+            # Append values to lists
+            lmbda_nu_hat.append(lmbda_nu_hat_val)
+            lmbda_nu_hat_max.append(lmbda_nu_hat_max_val)
+            p_nu_sci_hat.append(p_nu_sci_hat_val)
+            epsilon_nu_diss_hat.append(epsilon_nu_diss_hat_val)
+            u_nu_hat_p_nu_sur_hat.append(u_nu_hat_p_nu_sur_hat_val)
+            s_cnu_hat_p_nu_sur_hat.append(s_cnu_hat_p_nu_sur_hat_val)
+            psi_cnu_hat_p_nu_sur_hat.append(psi_cnu_hat_p_nu_sur_hat_val)
+            xi_c_hat_p_nu_sur_hat.append(xi_c_hat_p_nu_sur_hat_val)
+            p_c_sci_hat.append(p_c_sci_hat_val)
+            epsilon_cnu_diss_hat.append(epsilon_cnu_diss_hat_val)
+            u_nu_hat_p_c_sur_hat.append(u_nu_hat_p_c_sur_hat_val)
+            s_cnu_hat_p_c_sur_hat.append(s_cnu_hat_p_c_sur_hat_val)
+            psi_cnu_hat_p_c_sur_hat.append(psi_cnu_hat_p_c_sur_hat_val)
+            xi_c_hat_p_c_sur_hat.append(xi_c_hat_p_c_sur_hat_val)
         
-        return epsilon_cnu_diss_hat_crit_val
+        # Critical dissipated scission energy
+        epsilon_nu_diss_hat_crit = epsilon_nu_diss_hat[-1]
+        epsilon_cnu_diss_hat_crit = epsilon_cnu_diss_hat[-1]
+
+        # Maximum strength/survival values and associated segment
+        # stretches
+        indx_u_nu_hat_p_nu_sur_hat_max = (
+            np.argmax(np.asarray(u_nu_hat_p_nu_sur_hat))
+        )
+        u_nu_hat_p_nu_sur_hat_max = (
+            u_nu_hat_p_nu_sur_hat[indx_u_nu_hat_p_nu_sur_hat_max]
+        )
+        lmbda_nu_hat_u_nu_hat_p_nu_sur_hat_max = (
+            lmbda_nu_hat[indx_u_nu_hat_p_nu_sur_hat_max]
+        )
+        indx_s_cnu_hat_p_nu_sur_hat_max = (
+            np.argmax(np.asarray(s_cnu_hat_p_nu_sur_hat))
+        )
+        s_cnu_hat_p_nu_sur_hat_max = (
+            s_cnu_hat_p_nu_sur_hat[indx_s_cnu_hat_p_nu_sur_hat_max]
+        )
+        lmbda_nu_hat_s_cnu_hat_p_nu_sur_hat_max = (
+            lmbda_nu_hat[indx_s_cnu_hat_p_nu_sur_hat_max]
+        )
+        indx_psi_cnu_hat_p_nu_sur_hat_max = (
+            np.argmax(np.asarray(psi_cnu_hat_p_nu_sur_hat))
+        )
+        psi_cnu_hat_p_nu_sur_hat_max = (
+            psi_cnu_hat_p_nu_sur_hat[indx_psi_cnu_hat_p_nu_sur_hat_max]
+        )
+        lmbda_nu_hat_psi_cnu_hat_p_nu_sur_hat_max = (
+            lmbda_nu_hat[indx_psi_cnu_hat_p_nu_sur_hat_max]
+        )
+        indx_xi_c_hat_p_nu_sur_hat_max = (
+            np.argmax(np.asarray(xi_c_hat_p_nu_sur_hat))
+        )
+        xi_c_hat_p_nu_sur_hat_max = (
+            xi_c_hat_p_nu_sur_hat[indx_xi_c_hat_p_nu_sur_hat_max]
+        )
+        lmbda_nu_hat_xi_c_hat_p_nu_sur_hat_max = (
+            lmbda_nu_hat[indx_xi_c_hat_p_nu_sur_hat_max]
+        )
+        indx_u_nu_hat_p_c_sur_hat_max = (
+            np.argmax(np.asarray(u_nu_hat_p_c_sur_hat))
+        )
+        u_nu_hat_p_c_sur_hat_max = (
+            u_nu_hat_p_c_sur_hat[indx_u_nu_hat_p_c_sur_hat_max]
+        )
+        lmbda_nu_hat_u_nu_hat_p_c_sur_hat_max = (
+            lmbda_nu_hat[indx_u_nu_hat_p_c_sur_hat_max]
+        )
+        indx_s_cnu_hat_p_c_sur_hat_max = (
+            np.argmax(np.asarray(s_cnu_hat_p_c_sur_hat))
+        )
+        s_cnu_hat_p_c_sur_hat_max = (
+            s_cnu_hat_p_c_sur_hat[indx_s_cnu_hat_p_c_sur_hat_max]
+        )
+        lmbda_nu_hat_s_cnu_hat_p_c_sur_hat_max = (
+            lmbda_nu_hat[indx_s_cnu_hat_p_c_sur_hat_max]
+        )
+        indx_psi_cnu_hat_p_c_sur_hat_max = (
+            np.argmax(np.asarray(psi_cnu_hat_p_c_sur_hat))
+        )
+        psi_cnu_hat_p_c_sur_hat_max = (
+            psi_cnu_hat_p_c_sur_hat[indx_psi_cnu_hat_p_c_sur_hat_max]
+        )
+        lmbda_nu_hat_psi_cnu_hat_p_c_sur_hat_max = (
+            lmbda_nu_hat[indx_psi_cnu_hat_p_c_sur_hat_max]
+        )
+        indx_xi_c_hat_p_c_sur_hat_max = (
+            np.argmax(np.asarray(xi_c_hat_p_c_sur_hat))
+        )
+        xi_c_hat_p_c_sur_hat_max = (
+            xi_c_hat_p_c_sur_hat[indx_xi_c_hat_p_c_sur_hat_max]
+        )
+        lmbda_nu_hat_xi_c_hat_p_c_sur_hat_max = (
+            lmbda_nu_hat[indx_xi_c_hat_p_c_sur_hat_max]
+        )
+        
+        # Probability density distribution of segment scission
+        # root-mean-square and mean calculations
+        lmbda_nu_hat_arr = np.asarray(lmbda_nu_hat)
+        p_nu_sci_hat_arr = np.asarray(p_nu_sci_hat)
+        partial_p_nu_sci_hat__partial_lmbda_nu_hat_arr = (
+            np.gradient(p_nu_sci_hat_arr, lmbda_nu_hat_arr, edge_order=2)
+        )
+
+        Z_nu_sci = (
+            np.trapz(partial_p_nu_sci_hat__partial_lmbda_nu_hat_arr, lmbda_nu_hat_arr)
+        )
+
+        lmbda_nu_hat_p_nu_sci_hat_rms_intrgrnd_arr = (
+            partial_p_nu_sci_hat__partial_lmbda_nu_hat_arr * lmbda_nu_hat_arr**2
+        )
+        lmbda_nu_hat_p_nu_sci_hat_mean_intrgrnd_arr = (
+            partial_p_nu_sci_hat__partial_lmbda_nu_hat_arr * lmbda_nu_hat_arr
+        )
+
+        lmbda_nu_hat_p_nu_sci_hat_rms = (
+            np.sqrt(np.trapz(lmbda_nu_hat_p_nu_sci_hat_rms_intrgrnd_arr, lmbda_nu_hat_arr)/Z_nu_sci)
+        )
+        lmbda_nu_hat_p_nu_sci_hat_mean = (
+            np.trapz(lmbda_nu_hat_p_nu_sci_hat_mean_intrgrnd_arr, lmbda_nu_hat_arr)/Z_nu_sci
+        )
+
+        indx_left_lmbda_nu_hat_p_nu_sci_hat_rms = (
+            np.amax(np.flatnonzero(lmbda_nu_hat_arr < lmbda_nu_hat_p_nu_sci_hat_rms))
+        )
+        indx_right_lmbda_nu_hat_p_nu_sci_hat_rms = (
+            indx_left_lmbda_nu_hat_p_nu_sci_hat_rms + 1
+        )
+        lmbda_nu_hat_left = (
+            lmbda_nu_hat[indx_left_lmbda_nu_hat_p_nu_sci_hat_rms]
+        )
+        lmbda_nu_hat_right = (
+            lmbda_nu_hat[indx_right_lmbda_nu_hat_p_nu_sci_hat_rms]
+        )
+        epsilon_nu_diss_hat_left = (
+            epsilon_nu_diss_hat[indx_left_lmbda_nu_hat_p_nu_sci_hat_rms]
+        )
+        epsilon_nu_diss_hat_right = (
+            epsilon_nu_diss_hat[indx_right_lmbda_nu_hat_p_nu_sci_hat_rms]
+        )
+        epsilon_nu_diss_hat_p_nu_sci_hat_rms = (
+            epsilon_nu_diss_hat_left
+            + (lmbda_nu_hat_p_nu_sci_hat_rms-lmbda_nu_hat_left)
+            * (epsilon_nu_diss_hat_right-epsilon_nu_diss_hat_left)
+            / (lmbda_nu_hat_right-lmbda_nu_hat_left)
+        )
+
+        indx_left_lmbda_nu_hat_p_nu_sci_hat_mean = (
+            np.amax(np.flatnonzero(lmbda_nu_hat_arr < lmbda_nu_hat_p_nu_sci_hat_mean))
+        )
+        indx_right_lmbda_nu_hat_p_nu_sci_hat_mean = (
+            indx_left_lmbda_nu_hat_p_nu_sci_hat_mean + 1
+        )
+        lmbda_nu_hat_left = (
+            lmbda_nu_hat[indx_left_lmbda_nu_hat_p_nu_sci_hat_mean]
+        )
+        lmbda_nu_hat_right = (
+            lmbda_nu_hat[indx_right_lmbda_nu_hat_p_nu_sci_hat_mean]
+        )
+        epsilon_nu_diss_hat_left = (
+            epsilon_nu_diss_hat[indx_left_lmbda_nu_hat_p_nu_sci_hat_mean]
+        )
+        epsilon_nu_diss_hat_right = (
+            epsilon_nu_diss_hat[indx_right_lmbda_nu_hat_p_nu_sci_hat_mean]
+        )
+        epsilon_nu_diss_hat_p_nu_sci_hat_mean = (
+            epsilon_nu_diss_hat_left
+            + (lmbda_nu_hat_p_nu_sci_hat_rms-lmbda_nu_hat_left)
+            * (epsilon_nu_diss_hat_right-epsilon_nu_diss_hat_left)
+            / (lmbda_nu_hat_right-lmbda_nu_hat_left)
+        )
+        
+        p_c_sci_hat_arr = np.asarray(p_c_sci_hat)
+        partial_p_c_sci_hat__partial_lmbda_nu_hat_arr = (
+                np.gradient(p_c_sci_hat_arr, lmbda_nu_hat_arr, edge_order=2)
+            )
+        
+        Z_c_sci = (
+            np.trapz(partial_p_c_sci_hat__partial_lmbda_nu_hat_arr, lmbda_nu_hat_arr)
+        )
+
+        lmbda_nu_hat_p_c_sci_hat_rms_intrgrnd_arr = (
+            partial_p_c_sci_hat__partial_lmbda_nu_hat_arr * lmbda_nu_hat_arr**2
+        )
+        lmbda_nu_hat_p_c_sci_hat_mean_intrgrnd_arr = (
+            partial_p_c_sci_hat__partial_lmbda_nu_hat_arr * lmbda_nu_hat_arr
+        )
+
+        lmbda_nu_hat_p_c_sci_hat_rms = (
+            np.sqrt(np.trapz(lmbda_nu_hat_p_c_sci_hat_rms_intrgrnd_arr, lmbda_nu_hat_arr)/Z_c_sci)
+        )
+        lmbda_nu_hat_p_c_sci_hat_mean = (
+            np.trapz(lmbda_nu_hat_p_c_sci_hat_mean_intrgrnd_arr, lmbda_nu_hat_arr)/Z_c_sci
+        )
+
+        indx_left_lmbda_nu_hat_p_c_sci_hat_rms = (
+            np.amax(np.flatnonzero(lmbda_nu_hat_arr < lmbda_nu_hat_p_c_sci_hat_rms))
+        )
+        indx_right_lmbda_nu_hat_p_c_sci_hat_rms = (
+            indx_left_lmbda_nu_hat_p_c_sci_hat_rms + 1
+        )
+        lmbda_nu_hat_left = (
+            lmbda_nu_hat[indx_left_lmbda_nu_hat_p_c_sci_hat_rms]
+        )
+        lmbda_nu_hat_right = (
+            lmbda_nu_hat[indx_right_lmbda_nu_hat_p_c_sci_hat_rms]
+        )
+        epsilon_cnu_diss_hat_left = (
+            epsilon_cnu_diss_hat[indx_left_lmbda_nu_hat_p_c_sci_hat_rms]
+        )
+        epsilon_cnu_diss_hat_right = (
+            epsilon_cnu_diss_hat[indx_right_lmbda_nu_hat_p_c_sci_hat_rms]
+        )
+        epsilon_cnu_diss_hat_p_c_sci_hat_rms = (
+            epsilon_cnu_diss_hat_left
+            + (lmbda_nu_hat_p_c_sci_hat_rms-lmbda_nu_hat_left)
+            * (epsilon_cnu_diss_hat_right-epsilon_cnu_diss_hat_left)
+            / (lmbda_nu_hat_right-lmbda_nu_hat_left)
+        )
+
+        indx_left_lmbda_nu_hat_p_c_sci_hat_mean = (
+            np.amax(np.flatnonzero(lmbda_nu_hat_arr < lmbda_nu_hat_p_c_sci_hat_mean))
+        )
+        indx_right_lmbda_nu_hat_p_c_sci_hat_mean = (
+            indx_left_lmbda_nu_hat_p_c_sci_hat_mean + 1
+        )
+        lmbda_nu_hat_left = (
+            lmbda_nu_hat[indx_left_lmbda_nu_hat_p_c_sci_hat_mean]
+        )
+        lmbda_nu_hat_right = (
+            lmbda_nu_hat[indx_right_lmbda_nu_hat_p_c_sci_hat_mean]
+        )
+        epsilon_cnu_diss_hat_left = (
+            epsilon_cnu_diss_hat[indx_left_lmbda_nu_hat_p_c_sci_hat_mean]
+        )
+        epsilon_cnu_diss_hat_right = (
+            epsilon_cnu_diss_hat[indx_right_lmbda_nu_hat_p_c_sci_hat_mean]
+        )
+        epsilon_cnu_diss_hat_p_c_sci_hat_mean = (
+            epsilon_cnu_diss_hat_left
+            + (lmbda_nu_hat_p_c_sci_hat_rms-lmbda_nu_hat_left)
+            * (epsilon_cnu_diss_hat_right-epsilon_cnu_diss_hat_left)
+            / (lmbda_nu_hat_right-lmbda_nu_hat_left)
+        )
+        
+        del (
+            lmbda_nu_hat_steps, lmbda_nu_hat, lmbda_nu_hat_max, p_nu_sci_hat,
+            epsilon_nu_diss_hat, u_nu_hat_p_nu_sur_hat, s_cnu_hat_p_nu_sur_hat,
+            psi_cnu_hat_p_nu_sur_hat, xi_c_hat_p_nu_sur_hat, p_c_sci_hat,
+            epsilon_cnu_diss_hat, u_nu_hat_p_c_sur_hat, s_cnu_hat_p_c_sur_hat,
+            psi_cnu_hat_p_c_sur_hat, xi_c_hat_p_c_sur_hat, lmbda_nu_hat_arr,
+            p_nu_sci_hat_arr, partial_p_nu_sci_hat__partial_lmbda_nu_hat_arr,
+            lmbda_nu_hat_p_nu_sci_hat_rms_intrgrnd_arr,
+            lmbda_nu_hat_p_nu_sci_hat_mean_intrgrnd_arr,
+            p_c_sci_hat_arr, partial_p_c_sci_hat__partial_lmbda_nu_hat_arr,
+            lmbda_nu_hat_p_c_sci_hat_rms_intrgrnd_arr,
+            lmbda_nu_hat_p_c_sci_hat_mean_intrgrnd_arr
+        )
+        
+        return (
+            epsilon_nu_diss_hat_crit, epsilon_cnu_diss_hat_crit,
+            u_nu_hat_p_nu_sur_hat_max, lmbda_nu_hat_u_nu_hat_p_nu_sur_hat_max,
+            s_cnu_hat_p_nu_sur_hat_max, lmbda_nu_hat_s_cnu_hat_p_nu_sur_hat_max,
+            psi_cnu_hat_p_nu_sur_hat_max, lmbda_nu_hat_psi_cnu_hat_p_nu_sur_hat_max,
+            xi_c_hat_p_nu_sur_hat_max, lmbda_nu_hat_xi_c_hat_p_nu_sur_hat_max,
+            u_nu_hat_p_c_sur_hat_max, lmbda_nu_hat_u_nu_hat_p_c_sur_hat_max,
+            s_cnu_hat_p_c_sur_hat_max, lmbda_nu_hat_s_cnu_hat_p_c_sur_hat_max,
+            psi_cnu_hat_p_c_sur_hat_max, lmbda_nu_hat_psi_cnu_hat_p_c_sur_hat_max,
+            xi_c_hat_p_c_sur_hat_max, lmbda_nu_hat_xi_c_hat_p_c_sur_hat_max,
+            lmbda_nu_hat_p_nu_sci_hat_rms, lmbda_nu_hat_p_nu_sci_hat_mean,
+            epsilon_nu_diss_hat_p_nu_sci_hat_rms, epsilon_nu_diss_hat_p_nu_sci_hat_mean,
+            lmbda_nu_hat_p_c_sci_hat_rms, lmbda_nu_hat_p_c_sci_hat_mean,
+            epsilon_cnu_diss_hat_p_c_sci_hat_rms, epsilon_cnu_diss_hat_p_c_sci_hat_mean
+        )
     
     def Z_intact_func(self, lmbda_c_eq):
         """Integrand involved in the intact equilibrium chain
@@ -806,10 +1161,10 @@ class AnalyticalScissionCompositeuFJC(CompositeuFJC):
         # equilibrium probability density distribution without
         # normalization
         I_0 = np.sum(np.multiply(weights, I_0_intrgrnd))*J
-
+        
         # Total configuration equilibrium partition function
         Z_eq_tot = (1.+self.nu*np.exp(-self.epsilon_nu_diss_hat_crit)) * I_0
-
+        
         # Integrand of the second moment of the initial intact chain
         # configuration equilibrium probability density distribution without
         # without normalization
@@ -822,6 +1177,8 @@ class AnalyticalScissionCompositeuFJC(CompositeuFJC):
         # equilibrium probability density distribution without
         # normalization
         I_2 = np.sum(np.multiply(weights, I_2_intrgrnd))*J
+        
+        del points, weights, lmbda_c_eq_0_points, I_0_intrgrnd, I_2_intrgrnd
         
         # Reference equilibrium chain stretch
         return np.sqrt(I_2/Z_eq_tot)
@@ -887,8 +1244,21 @@ class SmoothstepScissionCompositeuFJC(CompositeuFJC):
         self.num_quad_points   = 1001
 
         # Calculate and retain numerically calculated parameters
-        self.epsilon_nu_diss_hat_crit  = self.epsilon_nu_diss_hat_crit_func()
-        self.epsilon_cnu_diss_hat_crit = self.epsilon_cnu_diss_hat_crit_func()
+        (self.epsilon_nu_diss_hat_crit, self.epsilon_cnu_diss_hat_crit,
+         self.u_nu_hat_p_nu_sur_hat_max, self.lmbda_nu_hat_u_nu_hat_p_nu_sur_hat_max,
+         self.s_cnu_hat_p_nu_sur_hat_max, self.lmbda_nu_hat_s_cnu_hat_p_nu_sur_hat_max,
+         self.psi_cnu_hat_p_nu_sur_hat_max, self.lmbda_nu_hat_psi_cnu_hat_p_nu_sur_hat_max,
+         self.xi_c_hat_p_nu_sur_hat_max, self.lmbda_nu_hat_xi_c_hat_p_nu_sur_hat_max,
+         self.u_nu_hat_p_c_sur_hat_max, self.lmbda_nu_hat_u_nu_hat_p_c_sur_hat_max,
+         self.s_cnu_hat_p_c_sur_hat_max, self.lmbda_nu_hat_s_cnu_hat_p_c_sur_hat_max,
+         self.psi_cnu_hat_p_c_sur_hat_max, self.lmbda_nu_hat_psi_cnu_hat_p_c_sur_hat_max,
+         self.xi_c_hat_p_c_sur_hat_max, self.lmbda_nu_hat_xi_c_hat_p_c_sur_hat_max,
+         self.lmbda_nu_hat_p_nu_sci_hat_rms, self.lmbda_nu_hat_p_nu_sci_hat_mean,
+         self.epsilon_nu_diss_hat_p_nu_sci_hat_rms, self.epsilon_nu_diss_hat_p_nu_sci_hat_mean,
+         self.lmbda_nu_hat_p_c_sci_hat_rms, self.lmbda_nu_hat_p_c_sci_hat_mean,
+         self.epsilon_cnu_diss_hat_p_c_sci_hat_rms, self.epsilon_cnu_diss_hat_p_c_sci_hat_mean
+        ) = self.scission_parameters_func()
+
         self.A_nu          = self.A_nu_func()
         self.Lambda_nu_ref = self.lmbda_nu_func(self.A_nu)
 
@@ -1235,53 +1605,6 @@ class SmoothstepScissionCompositeuFJC(CompositeuFJC):
                 * (lmbda_nu_hat_val-lmbda_nu_hat_val_prior)
             )
     
-    def epsilon_nu_diss_hat_crit_func(self):
-        """Nondimensional rate-independent dissipated segment scission
-        energy for a chain at the critical state.
-        
-        This function computes the nondimensional rate-independent
-        dissipated segment scission energy for a chain at the critical
-        state.
-        """
-        # Define the values of the applied segment stretch to 
-        # calculate over
-        lmbda_nu_hat_num_steps = (
-            int(np.around(
-                (self.lmbda_nu_crit-self.lmbda_nu_ref)/self.lmbda_nu_hat_inc))
-            + 1
-        )
-        lmbda_nu_hat_steps = (
-            np.linspace(
-                self.lmbda_nu_ref, self.lmbda_nu_crit, lmbda_nu_hat_num_steps)
-        )
-
-        # initialization
-        lmbda_nu_hat_max_val_prior = 0.
-        lmbda_nu_hat_max_val       = 0.
-        epsilon_nu_diss_hat_crit_val_prior = 0.
-        epsilon_nu_diss_hat_crit_val       = 0.
-
-        for lmbda_nu_hat_indx in range(lmbda_nu_hat_num_steps):
-            lmbda_nu_hat_val = lmbda_nu_hat_steps[lmbda_nu_hat_indx]
-            lmbda_nu_hat_max_val = max([lmbda_nu_hat_max_val, lmbda_nu_hat_val])
-            
-            if lmbda_nu_hat_indx == 0:
-                pass
-            else:
-                epsilon_nu_diss_hat_crit_val = (
-                    self.epsilon_nu_diss_hat_rate_independent_scission_func(
-                        lmbda_nu_hat_max_val, lmbda_nu_hat_max_val_prior,
-                        lmbda_nu_hat_val,
-                        lmbda_nu_hat_steps[lmbda_nu_hat_indx-1],
-                        epsilon_nu_diss_hat_crit_val_prior)
-                )
-            
-            # update values
-            lmbda_nu_hat_max_val_prior = lmbda_nu_hat_max_val
-            epsilon_nu_diss_hat_crit_val_prior = epsilon_nu_diss_hat_crit_val
-        
-        return epsilon_nu_diss_hat_crit_val
-    
     def epsilon_cnu_diss_hat_prime_analytical_func(self, lmbda_nu_hat):
         """Analytical form of the derivative of the nondimensional
         rate-independent dissipated chain scission energy per segment
@@ -1401,13 +1724,58 @@ class SmoothstepScissionCompositeuFJC(CompositeuFJC):
                 * (lmbda_nu_hat_val-lmbda_nu_hat_val_prior)
             )
     
-    def epsilon_cnu_diss_hat_crit_func(self):
-        """Nondimensional rate-independent dissipated chain scission
-        energy per segment for a chain at the critical state.
+    def scission_parameters_func(self):
+        """Segment-level and chain-level scission parameters.
         
-        This function computes the nondimensional rate-independent
-        dissipated chain scission energy per segment for a chain at the
-        critical state.
+        This function computes the following segment-level scission
+        parameters:
+        -> Nondimensional rate-independent dissipated segment scission
+        energy for a segment at the critical state
+        -> Maximum value of the product of the nondimensional segment
+        potential energy with the probability of segment survival, and
+        the corresponding segment stretch
+        -> Maximum value of the product of the nondimensional
+        segment-level entropic free energy with the probability of
+        segment survival, and the corresponding segment stretch
+        -> Maximum value of the product of the nondimensional
+        segment-level Helmholtz free energy with the probability of
+        segment survival, and the corresponding segment stretch
+        -> Maximum value of the product of the nondimensional chain
+        force with the probability of segment survival, and the
+        corresponding segment stretch
+        -> Root-mean-square segment stretch of the probability density
+        function corresponding to the probability of segment scission,
+        along with the corresponding value of the nondimensional
+        rate-independent dissipated segment scission energy
+        -> Mean segment stretch of the probability density function
+        corresponding to the probability of segment scission, along with
+        the corresponding value of the nondimensional rate-independent
+        dissipated segment scission energy
+        
+        This function also computes the following chain-level scission
+        parameters:
+        -> Nondimensional per segment rate-independent dissipated chain
+        scission energy for a chain at the critical state
+        -> Maximum value of the product of the nondimensional segment
+        potential energy with the probability of chain survival, and
+        the corresponding segment stretch
+        -> Maximum value of the product of the nondimensional
+        segment-level entropic free energy with the probability of
+        chain survival, and the corresponding segment stretch
+        -> Maximum value of the product of the nondimensional per
+        segment chain-level Helmholtz free energy with the probability
+        of chain survival, and the corresponding segment stretch
+        -> Maximum value of the product of the nondimensional chain
+        force with the probability of chain survival, and the
+        corresponding segment stretch
+        -> Root-mean-square segment stretch of the probability density
+        function corresponding to the probability of chain scission,
+        along with the corresponding value of the nondimensional per
+        segment rate-independent dissipated chain scission energy
+        -> Mean segment stretch of the probability density function
+        corresponding to the probability of chain scission, along with
+        the corresponding value of the nondimensional per segment
+        rate-independent dissipated chain scission energy
         """
         # Define the values of the applied segment stretch to 
         # calculate over
@@ -1420,33 +1788,377 @@ class SmoothstepScissionCompositeuFJC(CompositeuFJC):
             np.linspace(
                 self.lmbda_nu_ref, self.lmbda_nu_crit, lmbda_nu_hat_num_steps)
         )
-
-        # initialization
-        lmbda_nu_hat_max_val_prior = 0.
-        lmbda_nu_hat_max_val       = 0.
-        epsilon_cnu_diss_hat_crit_val_prior = 0.
-        epsilon_cnu_diss_hat_crit_val       = 0.
-
+        
+        # Make arrays to allocate results
+        lmbda_nu_hat     = []
+        lmbda_nu_hat_max = []
+        p_nu_sci_hat     = []
+        epsilon_nu_diss_hat = []
+        u_nu_hat_p_nu_sur_hat    = []
+        s_cnu_hat_p_nu_sur_hat   = []
+        psi_cnu_hat_p_nu_sur_hat = []
+        xi_c_hat_p_nu_sur_hat    = []
+        p_c_sci_hat     = []
+        epsilon_cnu_diss_hat = []
+        u_nu_hat_p_c_sur_hat    = []
+        s_cnu_hat_p_c_sur_hat   = []
+        psi_cnu_hat_p_c_sur_hat = []
+        xi_c_hat_p_c_sur_hat    = []
+        
+        # Initialization
+        lmbda_nu_hat_max_val = 0.
+        epsilon_nu_diss_hat_val      = 0.
+        u_nu_hat_p_nu_sur_hat_val    = 0.
+        s_cnu_hat_p_nu_sur_hat_val   = 0.
+        psi_cnu_hat_p_nu_sur_hat_val = 0.
+        xi_c_hat_p_nu_sur_hat_val    = 0.
+        epsilon_cnu_diss_hat_val      = 0.
+        u_nu_hat_p_c_sur_hat_val    = 0.
+        s_cnu_hat_p_c_sur_hat_val   = 0.
+        psi_cnu_hat_p_c_sur_hat_val = 0.
+        xi_c_hat_p_c_sur_hat_val    = 0.
+        
+        # Calculate results through specified applied segment
+        # stretch values
         for lmbda_nu_hat_indx in range(lmbda_nu_hat_num_steps):
             lmbda_nu_hat_val = lmbda_nu_hat_steps[lmbda_nu_hat_indx]
             lmbda_nu_hat_max_val = max([lmbda_nu_hat_max_val, lmbda_nu_hat_val])
+            lmbda_c_eq_hat_val = self.lmbda_c_eq_func(lmbda_nu_hat_val)
+            lmbda_comp_nu_hat_val = lmbda_c_eq_hat_val - lmbda_nu_hat_val + 1.
+            u_nu_hat_val = self.u_nu_func(lmbda_nu_hat_val)
+            s_cnu_hat_val = self.s_cnu_func(lmbda_comp_nu_hat_val)
+            psi_cnu_hat_val = (
+                self.psi_cnu_func(lmbda_nu_hat_val, lmbda_c_eq_hat_val)
+            )
+            xi_c_hat_val = (
+                self.xi_c_func(lmbda_nu_hat_val, lmbda_c_eq_hat_val)
+            )
+            p_nu_sci_hat_val = self.p_nu_sci_hat_func(lmbda_nu_hat_val)
+            p_nu_sur_hat_val = self.p_nu_sur_hat_func(lmbda_nu_hat_val)
+            p_c_sur_hat_val = self.p_c_sur_hat_func(lmbda_nu_hat_val)
+            p_c_sci_hat_val = self.p_c_sci_hat_func(lmbda_nu_hat_val)
             
+            # Initialization
             if lmbda_nu_hat_indx == 0:
-                pass
+                u_nu_hat_init_val = u_nu_hat_val
+                s_cnu_hat_init_val = s_cnu_hat_val
+                psi_cnu_hat_init_val = psi_cnu_hat_val
+                xi_c_hat_init_val = xi_c_hat_val
             else:
-                epsilon_cnu_diss_hat_crit_val = (
-                    self.epsilon_cnu_diss_hat_rate_independent_scission_func(
-                        lmbda_nu_hat_max_val, lmbda_nu_hat_max_val_prior,
+                epsilon_nu_diss_hat_val = (
+                    self.epsilon_nu_diss_hat_rate_independent_scission_func(
+                        lmbda_nu_hat_max_val,
+                        lmbda_nu_hat_max[lmbda_nu_hat_indx-1],
                         lmbda_nu_hat_val,
-                        lmbda_nu_hat_steps[lmbda_nu_hat_indx-1],
-                        epsilon_cnu_diss_hat_crit_val_prior)
+                        lmbda_nu_hat[lmbda_nu_hat_indx-1],
+                        epsilon_nu_diss_hat[lmbda_nu_hat_indx-1])
+                )
+                u_nu_hat_p_nu_sur_hat_val = (
+                    p_nu_sur_hat_val * (u_nu_hat_val-u_nu_hat_init_val)
+                )
+                s_cnu_hat_p_nu_sur_hat_val = (
+                    p_nu_sur_hat_val * (s_cnu_hat_val-s_cnu_hat_init_val)
+                )
+                psi_cnu_hat_p_nu_sur_hat_val = (
+                    p_nu_sur_hat_val * (psi_cnu_hat_val-psi_cnu_hat_init_val)
+                )
+                xi_c_hat_p_nu_sur_hat_val = (
+                    p_nu_sur_hat_val * (xi_c_hat_val-xi_c_hat_init_val)
+                )
+                epsilon_cnu_diss_hat_val = (
+                    self.epsilon_cnu_diss_hat_rate_independent_scission_func(
+                        lmbda_nu_hat_max_val,
+                        lmbda_nu_hat_max[lmbda_nu_hat_indx-1],
+                        lmbda_nu_hat_val,
+                        lmbda_nu_hat[lmbda_nu_hat_indx-1],
+                        epsilon_cnu_diss_hat[lmbda_nu_hat_indx-1])
+                )
+                u_nu_hat_p_c_sur_hat_val = (
+                    p_c_sur_hat_val * (u_nu_hat_val-u_nu_hat_init_val)
+                )
+                s_cnu_hat_p_c_sur_hat_val = (
+                    p_c_sur_hat_val * (s_cnu_hat_val-s_cnu_hat_init_val)
+                )
+                psi_cnu_hat_p_c_sur_hat_val = (
+                    p_c_sur_hat_val * (psi_cnu_hat_val-psi_cnu_hat_init_val)
+                )
+                xi_c_hat_p_c_sur_hat_val = (
+                    p_c_sur_hat_val * (xi_c_hat_val-xi_c_hat_init_val)
                 )
             
-            # update values
-            lmbda_nu_hat_max_val_prior = lmbda_nu_hat_max_val
-            epsilon_cnu_diss_hat_crit_val_prior = epsilon_cnu_diss_hat_crit_val
+            # Append values to lists
+            lmbda_nu_hat.append(lmbda_nu_hat_val)
+            lmbda_nu_hat_max.append(lmbda_nu_hat_max_val)
+            p_nu_sci_hat.append(p_nu_sci_hat_val)
+            epsilon_nu_diss_hat.append(epsilon_nu_diss_hat_val)
+            u_nu_hat_p_nu_sur_hat.append(u_nu_hat_p_nu_sur_hat_val)
+            s_cnu_hat_p_nu_sur_hat.append(s_cnu_hat_p_nu_sur_hat_val)
+            psi_cnu_hat_p_nu_sur_hat.append(psi_cnu_hat_p_nu_sur_hat_val)
+            xi_c_hat_p_nu_sur_hat.append(xi_c_hat_p_nu_sur_hat_val)
+            p_c_sci_hat.append(p_c_sci_hat_val)
+            epsilon_cnu_diss_hat.append(epsilon_cnu_diss_hat_val)
+            u_nu_hat_p_c_sur_hat.append(u_nu_hat_p_c_sur_hat_val)
+            s_cnu_hat_p_c_sur_hat.append(s_cnu_hat_p_c_sur_hat_val)
+            psi_cnu_hat_p_c_sur_hat.append(psi_cnu_hat_p_c_sur_hat_val)
+            xi_c_hat_p_c_sur_hat.append(xi_c_hat_p_c_sur_hat_val)
         
-        return epsilon_cnu_diss_hat_crit_val
+        # Critical dissipated scission energy
+        epsilon_nu_diss_hat_crit = epsilon_nu_diss_hat[-1]
+        epsilon_cnu_diss_hat_crit = epsilon_cnu_diss_hat[-1]
+
+        # Maximum strength/survival values and associated segment
+        # stretches
+        indx_u_nu_hat_p_nu_sur_hat_max = (
+            np.argmax(np.asarray(u_nu_hat_p_nu_sur_hat))
+        )
+        u_nu_hat_p_nu_sur_hat_max = (
+            u_nu_hat_p_nu_sur_hat[indx_u_nu_hat_p_nu_sur_hat_max]
+        )
+        lmbda_nu_hat_u_nu_hat_p_nu_sur_hat_max = (
+            lmbda_nu_hat[indx_u_nu_hat_p_nu_sur_hat_max]
+        )
+        indx_s_cnu_hat_p_nu_sur_hat_max = (
+            np.argmax(np.asarray(s_cnu_hat_p_nu_sur_hat))
+        )
+        s_cnu_hat_p_nu_sur_hat_max = (
+            s_cnu_hat_p_nu_sur_hat[indx_s_cnu_hat_p_nu_sur_hat_max]
+        )
+        lmbda_nu_hat_s_cnu_hat_p_nu_sur_hat_max = (
+            lmbda_nu_hat[indx_s_cnu_hat_p_nu_sur_hat_max]
+        )
+        indx_psi_cnu_hat_p_nu_sur_hat_max = (
+            np.argmax(np.asarray(psi_cnu_hat_p_nu_sur_hat))
+        )
+        psi_cnu_hat_p_nu_sur_hat_max = (
+            psi_cnu_hat_p_nu_sur_hat[indx_psi_cnu_hat_p_nu_sur_hat_max]
+        )
+        lmbda_nu_hat_psi_cnu_hat_p_nu_sur_hat_max = (
+            lmbda_nu_hat[indx_psi_cnu_hat_p_nu_sur_hat_max]
+        )
+        indx_xi_c_hat_p_nu_sur_hat_max = (
+            np.argmax(np.asarray(xi_c_hat_p_nu_sur_hat))
+        )
+        xi_c_hat_p_nu_sur_hat_max = (
+            xi_c_hat_p_nu_sur_hat[indx_xi_c_hat_p_nu_sur_hat_max]
+        )
+        lmbda_nu_hat_xi_c_hat_p_nu_sur_hat_max = (
+            lmbda_nu_hat[indx_xi_c_hat_p_nu_sur_hat_max]
+        )
+        indx_u_nu_hat_p_c_sur_hat_max = (
+            np.argmax(np.asarray(u_nu_hat_p_c_sur_hat))
+        )
+        u_nu_hat_p_c_sur_hat_max = (
+            u_nu_hat_p_c_sur_hat[indx_u_nu_hat_p_c_sur_hat_max]
+        )
+        lmbda_nu_hat_u_nu_hat_p_c_sur_hat_max = (
+            lmbda_nu_hat[indx_u_nu_hat_p_c_sur_hat_max]
+        )
+        indx_s_cnu_hat_p_c_sur_hat_max = (
+            np.argmax(np.asarray(s_cnu_hat_p_c_sur_hat))
+        )
+        s_cnu_hat_p_c_sur_hat_max = (
+            s_cnu_hat_p_c_sur_hat[indx_s_cnu_hat_p_c_sur_hat_max]
+        )
+        lmbda_nu_hat_s_cnu_hat_p_c_sur_hat_max = (
+            lmbda_nu_hat[indx_s_cnu_hat_p_c_sur_hat_max]
+        )
+        indx_psi_cnu_hat_p_c_sur_hat_max = (
+            np.argmax(np.asarray(psi_cnu_hat_p_c_sur_hat))
+        )
+        psi_cnu_hat_p_c_sur_hat_max = (
+            psi_cnu_hat_p_c_sur_hat[indx_psi_cnu_hat_p_c_sur_hat_max]
+        )
+        lmbda_nu_hat_psi_cnu_hat_p_c_sur_hat_max = (
+            lmbda_nu_hat[indx_psi_cnu_hat_p_c_sur_hat_max]
+        )
+        indx_xi_c_hat_p_c_sur_hat_max = (
+            np.argmax(np.asarray(xi_c_hat_p_c_sur_hat))
+        )
+        xi_c_hat_p_c_sur_hat_max = (
+            xi_c_hat_p_c_sur_hat[indx_xi_c_hat_p_c_sur_hat_max]
+        )
+        lmbda_nu_hat_xi_c_hat_p_c_sur_hat_max = (
+            lmbda_nu_hat[indx_xi_c_hat_p_c_sur_hat_max]
+        )
+        
+        # Probability density distribution of segment scission
+        # root-mean-square and mean calculations
+        lmbda_nu_hat_arr = np.asarray(lmbda_nu_hat)
+        p_nu_sci_hat_arr = np.asarray(p_nu_sci_hat)
+        partial_p_nu_sci_hat__partial_lmbda_nu_hat_arr = (
+            np.gradient(p_nu_sci_hat_arr, lmbda_nu_hat_arr, edge_order=2)
+        )
+
+        Z_nu_sci = (
+            np.trapz(partial_p_nu_sci_hat__partial_lmbda_nu_hat_arr, lmbda_nu_hat_arr)
+        )
+
+        lmbda_nu_hat_p_nu_sci_hat_rms_intrgrnd_arr = (
+            partial_p_nu_sci_hat__partial_lmbda_nu_hat_arr * lmbda_nu_hat_arr**2
+        )
+        lmbda_nu_hat_p_nu_sci_hat_mean_intrgrnd_arr = (
+            partial_p_nu_sci_hat__partial_lmbda_nu_hat_arr * lmbda_nu_hat_arr
+        )
+
+        lmbda_nu_hat_p_nu_sci_hat_rms = (
+            np.sqrt(np.trapz(lmbda_nu_hat_p_nu_sci_hat_rms_intrgrnd_arr, lmbda_nu_hat_arr)/Z_nu_sci)
+        )
+        lmbda_nu_hat_p_nu_sci_hat_mean = (
+            np.trapz(lmbda_nu_hat_p_nu_sci_hat_mean_intrgrnd_arr, lmbda_nu_hat_arr)/Z_nu_sci
+        )
+
+        indx_left_lmbda_nu_hat_p_nu_sci_hat_rms = (
+            np.amax(np.flatnonzero(lmbda_nu_hat_arr < lmbda_nu_hat_p_nu_sci_hat_rms))
+        )
+        indx_right_lmbda_nu_hat_p_nu_sci_hat_rms = (
+            indx_left_lmbda_nu_hat_p_nu_sci_hat_rms + 1
+        )
+        lmbda_nu_hat_left = (
+            lmbda_nu_hat[indx_left_lmbda_nu_hat_p_nu_sci_hat_rms]
+        )
+        lmbda_nu_hat_right = (
+            lmbda_nu_hat[indx_right_lmbda_nu_hat_p_nu_sci_hat_rms]
+        )
+        epsilon_nu_diss_hat_left = (
+            epsilon_nu_diss_hat[indx_left_lmbda_nu_hat_p_nu_sci_hat_rms]
+        )
+        epsilon_nu_diss_hat_right = (
+            epsilon_nu_diss_hat[indx_right_lmbda_nu_hat_p_nu_sci_hat_rms]
+        )
+        epsilon_nu_diss_hat_p_nu_sci_hat_rms = (
+            epsilon_nu_diss_hat_left
+            + (lmbda_nu_hat_p_nu_sci_hat_rms-lmbda_nu_hat_left)
+            * (epsilon_nu_diss_hat_right-epsilon_nu_diss_hat_left)
+            / (lmbda_nu_hat_right-lmbda_nu_hat_left)
+        )
+
+        indx_left_lmbda_nu_hat_p_nu_sci_hat_mean = (
+            np.amax(np.flatnonzero(lmbda_nu_hat_arr < lmbda_nu_hat_p_nu_sci_hat_mean))
+        )
+        indx_right_lmbda_nu_hat_p_nu_sci_hat_mean = (
+            indx_left_lmbda_nu_hat_p_nu_sci_hat_mean + 1
+        )
+        lmbda_nu_hat_left = (
+            lmbda_nu_hat[indx_left_lmbda_nu_hat_p_nu_sci_hat_mean]
+        )
+        lmbda_nu_hat_right = (
+            lmbda_nu_hat[indx_right_lmbda_nu_hat_p_nu_sci_hat_mean]
+        )
+        epsilon_nu_diss_hat_left = (
+            epsilon_nu_diss_hat[indx_left_lmbda_nu_hat_p_nu_sci_hat_mean]
+        )
+        epsilon_nu_diss_hat_right = (
+            epsilon_nu_diss_hat[indx_right_lmbda_nu_hat_p_nu_sci_hat_mean]
+        )
+        epsilon_nu_diss_hat_p_nu_sci_hat_mean = (
+            epsilon_nu_diss_hat_left
+            + (lmbda_nu_hat_p_nu_sci_hat_rms-lmbda_nu_hat_left)
+            * (epsilon_nu_diss_hat_right-epsilon_nu_diss_hat_left)
+            / (lmbda_nu_hat_right-lmbda_nu_hat_left)
+        )
+        
+        p_c_sci_hat_arr = np.asarray(p_c_sci_hat)
+        partial_p_c_sci_hat__partial_lmbda_nu_hat_arr = (
+                np.gradient(p_c_sci_hat_arr, lmbda_nu_hat_arr, edge_order=2)
+            )
+        
+        Z_c_sci = (
+            np.trapz(partial_p_c_sci_hat__partial_lmbda_nu_hat_arr, lmbda_nu_hat_arr)
+        )
+
+        lmbda_nu_hat_p_c_sci_hat_rms_intrgrnd_arr = (
+            partial_p_c_sci_hat__partial_lmbda_nu_hat_arr * lmbda_nu_hat_arr**2
+        )
+        lmbda_nu_hat_p_c_sci_hat_mean_intrgrnd_arr = (
+            partial_p_c_sci_hat__partial_lmbda_nu_hat_arr * lmbda_nu_hat_arr
+        )
+
+        lmbda_nu_hat_p_c_sci_hat_rms = (
+            np.sqrt(np.trapz(lmbda_nu_hat_p_c_sci_hat_rms_intrgrnd_arr, lmbda_nu_hat_arr)/Z_c_sci)
+        )
+        lmbda_nu_hat_p_c_sci_hat_mean = (
+            np.trapz(lmbda_nu_hat_p_c_sci_hat_mean_intrgrnd_arr, lmbda_nu_hat_arr)/Z_c_sci
+        )
+
+        indx_left_lmbda_nu_hat_p_c_sci_hat_rms = (
+            np.amax(np.flatnonzero(lmbda_nu_hat_arr < lmbda_nu_hat_p_c_sci_hat_rms))
+        )
+        indx_right_lmbda_nu_hat_p_c_sci_hat_rms = (
+            indx_left_lmbda_nu_hat_p_c_sci_hat_rms + 1
+        )
+        lmbda_nu_hat_left = (
+            lmbda_nu_hat[indx_left_lmbda_nu_hat_p_c_sci_hat_rms]
+        )
+        lmbda_nu_hat_right = (
+            lmbda_nu_hat[indx_right_lmbda_nu_hat_p_c_sci_hat_rms]
+        )
+        epsilon_cnu_diss_hat_left = (
+            epsilon_cnu_diss_hat[indx_left_lmbda_nu_hat_p_c_sci_hat_rms]
+        )
+        epsilon_cnu_diss_hat_right = (
+            epsilon_cnu_diss_hat[indx_right_lmbda_nu_hat_p_c_sci_hat_rms]
+        )
+        epsilon_cnu_diss_hat_p_c_sci_hat_rms = (
+            epsilon_cnu_diss_hat_left
+            + (lmbda_nu_hat_p_c_sci_hat_rms-lmbda_nu_hat_left)
+            * (epsilon_cnu_diss_hat_right-epsilon_cnu_diss_hat_left)
+            / (lmbda_nu_hat_right-lmbda_nu_hat_left)
+        )
+
+        indx_left_lmbda_nu_hat_p_c_sci_hat_mean = (
+            np.amax(np.flatnonzero(lmbda_nu_hat_arr < lmbda_nu_hat_p_c_sci_hat_mean))
+        )
+        indx_right_lmbda_nu_hat_p_c_sci_hat_mean = (
+            indx_left_lmbda_nu_hat_p_c_sci_hat_mean + 1
+        )
+        lmbda_nu_hat_left = (
+            lmbda_nu_hat[indx_left_lmbda_nu_hat_p_c_sci_hat_mean]
+        )
+        lmbda_nu_hat_right = (
+            lmbda_nu_hat[indx_right_lmbda_nu_hat_p_c_sci_hat_mean]
+        )
+        epsilon_cnu_diss_hat_left = (
+            epsilon_cnu_diss_hat[indx_left_lmbda_nu_hat_p_c_sci_hat_mean]
+        )
+        epsilon_cnu_diss_hat_right = (
+            epsilon_cnu_diss_hat[indx_right_lmbda_nu_hat_p_c_sci_hat_mean]
+        )
+        epsilon_cnu_diss_hat_p_c_sci_hat_mean = (
+            epsilon_cnu_diss_hat_left
+            + (lmbda_nu_hat_p_c_sci_hat_rms-lmbda_nu_hat_left)
+            * (epsilon_cnu_diss_hat_right-epsilon_cnu_diss_hat_left)
+            / (lmbda_nu_hat_right-lmbda_nu_hat_left)
+        )
+        
+        del (
+            lmbda_nu_hat_steps, lmbda_nu_hat, lmbda_nu_hat_max, p_nu_sci_hat,
+            epsilon_nu_diss_hat, u_nu_hat_p_nu_sur_hat, s_cnu_hat_p_nu_sur_hat,
+            psi_cnu_hat_p_nu_sur_hat, xi_c_hat_p_nu_sur_hat, p_c_sci_hat,
+            epsilon_cnu_diss_hat, u_nu_hat_p_c_sur_hat, s_cnu_hat_p_c_sur_hat,
+            psi_cnu_hat_p_c_sur_hat, xi_c_hat_p_c_sur_hat, lmbda_nu_hat_arr,
+            p_nu_sci_hat_arr, partial_p_nu_sci_hat__partial_lmbda_nu_hat_arr,
+            lmbda_nu_hat_p_nu_sci_hat_rms_intrgrnd_arr,
+            lmbda_nu_hat_p_nu_sci_hat_mean_intrgrnd_arr,
+            p_c_sci_hat_arr, partial_p_c_sci_hat__partial_lmbda_nu_hat_arr,
+            lmbda_nu_hat_p_c_sci_hat_rms_intrgrnd_arr,
+            lmbda_nu_hat_p_c_sci_hat_mean_intrgrnd_arr
+        )
+        
+        return (
+            epsilon_nu_diss_hat_crit, epsilon_cnu_diss_hat_crit,
+            u_nu_hat_p_nu_sur_hat_max, lmbda_nu_hat_u_nu_hat_p_nu_sur_hat_max,
+            s_cnu_hat_p_nu_sur_hat_max, lmbda_nu_hat_s_cnu_hat_p_nu_sur_hat_max,
+            psi_cnu_hat_p_nu_sur_hat_max, lmbda_nu_hat_psi_cnu_hat_p_nu_sur_hat_max,
+            xi_c_hat_p_nu_sur_hat_max, lmbda_nu_hat_xi_c_hat_p_nu_sur_hat_max,
+            u_nu_hat_p_c_sur_hat_max, lmbda_nu_hat_u_nu_hat_p_c_sur_hat_max,
+            s_cnu_hat_p_c_sur_hat_max, lmbda_nu_hat_s_cnu_hat_p_c_sur_hat_max,
+            psi_cnu_hat_p_c_sur_hat_max, lmbda_nu_hat_psi_cnu_hat_p_c_sur_hat_max,
+            xi_c_hat_p_c_sur_hat_max, lmbda_nu_hat_xi_c_hat_p_c_sur_hat_max,
+            lmbda_nu_hat_p_nu_sci_hat_rms, lmbda_nu_hat_p_nu_sci_hat_mean,
+            epsilon_nu_diss_hat_p_nu_sci_hat_rms, epsilon_nu_diss_hat_p_nu_sci_hat_mean,
+            lmbda_nu_hat_p_c_sci_hat_rms, lmbda_nu_hat_p_c_sci_hat_mean,
+            epsilon_cnu_diss_hat_p_c_sci_hat_rms, epsilon_cnu_diss_hat_p_c_sci_hat_mean
+        )
     
     def Z_intact_func(self, lmbda_c_eq):
         """Integrand involved in the intact equilibrium chain
@@ -1516,10 +2228,10 @@ class SmoothstepScissionCompositeuFJC(CompositeuFJC):
         # equilibrium probability density distribution without
         # normalization
         I_0 = np.sum(np.multiply(weights, I_0_intrgrnd))*J
-
+        
         # Total configuration equilibrium partition function
         Z_eq_tot = (1.+self.nu*np.exp(-self.epsilon_nu_diss_hat_crit)) * I_0
-
+        
         # Integrand of the second moment of the initial intact chain
         # configuration equilibrium probability density distribution without
         # without normalization
@@ -1532,6 +2244,8 @@ class SmoothstepScissionCompositeuFJC(CompositeuFJC):
         # equilibrium probability density distribution without
         # normalization
         I_2 = np.sum(np.multiply(weights, I_2_intrgrnd))*J
+        
+        del points, weights, lmbda_c_eq_0_points, I_0_intrgrnd, I_2_intrgrnd
         
         # Reference equilibrium chain stretch
         return np.sqrt(I_2/Z_eq_tot)
@@ -1583,8 +2297,21 @@ class SigmoidScissionCompositeuFJC(CompositeuFJC):
         self.num_quad_points   = 1001
 
         # Calculate and retain numerically calculated parameters
-        self.epsilon_nu_diss_hat_crit  = self.epsilon_nu_diss_hat_crit_func()
-        self.epsilon_cnu_diss_hat_crit = self.epsilon_cnu_diss_hat_crit_func()
+        (self.epsilon_nu_diss_hat_crit, self.epsilon_cnu_diss_hat_crit,
+         self.u_nu_hat_p_nu_sur_hat_max, self.lmbda_nu_hat_u_nu_hat_p_nu_sur_hat_max,
+         self.s_cnu_hat_p_nu_sur_hat_max, self.lmbda_nu_hat_s_cnu_hat_p_nu_sur_hat_max,
+         self.psi_cnu_hat_p_nu_sur_hat_max, self.lmbda_nu_hat_psi_cnu_hat_p_nu_sur_hat_max,
+         self.xi_c_hat_p_nu_sur_hat_max, self.lmbda_nu_hat_xi_c_hat_p_nu_sur_hat_max,
+         self.u_nu_hat_p_c_sur_hat_max, self.lmbda_nu_hat_u_nu_hat_p_c_sur_hat_max,
+         self.s_cnu_hat_p_c_sur_hat_max, self.lmbda_nu_hat_s_cnu_hat_p_c_sur_hat_max,
+         self.psi_cnu_hat_p_c_sur_hat_max, self.lmbda_nu_hat_psi_cnu_hat_p_c_sur_hat_max,
+         self.xi_c_hat_p_c_sur_hat_max, self.lmbda_nu_hat_xi_c_hat_p_c_sur_hat_max,
+         self.lmbda_nu_hat_p_nu_sci_hat_rms, self.lmbda_nu_hat_p_nu_sci_hat_mean,
+         self.epsilon_nu_diss_hat_p_nu_sci_hat_rms, self.epsilon_nu_diss_hat_p_nu_sci_hat_mean,
+         self.lmbda_nu_hat_p_c_sci_hat_rms, self.lmbda_nu_hat_p_c_sci_hat_mean,
+         self.epsilon_cnu_diss_hat_p_c_sci_hat_rms, self.epsilon_cnu_diss_hat_p_c_sci_hat_mean
+        ) = self.scission_parameters_func()
+
         self.A_nu          = self.A_nu_func()
         self.Lambda_nu_ref = self.lmbda_nu_func(self.A_nu)
 
@@ -1917,53 +2644,6 @@ class SigmoidScissionCompositeuFJC(CompositeuFJC):
                 * (lmbda_nu_hat_val-lmbda_nu_hat_val_prior)
             )
     
-    def epsilon_nu_diss_hat_crit_func(self):
-        """Nondimensional rate-independent dissipated segment scission
-        energy for a chain at the critical state.
-        
-        This function computes the nondimensional rate-independent
-        dissipated segment scission energy for a chain at the critical
-        state.
-        """
-        # Define the values of the applied segment stretch to 
-        # calculate over
-        lmbda_nu_hat_num_steps = (
-            int(np.around(
-                (self.lmbda_nu_crit-self.lmbda_nu_ref)/self.lmbda_nu_hat_inc))
-            + 1
-        )
-        lmbda_nu_hat_steps = (
-            np.linspace(
-                self.lmbda_nu_ref, self.lmbda_nu_crit, lmbda_nu_hat_num_steps)
-        )
-
-        # initialization
-        lmbda_nu_hat_max_val_prior = 0.
-        lmbda_nu_hat_max_val       = 0.
-        epsilon_nu_diss_hat_crit_val_prior = 0.
-        epsilon_nu_diss_hat_crit_val       = 0.
-
-        for lmbda_nu_hat_indx in range(lmbda_nu_hat_num_steps):
-            lmbda_nu_hat_val = lmbda_nu_hat_steps[lmbda_nu_hat_indx]
-            lmbda_nu_hat_max_val = max([lmbda_nu_hat_max_val, lmbda_nu_hat_val])
-            
-            if lmbda_nu_hat_indx == 0:
-                pass
-            else:
-                epsilon_nu_diss_hat_crit_val = (
-                    self.epsilon_nu_diss_hat_rate_independent_scission_func(
-                        lmbda_nu_hat_max_val, lmbda_nu_hat_max_val_prior,
-                        lmbda_nu_hat_val,
-                        lmbda_nu_hat_steps[lmbda_nu_hat_indx-1],
-                        epsilon_nu_diss_hat_crit_val_prior)
-                )
-            
-            # update values
-            lmbda_nu_hat_max_val_prior = lmbda_nu_hat_max_val
-            epsilon_nu_diss_hat_crit_val_prior = epsilon_nu_diss_hat_crit_val
-        
-        return epsilon_nu_diss_hat_crit_val
-    
     def epsilon_cnu_diss_hat_prime_analytical_func(self, lmbda_nu_hat):
         """Analytical form of the derivative of the nondimensional
         rate-independent dissipated chain scission energy per segment
@@ -2083,13 +2763,58 @@ class SigmoidScissionCompositeuFJC(CompositeuFJC):
                 * (lmbda_nu_hat_val-lmbda_nu_hat_val_prior)
             )
     
-    def epsilon_cnu_diss_hat_crit_func(self):
-        """Nondimensional rate-independent dissipated chain scission
-        energy per segment for a chain at the critical state.
+    def scission_parameters_func(self):
+        """Segment-level and chain-level scission parameters.
         
-        This function computes the nondimensional rate-independent
-        dissipated chain scission energy per segment for a chain at the
-        critical state.
+        This function computes the following segment-level scission
+        parameters:
+        -> Nondimensional rate-independent dissipated segment scission
+        energy for a segment at the critical state
+        -> Maximum value of the product of the nondimensional segment
+        potential energy with the probability of segment survival, and
+        the corresponding segment stretch
+        -> Maximum value of the product of the nondimensional
+        segment-level entropic free energy with the probability of
+        segment survival, and the corresponding segment stretch
+        -> Maximum value of the product of the nondimensional
+        segment-level Helmholtz free energy with the probability of
+        segment survival, and the corresponding segment stretch
+        -> Maximum value of the product of the nondimensional chain
+        force with the probability of segment survival, and the
+        corresponding segment stretch
+        -> Root-mean-square segment stretch of the probability density
+        function corresponding to the probability of segment scission,
+        along with the corresponding value of the nondimensional
+        rate-independent dissipated segment scission energy
+        -> Mean segment stretch of the probability density function
+        corresponding to the probability of segment scission, along with
+        the corresponding value of the nondimensional rate-independent
+        dissipated segment scission energy
+        
+        This function also computes the following chain-level scission
+        parameters:
+        -> Nondimensional per segment rate-independent dissipated chain
+        scission energy for a chain at the critical state
+        -> Maximum value of the product of the nondimensional segment
+        potential energy with the probability of chain survival, and
+        the corresponding segment stretch
+        -> Maximum value of the product of the nondimensional
+        segment-level entropic free energy with the probability of
+        chain survival, and the corresponding segment stretch
+        -> Maximum value of the product of the nondimensional per
+        segment chain-level Helmholtz free energy with the probability
+        of chain survival, and the corresponding segment stretch
+        -> Maximum value of the product of the nondimensional chain
+        force with the probability of chain survival, and the
+        corresponding segment stretch
+        -> Root-mean-square segment stretch of the probability density
+        function corresponding to the probability of chain scission,
+        along with the corresponding value of the nondimensional per
+        segment rate-independent dissipated chain scission energy
+        -> Mean segment stretch of the probability density function
+        corresponding to the probability of chain scission, along with
+        the corresponding value of the nondimensional per segment
+        rate-independent dissipated chain scission energy
         """
         # Define the values of the applied segment stretch to 
         # calculate over
@@ -2102,33 +2827,377 @@ class SigmoidScissionCompositeuFJC(CompositeuFJC):
             np.linspace(
                 self.lmbda_nu_ref, self.lmbda_nu_crit, lmbda_nu_hat_num_steps)
         )
-
-        # initialization
-        lmbda_nu_hat_max_val_prior = 0.
-        lmbda_nu_hat_max_val       = 0.
-        epsilon_cnu_diss_hat_crit_val_prior = 0.
-        epsilon_cnu_diss_hat_crit_val       = 0.
-
+        
+        # Make arrays to allocate results
+        lmbda_nu_hat     = []
+        lmbda_nu_hat_max = []
+        p_nu_sci_hat     = []
+        epsilon_nu_diss_hat = []
+        u_nu_hat_p_nu_sur_hat    = []
+        s_cnu_hat_p_nu_sur_hat   = []
+        psi_cnu_hat_p_nu_sur_hat = []
+        xi_c_hat_p_nu_sur_hat    = []
+        p_c_sci_hat     = []
+        epsilon_cnu_diss_hat = []
+        u_nu_hat_p_c_sur_hat    = []
+        s_cnu_hat_p_c_sur_hat   = []
+        psi_cnu_hat_p_c_sur_hat = []
+        xi_c_hat_p_c_sur_hat    = []
+        
+        # Initialization
+        lmbda_nu_hat_max_val = 0.
+        epsilon_nu_diss_hat_val      = 0.
+        u_nu_hat_p_nu_sur_hat_val    = 0.
+        s_cnu_hat_p_nu_sur_hat_val   = 0.
+        psi_cnu_hat_p_nu_sur_hat_val = 0.
+        xi_c_hat_p_nu_sur_hat_val    = 0.
+        epsilon_cnu_diss_hat_val      = 0.
+        u_nu_hat_p_c_sur_hat_val    = 0.
+        s_cnu_hat_p_c_sur_hat_val   = 0.
+        psi_cnu_hat_p_c_sur_hat_val = 0.
+        xi_c_hat_p_c_sur_hat_val    = 0.
+        
+        # Calculate results through specified applied segment
+        # stretch values
         for lmbda_nu_hat_indx in range(lmbda_nu_hat_num_steps):
             lmbda_nu_hat_val = lmbda_nu_hat_steps[lmbda_nu_hat_indx]
             lmbda_nu_hat_max_val = max([lmbda_nu_hat_max_val, lmbda_nu_hat_val])
+            lmbda_c_eq_hat_val = self.lmbda_c_eq_func(lmbda_nu_hat_val)
+            lmbda_comp_nu_hat_val = lmbda_c_eq_hat_val - lmbda_nu_hat_val + 1.
+            u_nu_hat_val = self.u_nu_func(lmbda_nu_hat_val)
+            s_cnu_hat_val = self.s_cnu_func(lmbda_comp_nu_hat_val)
+            psi_cnu_hat_val = (
+                self.psi_cnu_func(lmbda_nu_hat_val, lmbda_c_eq_hat_val)
+            )
+            xi_c_hat_val = (
+                self.xi_c_func(lmbda_nu_hat_val, lmbda_c_eq_hat_val)
+            )
+            p_nu_sci_hat_val = self.p_nu_sci_hat_func(lmbda_nu_hat_val)
+            p_nu_sur_hat_val = self.p_nu_sur_hat_func(lmbda_nu_hat_val)
+            p_c_sur_hat_val = self.p_c_sur_hat_func(lmbda_nu_hat_val)
+            p_c_sci_hat_val = self.p_c_sci_hat_func(lmbda_nu_hat_val)
             
+            # Initialization
             if lmbda_nu_hat_indx == 0:
-                pass
+                u_nu_hat_init_val = u_nu_hat_val
+                s_cnu_hat_init_val = s_cnu_hat_val
+                psi_cnu_hat_init_val = psi_cnu_hat_val
+                xi_c_hat_init_val = xi_c_hat_val
             else:
-                epsilon_cnu_diss_hat_crit_val = (
-                    self.epsilon_cnu_diss_hat_rate_independent_scission_func(
-                        lmbda_nu_hat_max_val, lmbda_nu_hat_max_val_prior,
+                epsilon_nu_diss_hat_val = (
+                    self.epsilon_nu_diss_hat_rate_independent_scission_func(
+                        lmbda_nu_hat_max_val,
+                        lmbda_nu_hat_max[lmbda_nu_hat_indx-1],
                         lmbda_nu_hat_val,
-                        lmbda_nu_hat_steps[lmbda_nu_hat_indx-1],
-                        epsilon_cnu_diss_hat_crit_val_prior)
+                        lmbda_nu_hat[lmbda_nu_hat_indx-1],
+                        epsilon_nu_diss_hat[lmbda_nu_hat_indx-1])
+                )
+                u_nu_hat_p_nu_sur_hat_val = (
+                    p_nu_sur_hat_val * (u_nu_hat_val-u_nu_hat_init_val)
+                )
+                s_cnu_hat_p_nu_sur_hat_val = (
+                    p_nu_sur_hat_val * (s_cnu_hat_val-s_cnu_hat_init_val)
+                )
+                psi_cnu_hat_p_nu_sur_hat_val = (
+                    p_nu_sur_hat_val * (psi_cnu_hat_val-psi_cnu_hat_init_val)
+                )
+                xi_c_hat_p_nu_sur_hat_val = (
+                    p_nu_sur_hat_val * (xi_c_hat_val-xi_c_hat_init_val)
+                )
+                epsilon_cnu_diss_hat_val = (
+                    self.epsilon_cnu_diss_hat_rate_independent_scission_func(
+                        lmbda_nu_hat_max_val,
+                        lmbda_nu_hat_max[lmbda_nu_hat_indx-1],
+                        lmbda_nu_hat_val,
+                        lmbda_nu_hat[lmbda_nu_hat_indx-1],
+                        epsilon_cnu_diss_hat[lmbda_nu_hat_indx-1])
+                )
+                u_nu_hat_p_c_sur_hat_val = (
+                    p_c_sur_hat_val * (u_nu_hat_val-u_nu_hat_init_val)
+                )
+                s_cnu_hat_p_c_sur_hat_val = (
+                    p_c_sur_hat_val * (s_cnu_hat_val-s_cnu_hat_init_val)
+                )
+                psi_cnu_hat_p_c_sur_hat_val = (
+                    p_c_sur_hat_val * (psi_cnu_hat_val-psi_cnu_hat_init_val)
+                )
+                xi_c_hat_p_c_sur_hat_val = (
+                    p_c_sur_hat_val * (xi_c_hat_val-xi_c_hat_init_val)
                 )
             
-            # update values
-            lmbda_nu_hat_max_val_prior = lmbda_nu_hat_max_val
-            epsilon_cnu_diss_hat_crit_val_prior = epsilon_cnu_diss_hat_crit_val
+            # Append values to lists
+            lmbda_nu_hat.append(lmbda_nu_hat_val)
+            lmbda_nu_hat_max.append(lmbda_nu_hat_max_val)
+            p_nu_sci_hat.append(p_nu_sci_hat_val)
+            epsilon_nu_diss_hat.append(epsilon_nu_diss_hat_val)
+            u_nu_hat_p_nu_sur_hat.append(u_nu_hat_p_nu_sur_hat_val)
+            s_cnu_hat_p_nu_sur_hat.append(s_cnu_hat_p_nu_sur_hat_val)
+            psi_cnu_hat_p_nu_sur_hat.append(psi_cnu_hat_p_nu_sur_hat_val)
+            xi_c_hat_p_nu_sur_hat.append(xi_c_hat_p_nu_sur_hat_val)
+            p_c_sci_hat.append(p_c_sci_hat_val)
+            epsilon_cnu_diss_hat.append(epsilon_cnu_diss_hat_val)
+            u_nu_hat_p_c_sur_hat.append(u_nu_hat_p_c_sur_hat_val)
+            s_cnu_hat_p_c_sur_hat.append(s_cnu_hat_p_c_sur_hat_val)
+            psi_cnu_hat_p_c_sur_hat.append(psi_cnu_hat_p_c_sur_hat_val)
+            xi_c_hat_p_c_sur_hat.append(xi_c_hat_p_c_sur_hat_val)
         
-        return epsilon_cnu_diss_hat_crit_val
+        # Critical dissipated scission energy
+        epsilon_nu_diss_hat_crit = epsilon_nu_diss_hat[-1]
+        epsilon_cnu_diss_hat_crit = epsilon_cnu_diss_hat[-1]
+
+        # Maximum strength/survival values and associated segment
+        # stretches
+        indx_u_nu_hat_p_nu_sur_hat_max = (
+            np.argmax(np.asarray(u_nu_hat_p_nu_sur_hat))
+        )
+        u_nu_hat_p_nu_sur_hat_max = (
+            u_nu_hat_p_nu_sur_hat[indx_u_nu_hat_p_nu_sur_hat_max]
+        )
+        lmbda_nu_hat_u_nu_hat_p_nu_sur_hat_max = (
+            lmbda_nu_hat[indx_u_nu_hat_p_nu_sur_hat_max]
+        )
+        indx_s_cnu_hat_p_nu_sur_hat_max = (
+            np.argmax(np.asarray(s_cnu_hat_p_nu_sur_hat))
+        )
+        s_cnu_hat_p_nu_sur_hat_max = (
+            s_cnu_hat_p_nu_sur_hat[indx_s_cnu_hat_p_nu_sur_hat_max]
+        )
+        lmbda_nu_hat_s_cnu_hat_p_nu_sur_hat_max = (
+            lmbda_nu_hat[indx_s_cnu_hat_p_nu_sur_hat_max]
+        )
+        indx_psi_cnu_hat_p_nu_sur_hat_max = (
+            np.argmax(np.asarray(psi_cnu_hat_p_nu_sur_hat))
+        )
+        psi_cnu_hat_p_nu_sur_hat_max = (
+            psi_cnu_hat_p_nu_sur_hat[indx_psi_cnu_hat_p_nu_sur_hat_max]
+        )
+        lmbda_nu_hat_psi_cnu_hat_p_nu_sur_hat_max = (
+            lmbda_nu_hat[indx_psi_cnu_hat_p_nu_sur_hat_max]
+        )
+        indx_xi_c_hat_p_nu_sur_hat_max = (
+            np.argmax(np.asarray(xi_c_hat_p_nu_sur_hat))
+        )
+        xi_c_hat_p_nu_sur_hat_max = (
+            xi_c_hat_p_nu_sur_hat[indx_xi_c_hat_p_nu_sur_hat_max]
+        )
+        lmbda_nu_hat_xi_c_hat_p_nu_sur_hat_max = (
+            lmbda_nu_hat[indx_xi_c_hat_p_nu_sur_hat_max]
+        )
+        indx_u_nu_hat_p_c_sur_hat_max = (
+            np.argmax(np.asarray(u_nu_hat_p_c_sur_hat))
+        )
+        u_nu_hat_p_c_sur_hat_max = (
+            u_nu_hat_p_c_sur_hat[indx_u_nu_hat_p_c_sur_hat_max]
+        )
+        lmbda_nu_hat_u_nu_hat_p_c_sur_hat_max = (
+            lmbda_nu_hat[indx_u_nu_hat_p_c_sur_hat_max]
+        )
+        indx_s_cnu_hat_p_c_sur_hat_max = (
+            np.argmax(np.asarray(s_cnu_hat_p_c_sur_hat))
+        )
+        s_cnu_hat_p_c_sur_hat_max = (
+            s_cnu_hat_p_c_sur_hat[indx_s_cnu_hat_p_c_sur_hat_max]
+        )
+        lmbda_nu_hat_s_cnu_hat_p_c_sur_hat_max = (
+            lmbda_nu_hat[indx_s_cnu_hat_p_c_sur_hat_max]
+        )
+        indx_psi_cnu_hat_p_c_sur_hat_max = (
+            np.argmax(np.asarray(psi_cnu_hat_p_c_sur_hat))
+        )
+        psi_cnu_hat_p_c_sur_hat_max = (
+            psi_cnu_hat_p_c_sur_hat[indx_psi_cnu_hat_p_c_sur_hat_max]
+        )
+        lmbda_nu_hat_psi_cnu_hat_p_c_sur_hat_max = (
+            lmbda_nu_hat[indx_psi_cnu_hat_p_c_sur_hat_max]
+        )
+        indx_xi_c_hat_p_c_sur_hat_max = (
+            np.argmax(np.asarray(xi_c_hat_p_c_sur_hat))
+        )
+        xi_c_hat_p_c_sur_hat_max = (
+            xi_c_hat_p_c_sur_hat[indx_xi_c_hat_p_c_sur_hat_max]
+        )
+        lmbda_nu_hat_xi_c_hat_p_c_sur_hat_max = (
+            lmbda_nu_hat[indx_xi_c_hat_p_c_sur_hat_max]
+        )
+        
+        # Probability density distribution of segment scission
+        # root-mean-square and mean calculations
+        lmbda_nu_hat_arr = np.asarray(lmbda_nu_hat)
+        p_nu_sci_hat_arr = np.asarray(p_nu_sci_hat)
+        partial_p_nu_sci_hat__partial_lmbda_nu_hat_arr = (
+            np.gradient(p_nu_sci_hat_arr, lmbda_nu_hat_arr, edge_order=2)
+        )
+
+        Z_nu_sci = (
+            np.trapz(partial_p_nu_sci_hat__partial_lmbda_nu_hat_arr, lmbda_nu_hat_arr)
+        )
+
+        lmbda_nu_hat_p_nu_sci_hat_rms_intrgrnd_arr = (
+            partial_p_nu_sci_hat__partial_lmbda_nu_hat_arr * lmbda_nu_hat_arr**2
+        )
+        lmbda_nu_hat_p_nu_sci_hat_mean_intrgrnd_arr = (
+            partial_p_nu_sci_hat__partial_lmbda_nu_hat_arr * lmbda_nu_hat_arr
+        )
+
+        lmbda_nu_hat_p_nu_sci_hat_rms = (
+            np.sqrt(np.trapz(lmbda_nu_hat_p_nu_sci_hat_rms_intrgrnd_arr, lmbda_nu_hat_arr)/Z_nu_sci)
+        )
+        lmbda_nu_hat_p_nu_sci_hat_mean = (
+            np.trapz(lmbda_nu_hat_p_nu_sci_hat_mean_intrgrnd_arr, lmbda_nu_hat_arr)/Z_nu_sci
+        )
+
+        indx_left_lmbda_nu_hat_p_nu_sci_hat_rms = (
+            np.amax(np.flatnonzero(lmbda_nu_hat_arr < lmbda_nu_hat_p_nu_sci_hat_rms))
+        )
+        indx_right_lmbda_nu_hat_p_nu_sci_hat_rms = (
+            indx_left_lmbda_nu_hat_p_nu_sci_hat_rms + 1
+        )
+        lmbda_nu_hat_left = (
+            lmbda_nu_hat[indx_left_lmbda_nu_hat_p_nu_sci_hat_rms]
+        )
+        lmbda_nu_hat_right = (
+            lmbda_nu_hat[indx_right_lmbda_nu_hat_p_nu_sci_hat_rms]
+        )
+        epsilon_nu_diss_hat_left = (
+            epsilon_nu_diss_hat[indx_left_lmbda_nu_hat_p_nu_sci_hat_rms]
+        )
+        epsilon_nu_diss_hat_right = (
+            epsilon_nu_diss_hat[indx_right_lmbda_nu_hat_p_nu_sci_hat_rms]
+        )
+        epsilon_nu_diss_hat_p_nu_sci_hat_rms = (
+            epsilon_nu_diss_hat_left
+            + (lmbda_nu_hat_p_nu_sci_hat_rms-lmbda_nu_hat_left)
+            * (epsilon_nu_diss_hat_right-epsilon_nu_diss_hat_left)
+            / (lmbda_nu_hat_right-lmbda_nu_hat_left)
+        )
+
+        indx_left_lmbda_nu_hat_p_nu_sci_hat_mean = (
+            np.amax(np.flatnonzero(lmbda_nu_hat_arr < lmbda_nu_hat_p_nu_sci_hat_mean))
+        )
+        indx_right_lmbda_nu_hat_p_nu_sci_hat_mean = (
+            indx_left_lmbda_nu_hat_p_nu_sci_hat_mean + 1
+        )
+        lmbda_nu_hat_left = (
+            lmbda_nu_hat[indx_left_lmbda_nu_hat_p_nu_sci_hat_mean]
+        )
+        lmbda_nu_hat_right = (
+            lmbda_nu_hat[indx_right_lmbda_nu_hat_p_nu_sci_hat_mean]
+        )
+        epsilon_nu_diss_hat_left = (
+            epsilon_nu_diss_hat[indx_left_lmbda_nu_hat_p_nu_sci_hat_mean]
+        )
+        epsilon_nu_diss_hat_right = (
+            epsilon_nu_diss_hat[indx_right_lmbda_nu_hat_p_nu_sci_hat_mean]
+        )
+        epsilon_nu_diss_hat_p_nu_sci_hat_mean = (
+            epsilon_nu_diss_hat_left
+            + (lmbda_nu_hat_p_nu_sci_hat_rms-lmbda_nu_hat_left)
+            * (epsilon_nu_diss_hat_right-epsilon_nu_diss_hat_left)
+            / (lmbda_nu_hat_right-lmbda_nu_hat_left)
+        )
+        
+        p_c_sci_hat_arr = np.asarray(p_c_sci_hat)
+        partial_p_c_sci_hat__partial_lmbda_nu_hat_arr = (
+                np.gradient(p_c_sci_hat_arr, lmbda_nu_hat_arr, edge_order=2)
+            )
+        
+        Z_c_sci = (
+            np.trapz(partial_p_c_sci_hat__partial_lmbda_nu_hat_arr, lmbda_nu_hat_arr)
+        )
+
+        lmbda_nu_hat_p_c_sci_hat_rms_intrgrnd_arr = (
+            partial_p_c_sci_hat__partial_lmbda_nu_hat_arr * lmbda_nu_hat_arr**2
+        )
+        lmbda_nu_hat_p_c_sci_hat_mean_intrgrnd_arr = (
+            partial_p_c_sci_hat__partial_lmbda_nu_hat_arr * lmbda_nu_hat_arr
+        )
+
+        lmbda_nu_hat_p_c_sci_hat_rms = (
+            np.sqrt(np.trapz(lmbda_nu_hat_p_c_sci_hat_rms_intrgrnd_arr, lmbda_nu_hat_arr)/Z_c_sci)
+        )
+        lmbda_nu_hat_p_c_sci_hat_mean = (
+            np.trapz(lmbda_nu_hat_p_c_sci_hat_mean_intrgrnd_arr, lmbda_nu_hat_arr)/Z_c_sci
+        )
+
+        indx_left_lmbda_nu_hat_p_c_sci_hat_rms = (
+            np.amax(np.flatnonzero(lmbda_nu_hat_arr < lmbda_nu_hat_p_c_sci_hat_rms))
+        )
+        indx_right_lmbda_nu_hat_p_c_sci_hat_rms = (
+            indx_left_lmbda_nu_hat_p_c_sci_hat_rms + 1
+        )
+        lmbda_nu_hat_left = (
+            lmbda_nu_hat[indx_left_lmbda_nu_hat_p_c_sci_hat_rms]
+        )
+        lmbda_nu_hat_right = (
+            lmbda_nu_hat[indx_right_lmbda_nu_hat_p_c_sci_hat_rms]
+        )
+        epsilon_cnu_diss_hat_left = (
+            epsilon_cnu_diss_hat[indx_left_lmbda_nu_hat_p_c_sci_hat_rms]
+        )
+        epsilon_cnu_diss_hat_right = (
+            epsilon_cnu_diss_hat[indx_right_lmbda_nu_hat_p_c_sci_hat_rms]
+        )
+        epsilon_cnu_diss_hat_p_c_sci_hat_rms = (
+            epsilon_cnu_diss_hat_left
+            + (lmbda_nu_hat_p_c_sci_hat_rms-lmbda_nu_hat_left)
+            * (epsilon_cnu_diss_hat_right-epsilon_cnu_diss_hat_left)
+            / (lmbda_nu_hat_right-lmbda_nu_hat_left)
+        )
+
+        indx_left_lmbda_nu_hat_p_c_sci_hat_mean = (
+            np.amax(np.flatnonzero(lmbda_nu_hat_arr < lmbda_nu_hat_p_c_sci_hat_mean))
+        )
+        indx_right_lmbda_nu_hat_p_c_sci_hat_mean = (
+            indx_left_lmbda_nu_hat_p_c_sci_hat_mean + 1
+        )
+        lmbda_nu_hat_left = (
+            lmbda_nu_hat[indx_left_lmbda_nu_hat_p_c_sci_hat_mean]
+        )
+        lmbda_nu_hat_right = (
+            lmbda_nu_hat[indx_right_lmbda_nu_hat_p_c_sci_hat_mean]
+        )
+        epsilon_cnu_diss_hat_left = (
+            epsilon_cnu_diss_hat[indx_left_lmbda_nu_hat_p_c_sci_hat_mean]
+        )
+        epsilon_cnu_diss_hat_right = (
+            epsilon_cnu_diss_hat[indx_right_lmbda_nu_hat_p_c_sci_hat_mean]
+        )
+        epsilon_cnu_diss_hat_p_c_sci_hat_mean = (
+            epsilon_cnu_diss_hat_left
+            + (lmbda_nu_hat_p_c_sci_hat_rms-lmbda_nu_hat_left)
+            * (epsilon_cnu_diss_hat_right-epsilon_cnu_diss_hat_left)
+            / (lmbda_nu_hat_right-lmbda_nu_hat_left)
+        )
+        
+        del (
+            lmbda_nu_hat_steps, lmbda_nu_hat, lmbda_nu_hat_max, p_nu_sci_hat,
+            epsilon_nu_diss_hat, u_nu_hat_p_nu_sur_hat, s_cnu_hat_p_nu_sur_hat,
+            psi_cnu_hat_p_nu_sur_hat, xi_c_hat_p_nu_sur_hat, p_c_sci_hat,
+            epsilon_cnu_diss_hat, u_nu_hat_p_c_sur_hat, s_cnu_hat_p_c_sur_hat,
+            psi_cnu_hat_p_c_sur_hat, xi_c_hat_p_c_sur_hat, lmbda_nu_hat_arr,
+            p_nu_sci_hat_arr, partial_p_nu_sci_hat__partial_lmbda_nu_hat_arr,
+            lmbda_nu_hat_p_nu_sci_hat_rms_intrgrnd_arr,
+            lmbda_nu_hat_p_nu_sci_hat_mean_intrgrnd_arr,
+            p_c_sci_hat_arr, partial_p_c_sci_hat__partial_lmbda_nu_hat_arr,
+            lmbda_nu_hat_p_c_sci_hat_rms_intrgrnd_arr,
+            lmbda_nu_hat_p_c_sci_hat_mean_intrgrnd_arr
+        )
+        
+        return (
+            epsilon_nu_diss_hat_crit, epsilon_cnu_diss_hat_crit,
+            u_nu_hat_p_nu_sur_hat_max, lmbda_nu_hat_u_nu_hat_p_nu_sur_hat_max,
+            s_cnu_hat_p_nu_sur_hat_max, lmbda_nu_hat_s_cnu_hat_p_nu_sur_hat_max,
+            psi_cnu_hat_p_nu_sur_hat_max, lmbda_nu_hat_psi_cnu_hat_p_nu_sur_hat_max,
+            xi_c_hat_p_nu_sur_hat_max, lmbda_nu_hat_xi_c_hat_p_nu_sur_hat_max,
+            u_nu_hat_p_c_sur_hat_max, lmbda_nu_hat_u_nu_hat_p_c_sur_hat_max,
+            s_cnu_hat_p_c_sur_hat_max, lmbda_nu_hat_s_cnu_hat_p_c_sur_hat_max,
+            psi_cnu_hat_p_c_sur_hat_max, lmbda_nu_hat_psi_cnu_hat_p_c_sur_hat_max,
+            xi_c_hat_p_c_sur_hat_max, lmbda_nu_hat_xi_c_hat_p_c_sur_hat_max,
+            lmbda_nu_hat_p_nu_sci_hat_rms, lmbda_nu_hat_p_nu_sci_hat_mean,
+            epsilon_nu_diss_hat_p_nu_sci_hat_rms, epsilon_nu_diss_hat_p_nu_sci_hat_mean,
+            lmbda_nu_hat_p_c_sci_hat_rms, lmbda_nu_hat_p_c_sci_hat_mean,
+            epsilon_cnu_diss_hat_p_c_sci_hat_rms, epsilon_cnu_diss_hat_p_c_sci_hat_mean
+        )
     
     def Z_intact_func(self, lmbda_c_eq):
         """Integrand involved in the intact equilibrium chain
@@ -2198,10 +3267,10 @@ class SigmoidScissionCompositeuFJC(CompositeuFJC):
         # equilibrium probability density distribution without
         # normalization
         I_0 = np.sum(np.multiply(weights, I_0_intrgrnd))*J
-
+        
         # Total configuration equilibrium partition function
         Z_eq_tot = (1.+self.nu*np.exp(-self.epsilon_nu_diss_hat_crit)) * I_0
-
+        
         # Integrand of the second moment of the initial intact chain
         # configuration equilibrium probability density distribution without
         # without normalization
@@ -2214,6 +3283,8 @@ class SigmoidScissionCompositeuFJC(CompositeuFJC):
         # equilibrium probability density distribution without
         # normalization
         I_2 = np.sum(np.multiply(weights, I_2_intrgrnd))*J
+        
+        del points, weights, lmbda_c_eq_0_points, I_0_intrgrnd, I_2_intrgrnd
         
         # Reference equilibrium chain stretch
         return np.sqrt(I_2/Z_eq_tot)
