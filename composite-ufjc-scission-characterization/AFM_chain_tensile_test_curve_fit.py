@@ -1736,7 +1736,7 @@ class AFMChainTensileTestCurveFitCharacterizer(
         ax4.set_yticks([0.0, 0.25, 0.5])
         ax4.tick_params(axis='y', labelsize=16)
         ax4.set_ylabel(
-            r'$\overline{\hat{\varepsilon}_{c\nu}^{sci}},~\overline{\hat{\varepsilon}_{c\nu}^{diss}}$',
+            r'$\overline{\hat{\varepsilon}_{c\nu}^{diss}}$',
             fontsize=20)
         ax4.grid(True, alpha=0.25)
         plt.xlim([-0.05, lmbda_c_eq_max + 0.05])
@@ -1744,7 +1744,7 @@ class AFMChainTensileTestCurveFitCharacterizer(
         plt.xlabel(r'$\lambda_c^{eq}$', fontsize=20)
         save_current_figure_no_labels(
             self.savedir,
-            self.data_file_prefix+"-rate-independent-and-rate-dependent-chains-vs-lmbda_c_eq-no-epsilon_cnu_diss")
+            self.data_file_prefix+"-rate-independent-and-rate-dependent-chains-vs-lmbda_c_eq-no-epsilon_cnu_sci")
 
 
 if __name__ == '__main__':
