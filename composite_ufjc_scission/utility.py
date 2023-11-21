@@ -60,15 +60,13 @@ def latex_formatting_figure(post_processing_parameters):
 
     # LaTeX plot formatting settings
     plt.rcParams['axes.linewidth'] = ppp.axes_linewidth
-    plt.rcParams['font.family']    = ppp.font_family
-    # comment the line below out in WSL2, uncomment the line below in
-    # native Linux on workstation
+    plt.rcParams['font.family'] = ppp.font_family
     plt.rcParams['text.usetex'] = ppp.text_usetex
     
     # plot axis tick settings
-    plt.rcParams['ytick.right']     = ppp.ytick_right
+    plt.rcParams['ytick.right'] = ppp.ytick_right
     plt.rcParams['ytick.direction'] = ppp.ytick_direction
-    plt.rcParams['xtick.top']       = ppp.xtick_top
+    plt.rcParams['xtick.top'] = ppp.xtick_top
     plt.rcParams['xtick.direction'] = ppp.xtick_direction
     
     plt.rcParams["xtick.minor.visible"] = ppp.xtick_minor_visible
@@ -84,7 +82,6 @@ def save_current_figure(
     plt.ylabel(ylabel, fontsize=ylabelfontsize)
     plt.tight_layout()
     plt.savefig(savedir+name+".pdf", transparent=True)
-    # plt.savefig(savedir+name+".eps", format='eps', dpi=1000, transparent=True)
     plt.close()
 
 def save_current_figure_no_labels(savedir, name):
@@ -95,5 +92,4 @@ def save_current_figure_no_labels(savedir, name):
     """
     plt.tight_layout()
     plt.savefig(savedir+name+".pdf", transparent=True)
-    # plt.savefig(savedir+name+".eps", format='eps', dpi=1000, transparent=True)
     plt.close()

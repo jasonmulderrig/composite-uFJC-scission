@@ -21,21 +21,21 @@ class CompositeuFJC(object):
         # Define and store numerical tolerance parameters
         min_exponent = np.log(sys.float_info.min) / np.log(10)
         max_exponent = np.log(sys.float_info.max) / np.log(10)
-        eps_val      = np.finfo(float).eps
-        cond_val     = eps_val * 5e10
+        eps_val = np.finfo(float).eps
+        cond_val = eps_val * 5e10
 
         self.min_exponent = min_exponent
         self.max_exponent = max_exponent
-        self.eps_val      = eps_val
-        self.cond_val     = cond_val
+        self.eps_val = eps_val
+        self.cond_val = cond_val
 
         # Get default parameter values
-        nu           = kwargs.get("nu", None)
-        nu_b         = kwargs.get("nu_b", None)
-        zeta_b_char  = kwargs.get("zeta_b_char", None)
-        kappa_b      = kwargs.get("kappa_b", None)
+        nu = kwargs.get("nu", None)
+        nu_b = kwargs.get("nu_b", None)
+        zeta_b_char = kwargs.get("zeta_b_char", None)
+        kappa_b = kwargs.get("kappa_b", None)
         zeta_nu_char = kwargs.get("zeta_nu_char", None)
-        kappa_nu     = kwargs.get("kappa_nu", None)
+        kappa_nu = kwargs.get("kappa_nu", None)
         
         # Check the correctness of the specified parameters
         # Calculate segment-level parameters from provided bond-level
@@ -70,20 +70,20 @@ class CompositeuFJC(object):
                 sys.exit(error_message)
             else:
                 zeta_nu_char = nu_b * zeta_b_char
-                kappa_nu     = nu_b * kappa_b
+                kappa_nu = nu_b * kappa_b
         
         # Retain specified parameters
-        self.nu              = nu
-        self.nu_b            = nu_b
-        self.zeta_b_char     = zeta_b_char
-        self.kappa_b         = kappa_b
-        self.zeta_nu_char    = zeta_nu_char
-        self.kappa_nu        = kappa_nu
+        self.nu = nu
+        self.nu_b = nu_b
+        self.zeta_b_char = zeta_b_char
+        self.kappa_b = kappa_b
+        self.zeta_nu_char = zeta_nu_char
+        self.kappa_nu = kappa_nu
         
         # Calculate and retain analytically derived parameters
-        self.lmbda_nu_ref    = 1.
-        self.lmbda_c_eq_ref  = 0.
-        self.lmbda_nu_crit   = 1. + np.sqrt(self.zeta_nu_char/self.kappa_nu)
+        self.lmbda_nu_ref = 1.
+        self.lmbda_c_eq_ref = 0.
+        self.lmbda_nu_crit = 1. + np.sqrt(self.zeta_nu_char/self.kappa_nu)
         self.lmbda_c_eq_crit = (
             1. + np.sqrt(self.zeta_nu_char/self.kappa_nu)
             - np.sqrt(1./(self.kappa_nu*self.zeta_nu_char))
@@ -92,7 +92,7 @@ class CompositeuFJC(object):
         
         # Calculate and retain numerically calculated parameters
         self.lmbda_c_eq_pade2berg_crit = self.lmbda_c_eq_pade2berg_crit_func()
-        self.lmbda_nu_pade2berg_crit   = (
+        self.lmbda_nu_pade2berg_crit = (
             self.lmbda_nu_func(self.lmbda_c_eq_pade2berg_crit)
         )
     
@@ -247,29 +247,29 @@ class CompositeuFJC(object):
         else:
             alpha_tilde = 1.
             
-            trm_i  = -3. * (self.kappa_nu+1.)
+            trm_i = -3. * (self.kappa_nu+1.)
             trm_ii = -(2.*self.kappa_nu+3.)
             beta_tilde_nmrtr = trm_i + lmbda_c_eq * trm_ii
             beta_tilde_dnmntr = self.kappa_nu + 1.
-            beta_tilde  = beta_tilde_nmrtr / beta_tilde_dnmntr
+            beta_tilde = beta_tilde_nmrtr / beta_tilde_dnmntr
             
-            trm_i   = 2. * self.kappa_nu
-            trm_ii  = 4. * self.kappa_nu + 6.
+            trm_i = 2. * self.kappa_nu
+            trm_ii = 4. * self.kappa_nu + 6.
             trm_iii = self.kappa_nu + 3.
             gamma_tilde_nmrtr = trm_i + lmbda_c_eq * (trm_ii+lmbda_c_eq*trm_iii)
             gamma_tilde_dnmntr = self.kappa_nu + 1.
-            gamma_tilde  = gamma_tilde_nmrtr / gamma_tilde_dnmntr
+            gamma_tilde = gamma_tilde_nmrtr / gamma_tilde_dnmntr
 
-            trm_i   = 2.
-            trm_ii  = 2. * self.kappa_nu
+            trm_i = 2.
+            trm_ii = 2. * self.kappa_nu
             trm_iii = self.kappa_nu + 3.
             delta_tilde_nmrtr = (
                 trm_i - lmbda_c_eq * (trm_ii+lmbda_c_eq*(trm_iii+lmbda_c_eq))
             )
             delta_tilde_dnmntr = self.kappa_nu + 1.
-            delta_tilde  = delta_tilde_nmrtr / delta_tilde_dnmntr
+            delta_tilde = delta_tilde_nmrtr / delta_tilde_dnmntr
 
-            pi_tilde_nmrtr  = 3. * alpha_tilde * gamma_tilde - beta_tilde**2
+            pi_tilde_nmrtr = 3. * alpha_tilde * gamma_tilde - beta_tilde**2
             pi_tilde_dnmntr = 3. * alpha_tilde**2
             pi_tilde = pi_tilde_nmrtr / pi_tilde_dnmntr
 
@@ -347,26 +347,26 @@ class CompositeuFJC(object):
         elif lmbda_nu < self.lmbda_nu_pade2berg_crit:
             alpha_tilde = 1.
             
-            trm_i  = self.kappa_nu + 3.
+            trm_i = self.kappa_nu + 3.
             trm_ii = 1.
             beta_tilde = trm_i * (trm_ii-lmbda_nu)
 
-            trm_i   = 2. * self.kappa_nu + 3.
-            trm_ii  = 2.
+            trm_i = 2. * self.kappa_nu + 3.
+            trm_ii = 2.
             trm_iii = 2. * self.kappa_nu
             gamma_tilde = trm_i * (lmbda_nu**2-trm_ii*lmbda_nu) + trm_iii
             
-            trm_i   = self.kappa_nu + 1.
-            trm_ii  = 3.
+            trm_i = self.kappa_nu + 1.
+            trm_ii = 3.
             trm_iii = 2.
-            trm_iv  = self.kappa_nu
-            trm_v   = 1.
+            trm_iv = self.kappa_nu
+            trm_v = 1.
             delta_tilde = (
                 trm_i * (trm_ii*lmbda_nu**2-lmbda_nu**3)
                 - trm_iii * (trm_iv*lmbda_nu+trm_v)
             )
             
-            pi_tilde_nmrtr  = 3. * alpha_tilde * gamma_tilde - beta_tilde**2
+            pi_tilde_nmrtr = 3. * alpha_tilde * gamma_tilde - beta_tilde**2
             pi_tilde_dnmntr = 3. * alpha_tilde**2
             pi_tilde = pi_tilde_nmrtr / pi_tilde_dnmntr
 
@@ -409,29 +409,29 @@ class CompositeuFJC(object):
         elif lmbda_c_eq < self.lmbda_c_eq_pade2berg_crit:
             alpha_tilde = 1.
             
-            trm_i  = -3. * (self.kappa_nu+1.)
+            trm_i = -3. * (self.kappa_nu+1.)
             trm_ii = -(2.*self.kappa_nu+3.)
-            beta_tilde_nmrtr  = trm_i + lmbda_c_eq * trm_ii
+            beta_tilde_nmrtr = trm_i + lmbda_c_eq * trm_ii
             beta_tilde_dnmntr = self.kappa_nu + 1.
-            beta_tilde  = beta_tilde_nmrtr / beta_tilde_dnmntr
+            beta_tilde = beta_tilde_nmrtr / beta_tilde_dnmntr
             
-            trm_i   = 2. * self.kappa_nu
-            trm_ii  = 4. * self.kappa_nu + 6.
+            trm_i = 2. * self.kappa_nu
+            trm_ii = 4. * self.kappa_nu + 6.
             trm_iii = self.kappa_nu + 3.
             gamma_tilde_nmrtr = trm_i + lmbda_c_eq * (trm_ii+lmbda_c_eq*trm_iii)
             gamma_tilde_dnmntr = self.kappa_nu + 1.
-            gamma_tilde  = gamma_tilde_nmrtr / gamma_tilde_dnmntr
+            gamma_tilde = gamma_tilde_nmrtr / gamma_tilde_dnmntr
 
-            trm_i   = 2.
-            trm_ii  = 2. * self.kappa_nu
+            trm_i = 2.
+            trm_ii = 2. * self.kappa_nu
             trm_iii = self.kappa_nu + 3.
             delta_tilde_nmrtr = (
                 trm_i - lmbda_c_eq * (trm_ii+lmbda_c_eq*(trm_iii+lmbda_c_eq))
             )
             delta_tilde_dnmntr = self.kappa_nu + 1.
-            delta_tilde  = delta_tilde_nmrtr / delta_tilde_dnmntr
+            delta_tilde = delta_tilde_nmrtr / delta_tilde_dnmntr
 
-            pi_tilde_nmrtr  = 3. * alpha_tilde * gamma_tilde - beta_tilde**2
+            pi_tilde_nmrtr = 3. * alpha_tilde * gamma_tilde - beta_tilde**2
             pi_tilde_dnmntr = 3. * alpha_tilde**2
             pi_tilde = pi_tilde_nmrtr / pi_tilde_dnmntr
 
@@ -457,13 +457,13 @@ class CompositeuFJC(object):
         # Bergstrom approximant
         else:
             alpha_tilde = 1.
-            beta_tilde  = -3.
+            beta_tilde = -3.
             gamma_tilde = 3. - self.zeta_nu_char**2 / self.kappa_nu
             delta_tilde = self.zeta_nu_char**2 / self.kappa_nu * lmbda_c_eq - 1.
 
             pi_tilde_nmrtr = 3. * alpha_tilde * gamma_tilde - beta_tilde**2
             pi_tilde_dnmntr = 3. * alpha_tilde**2
-            pi_tilde  = pi_tilde_nmrtr / pi_tilde_dnmntr
+            pi_tilde = pi_tilde_nmrtr / pi_tilde_dnmntr
 
             rho_tilde_nmrtr = (
                 2. * beta_tilde**3 - 9. * alpha_tilde * beta_tilde * gamma_tilde
